@@ -1,10 +1,11 @@
 name: 'Continuous Integration'
-on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - edited
+#       - synchronize
+on: repository_vulnerability_alert
 
 jobs:
   test:

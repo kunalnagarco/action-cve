@@ -6,8 +6,9 @@ name: 'Continuous Integration'
 #       - edited
 #       - synchronize
 on:
-  schedule:
-    - cron: '*/5 * * * *'
+  push:
+    branches:
+      - main
 
 jobs:
   test:

@@ -10,7 +10,10 @@ async function run(): Promise<void> {
     console.log(
       await octokit.rest.repos.checkVulnerabilityAlerts({
         owner: 'kunalnagarco',
-        repo: 'action-cve'
+        repo: 'action-cve',
+        mediaType: {
+          previews: ['dorian']
+        }
       })
     )
   } catch (err) {

@@ -1,0 +1,13 @@
+name: 'cve'
+description: 'Send GitHub vulnerability alerts to multiple platforms'
+author: '@kunalnagarco'
+inputs:
+  webhook_url:
+    required: true
+    description: 'Blah'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -4,7 +4,7 @@ import * as github from '@actions/github'
 import * as core from '@actions/core'
 
 async function run(): Promise<void> {
-  const token = core.getInput('GITHUB_TOKEN')
+  const token = core.getInput('myToken')
   const octokit = github.getOctokit(token)
   console.log(
     octokit.rest.repos.checkVulnerabilityAlerts({

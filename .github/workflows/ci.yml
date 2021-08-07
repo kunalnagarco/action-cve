@@ -33,6 +33,7 @@ jobs:
       - name: Run action
         uses: ./
         env:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: npm install

@@ -8,11 +8,11 @@ async function run(): Promise<void> {
     const token = core.getInput('token')
     const octokit = github.getOctokit(token)
     console.log(
-      await octokit.rest.repos.checkVulnerabilityAlerts({
+      await octokit.request('GET /repos/{owner}/{repo}/vulnerability-alerts', {
         owner: 'kunalnagarco',
         repo: 'action-cve',
         mediaType: {
-          previews: ['squirrel-girl']
+          previews: ['dorian']
         }
       })
     )

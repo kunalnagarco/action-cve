@@ -61,8 +61,8 @@ async function run(): Promise<void> {
                   id
                   securityAdvisory {
                     id
-                    cwes {
-                      edges{
+                    cwes(first: 10) {
+                      edges {
                         node {
                           id
                           cweId

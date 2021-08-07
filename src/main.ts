@@ -42,10 +42,8 @@ async function run(): Promise<void> {
     //   }
     // })
     console.log(
-      JSON.parse(
-        JSON.stringify(
-          (result as any).organization.repository.vulnerabilityAlerts
-        )
+      JSON.stringify(
+        (result as any).organization.repository.vulnerabilityAlerts
       )
     )
   } catch (err) {

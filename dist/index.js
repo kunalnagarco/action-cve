@@ -121,7 +121,8 @@ function run() {
         }
       }
     `);
-            const alerts = result.organization.repository.vulnerabilityAlerts.edges;
+            const alerts = result.organization.repository.vulnerabilityAlerts
+                .edges;
             if (alerts.length === 0) {
                 core_1.info('No vulnerability alerts!');
             }

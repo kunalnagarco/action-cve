@@ -52,14 +52,7 @@ function run() {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {
-                  id
-                  securityVulnerability {
-                    advisory {
-                      cvss {
-                        score
-                      }
-                    }
-                  }
+                  __typename
                 }
               }
             }

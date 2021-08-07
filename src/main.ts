@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     const result = await octokit.graphql(`
       query {
         organization(login:"kunalnagarco") {
-          repository(name:"action-semantic-pr") {
+          repository(name:"woot") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {

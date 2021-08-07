@@ -44,7 +44,7 @@ function run() {
         try {
             const token = core.getInput('token');
             const octokit = github.getOctokit(token);
-            console.log(yield octokit.rest.activity.getFeeds()
+            const result = yield octokit.rest.activity.getFeeds();
             // await octokit.request('PUT /repos/{owner}/{repo}/vulnerability-alerts', {
             //   owner: 'kunalnagarco',
             //   repo: 'action-cve',
@@ -52,7 +52,7 @@ function run() {
             //     previews: ['dorian']
             //   }
             // })
-            );
+            console.log(result.data._links.security_advisories);
         }
         catch (err) {
             console.log(err);

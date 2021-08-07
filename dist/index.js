@@ -41,7 +41,8 @@ const github = __importStar(__nccwpck_require__(438));
 const core = __importStar(__nccwpck_require__(186));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const token = core.getInput('GITHUB_TOKEN');
+        const token = core.getInput('myToken');
+        console.log(token);
         const octokit = github.getOctokit(token);
         console.log(octokit.rest.repos.checkVulnerabilityAlerts({
             owner: '@kunalnagarco',

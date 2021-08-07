@@ -42,7 +42,7 @@ const core = __importStar(__nccwpck_require__(186));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput('myToken');
+            const token = core.getInput('token');
             const octokit = github.getOctokit(token);
             console.log(yield octokit.rest.repos.checkVulnerabilityAlerts({
                 owner: '@kunalnagarco',

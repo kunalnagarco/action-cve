@@ -12,7 +12,7 @@ async function run(): Promise<void> {
         owner: 'kunalnagarco',
         repo: 'action-cve',
         mediaType: {
-          previews: ['dorian']
+          previews: ['squirrel-girl']
         }
       })
     )

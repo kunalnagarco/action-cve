@@ -48,9 +48,7 @@ function run() {
                 owner: 'kunalnagarco',
                 repo: 'action-cve',
                 mediaType: {
-                    previews: [
-                        'dorian'
-                    ]
+                    previews: ['squirrel-girl']
                 }
             }));
         }

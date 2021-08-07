@@ -34,7 +34,7 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies

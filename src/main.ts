@@ -7,7 +7,10 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const octokit = github.getOctokit(token)
-    const result = await octokit.rest.activity.getFeeds()
+    const result = await octokit.rest.activity.listRepoEvents({
+      owner: 'kunalnagarco',
+      repo: 'action-cve'
+    })
     // await octokit.request('PUT /repos/{owner}/{repo}/vulnerability-alerts', {
     //   owner: 'kunalnagarco',
     //   repo: 'action-cve',
@@ -15,7 +18,7 @@ async function run(): Promise<void> {
     //     previews: ['dorian']
     //   }
     // })
-    console.log(result.data._links.security_advisories)
+    console.log(result.data)
   } catch (err) {
     console.log(err)
   }

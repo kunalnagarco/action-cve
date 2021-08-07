@@ -10,15 +10,22 @@ async function run(): Promise<void> {
     const result = await octokit.graphql(`
       query {
         organization(login:"kunalnagarco") {
-        repository(name:"action-cve") {
-          vulnerabilityAlerts {
-            edges{
-              node{
-                id
+          repository(name:"action-cve") {
+            vulnerabilityAlerts(first: 20) {
+              edges {
+                node {
+                  id
+                  securityVulnerability {
+                    advisory {
+                      cvss {
+                        score
+                      }
+                    }
+                  }
+                }
               }
             }
           }
-        }
         }
       }
     `)

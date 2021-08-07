@@ -40,8 +40,8 @@ const github = __importStar(__nccwpck_require__(438));
 // import * as core from '@actions/core'
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(github.context.payload);
-        console.log(github.context.payload.repository_vulnerability_alert);
+        console.log(github.context);
+        // console.log(github.context.payload.repository_vulnerability_alert)
         // const regexPattern = new RegExp(
         //   /^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/
         // )

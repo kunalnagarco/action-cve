@@ -78,7 +78,7 @@ function run() {
             //     previews: ['dorian']
             //   }
             // })
-            console.log(result.organization.repository.vulnerabilityAlerts);
+            console.log(JSON.parse(JSON.stringify(result.organization.repository.vulnerabilityAlerts)));
         }
         catch (err) {
             console.log(err);

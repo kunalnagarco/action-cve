@@ -41,7 +41,13 @@ async function run(): Promise<void> {
     //     previews: ['dorian']
     //   }
     // })
-    console.log((result as any).organization.repository.vulnerabilityAlerts)
+    console.log(
+      JSON.parse(
+        JSON.stringify(
+          (result as any).organization.repository.vulnerabilityAlerts
+        )
+      )
+    )
   } catch (err) {
     console.log(err)
   }

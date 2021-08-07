@@ -7,10 +7,25 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
     const octokit = github.getOctokit(token)
-    const result = await octokit.rest.activity.listRepoEvents({
-      owner: 'kunalnagarco',
-      repo: 'action-cve'
-    })
+    const result = await octokit.graphql(`
+      query {
+        organization(login:"kunalnagarco") {
+        repository(name:"action-cve") {
+          vulnerabilityAlerts {
+            edges{
+              node{
+                id
+              }
+            }
+          }
+        }
+        }
+      }
+    `)
+    // const result = await octokit.rest.activity.listRepoEvents({
+    //   owner: 'kunalnagarco',
+    //   repo: 'action-cve'
+    // })
     // await octokit.request('PUT /repos/{owner}/{repo}/vulnerability-alerts', {
     //   owner: 'kunalnagarco',
     //   repo: 'action-cve',
@@ -18,7 +33,7 @@ async function run(): Promise<void> {
     //     previews: ['dorian']
     //   }
     // })
-    console.log(result.data)
+    console.log(result)
   } catch (err) {
     console.log(err)
   }

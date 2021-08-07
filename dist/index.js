@@ -45,7 +45,7 @@ function run() {
             const token = core.getInput('token');
             const octokit = github.getOctokit(token);
             console.log(yield octokit.rest.repos.checkVulnerabilityAlerts({
-                owner: '@kunalnagarco',
+                owner: 'kunalnagarco',
                 repo: 'action-cve'
             }));
         }

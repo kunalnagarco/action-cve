@@ -48,7 +48,7 @@ function run() {
             const result = yield octokit.graphql(`
       query {
         organization(login:"kunalnagarco") {
-          repository(name:"action-cve") {
+          repository(name:"action-semantic-pr") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {

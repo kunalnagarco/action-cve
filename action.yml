@@ -4,9 +4,9 @@ author: '@kunalnagarco'
 inputs:
   token:
     description: 'GitHub token'
-  webhook_url:
-    required: true
-    description: 'Blah'
+  # slack_webhook:
+  #   required: true
+  #   description: 'Blah'
 branding:
   icon: 'check-circle'
   color: 'green'

@@ -6,25 +6,6 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,24 +18,77 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const github = __importStar(__nccwpck_require__(438));
-// import { Octokit } from '@octokit/rest'
-const core = __importStar(__nccwpck_require__(186));
+const github_1 = __nccwpck_require__(438);
+const core_1 = __nccwpck_require__(186);
+// import { IncomingWebhook } from '@slack/webhook'
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput('token');
-            const octokit = github.getOctokit(token);
+            const token = core_1.getInput('token');
+            // const webhookUrl = getInput('slack_webhook')
+            const octokit = github_1.getOctokit(token);
+            // const result = await octokit.graphql(`
+            //   query {
+            //     organization(login:"kunalnagarco") {
+            //       repository(name:"action-cve") {
+            //         vulnerabilityAlerts(first: 20) {
+            //           edges {
+            //             node {
+            //               id
+            //               securityAdvisory {
+            //                 id
+            //                 description
+            //                 cvss {
+            //                   score
+            //                   vectorString
+            //                 }
+            //                 permalink
+            //                 severity
+            //                 summary
+            //               }
+            //               securityVulnerability {
+            //                 firstPatchedVersion {
+            //                   identifier
+            //                 }
+            //                 package {
+            //                   ecosystem
+            //                   name
+            //                 }
+            //                 vulnerableVersionRange
+            //                 advisory {
+            //                   cvss {
+            //                     score
+            //                   }
+            //                   summary
+            //                 }
+            //               }
+            //             }
+            //           }
+            //         }
+            //       }
+            //     }
+            //   }
+            // `)
             const result = yield octokit.graphql(`
       query {
         organization(login:"kunalnagarco") {
-          repository(name:"woot") {
+          repository(name:"action-cve") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {
                   id
                   securityAdvisory {
                     id
+                    cwes {
+                      edges{
+                        node {
+                          id
+                          cweId
+                          name
+                          description
+                        }
+                      }
+                    }
                     description
                     cvss {
                       score
@@ -87,30 +121,21 @@ function run() {
         }
       }
     `);
-            // const result = await octokit.rest.activity.listRepoEvents({
-            //   owner: 'kunalnagarco',
-            //   repo: 'action-cve'
-            // })
-            // await octokit.request('PUT /repos/{owner}/{repo}/vulnerability-alerts', {
-            //   owner: 'kunalnagarco',
-            //   repo: 'action-cve',
-            //   mediaType: {
-            //     previews: ['dorian']
-            //   }
-            // })
-            console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
+            const alerts = result.organization.repository.vulnerabilityAlerts.edges;
+            if (alerts.length === 0) {
+                core_1.info('No vulnerability alerts!');
+            }
+            else {
+                // const webhook = new IncomingWebhook(webhookUrl)
+                // await webhook.send({
+                //   text: 'Woot!'
+                // })
+                console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
+            }
         }
         catch (err) {
-            console.log(err);
+            core_1.setFailed(err);
         }
-        // console.log(github.context.payload.repository_vulnerability_alert)
-        // const regexPattern = new RegExp(
-        //   /^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test|¯\\_\(ツ\)_\/¯)(?<scope>\(\w+\)?((?=:\s)|(?=!:\s)))?(?<breaking>!)?(?<subject>:\s.*)?|^(?<merge>Merge \w+)/
-        // )
-        // const title: string = github.context.payload.pull_request?.title
-        // if (!regexPattern.test(title)) {
-        //   core.setFailed('Invalid PR Title!')
-        // }
     });
 }
 run();

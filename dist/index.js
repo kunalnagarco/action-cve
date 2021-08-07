@@ -36,6 +36,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const github = __importStar(__nccwpck_require__(438));
 // import { Octokit } from '@octokit/rest'
 const core = __importStar(__nccwpck_require__(186));
@@ -77,7 +78,7 @@ function run() {
             //     previews: ['dorian']
             //   }
             // })
-            console.log(result);
+            console.log(result.organization.repository.vulnerabilityAlerts);
         }
         catch (err) {
             console.log(err);

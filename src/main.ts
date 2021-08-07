@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as github from '@actions/github'
 // import { Octokit } from '@octokit/rest'
 import * as core from '@actions/core'
@@ -40,7 +41,7 @@ async function run(): Promise<void> {
     //     previews: ['dorian']
     //   }
     // })
-    console.log(result)
+    console.log((result as any).organization.repository.vulnerabilityAlerts)
   } catch (err) {
     console.log(err)
   }

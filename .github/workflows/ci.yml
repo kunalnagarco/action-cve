@@ -5,7 +5,9 @@ name: 'Continuous Integration'
 #       - opened
 #       - edited
 #       - synchronize
-on: repository_vulnerability_alert
+on:
+  schedule:
+    - cron: '*/5 * * * *'
 
 jobs:
   test:

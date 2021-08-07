@@ -9,7 +9,7 @@ async function run(): Promise<void> {
     const octokit = github.getOctokit(token)
     console.log(
       await octokit.rest.repos.checkVulnerabilityAlerts({
-        owner: '@kunalnagarco',
+        owner: 'kunalnagarco',
         repo: 'action-cve'
       })
     )

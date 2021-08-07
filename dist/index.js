@@ -43,9 +43,8 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('myToken');
-            console.log(token);
             const octokit = github.getOctokit(token);
-            console.log(octokit.rest.repos.checkVulnerabilityAlerts({
+            console.log(yield octokit.rest.repos.checkVulnerabilityAlerts({
                 owner: '@kunalnagarco',
                 repo: 'action-cve'
             }));

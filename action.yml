@@ -2,6 +2,8 @@ name: 'cve'
 description: 'Send GitHub vulnerability alerts to multiple platforms'
 author: '@kunalnagarco'
 inputs:
+  token:
+    description: 'GitHub token'
   webhook_url:
     required: true
     description: 'Blah'

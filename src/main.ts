@@ -59,24 +59,42 @@ async function run(): Promise<void> {
     } else {
       const webhook = new IncomingWebhook(webhookUrl)
       const blocks: any = []
+      blocks.push({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `You have ${alerts.length} vulnerabilities in *kunalnagarco/action-cve*`
+        }
+      })
+      blocks.push({
+        type: 'divider'
+      })
       alerts.forEach((alert: any) => {
         blocks.push({
           type: 'section',
           text: {
             type: 'mrkdwn',
             text: `
-              Package name: ${alert.node.securityVulnerability.package.name}
-              Vulnerability Version Range: ${alert.node.securityVulnerability.vulnerableVersionRange}
-              Severity: ${alert.node.securityAdvisory.severity}
-              Summary: ${alert.node.securityVulnerability.advisory.summary}
+*Package name:* ${alert.node.securityVulnerability.package.name}
+*Vulnerability Version Range:* ${alert.node.securityVulnerability.vulnerableVersionRange}
+*Severity:* ${alert.node.securityAdvisory.severity}
+*Summary:* ${alert.node.securityVulnerability.advisory.summary}
             `
+          },
+          accessory: {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'View Advisory',
+              emoji: true
+            },
+            url: alert.node.securityAdvisory.permalink
           }
         })
       })
       console.log(blocks)
       await webhook.send({
-        blocks,
-        text: `${alerts.length} vulnerabilities found!`
+        blocks
       })
       console.log(
         JSON.stringify(

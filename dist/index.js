@@ -36,10 +36,12 @@ function run() {
             const token = core_1.getInput('token');
             const webhookUrl = core_1.getInput('slack_webhook');
             const octokit = github_1.getOctokit(token);
+            const owner = github_1.context.repo.owner;
+            const repo = github_1.context.repo.repo;
             const result = yield octokit.graphql(`
       query {
-        organization(login:"kunalnagarco") {
-          repository(name:"action-cve") {
+        organization(login:"${owner}") {
+          repository(name:"${repo}") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {
@@ -90,11 +92,11 @@ function run() {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `You have ${alerts.length} vulnerabilities in *kunalnagarco/action-cve*`
+                        text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`
                     }
                 });
                 blocks.push({
-                    type: 'divider',
+                    type: 'divider'
                 });
                 alerts.forEach((alert) => {
                     blocks.push({
@@ -115,13 +117,16 @@ function run() {
                                 text: 'View Advisory',
                                 emoji: true
                             },
+                            style: 'danger',
                             url: alert.node.securityAdvisory.permalink
                         }
                     });
                 });
                 console.log(blocks);
                 yield webhook.send({
-                    blocks
+                    blocks,
+                    icon_emoji: "🐛",
+                    username: "boop"
                 });
                 console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
             }

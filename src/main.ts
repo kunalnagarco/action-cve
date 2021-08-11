@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable github/array-foreach */
-import { context, getOctokit } from '@actions/github'
-import { info, getInput, setFailed } from '@actions/core'
-import { IncomingWebhook } from '@slack/webhook'
+import {context, getOctokit} from '@actions/github'
+import {info, getInput, setFailed} from '@actions/core'
+import {IncomingWebhook} from '@slack/webhook'
 
 async function run(): Promise<void> {
   try {
@@ -98,8 +98,8 @@ async function run(): Promise<void> {
       console.log(blocks)
       await webhook.send({
         blocks,
-        icon_emoji: "🐛",
-        username: "boop"
+        icon_emoji: '🐛',
+        username: 'boop'
       })
       console.log(
         JSON.stringify(

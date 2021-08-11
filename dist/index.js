@@ -122,7 +122,7 @@ function run() {
                 console.log(blocks);
                 yield webhook.send({
                     blocks,
-                    icon_url: 'https://github.com/kunalnagarco/action-cve/tree/main/icons/ladybug.png',
+                    icon_url: 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
                     username: 'GitHub Action - @kunalnagarco/action-cve',
                 });
                 console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));

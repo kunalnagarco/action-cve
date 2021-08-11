@@ -76,6 +76,7 @@ async function run(): Promise<void> {
             text: `
 *Package name:* ${alert.node.securityVulnerability.package.name}
 *Vulnerability Version Range:* ${alert.node.securityVulnerability.vulnerableVersionRange}
+*Fixed In:* ${alert.node.securityVulnerability.firstPatchedVersion.identifier}
 *Severity:* ${alert.node.securityAdvisory.severity}
 *Summary:* ${alert.node.securityVulnerability.advisory.summary}
             `,

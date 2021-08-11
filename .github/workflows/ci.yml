@@ -37,7 +37,7 @@ jobs:
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install dependencies
-        run: npm install
-      - name: Release (dry-run)
-        run: npm run release -- --dry-run
+      # - name: Install dependencies
+      #   run: npm install
+      # - name: Release (dry-run)
+      #   run: npm run release -- --dry-run

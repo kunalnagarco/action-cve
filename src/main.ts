@@ -1,9 +1,6 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable github/array-foreach */
-import {context, getOctokit} from '@actions/github'
-import {info, getInput, setFailed} from '@actions/core'
-import {IncomingWebhook} from '@slack/webhook'
+import { context, getOctokit } from '@actions/github'
+import { info, getInput, setFailed } from '@actions/core'
+import { IncomingWebhook } from '@slack/webhook'
 
 async function run(): Promise<void> {
   try {
@@ -65,11 +62,11 @@ async function run(): Promise<void> {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`
-        }
+          text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`,
+        },
       })
       blocks.push({
-        type: 'divider'
+        type: 'divider',
       })
       alerts.forEach((alert: any) => {
         blocks.push({
@@ -81,30 +78,30 @@ async function run(): Promise<void> {
 *Vulnerability Version Range:* ${alert.node.securityVulnerability.vulnerableVersionRange}
 *Severity:* ${alert.node.securityAdvisory.severity}
 *Summary:* ${alert.node.securityVulnerability.advisory.summary}
-            `
+            `,
           },
           accessory: {
             type: 'button',
             text: {
               type: 'plain_text',
               text: 'View Advisory',
-              emoji: true
+              emoji: true,
             },
             style: 'danger',
-            url: alert.node.securityAdvisory.permalink
-          }
+            url: alert.node.securityAdvisory.permalink,
+          },
         })
       })
       console.log(blocks)
       await webhook.send({
         blocks,
         icon_emoji: '🐛',
-        username: 'boop'
+        username: 'boop',
       })
       console.log(
         JSON.stringify(
-          (result as any).organization.repository.vulnerabilityAlerts
-        )
+          (result as any).organization.repository.vulnerabilityAlerts,
+        ),
       )
     }
   } catch (err) {

@@ -1,11 +1,9 @@
-name: 'Continuous Integration'
+name: 'Continuous Deployment'
 
 on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
+  push:
+    branches:
+      - main
 
 jobs:
   test:
@@ -15,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: Cache npm dependencies
+      - name: Cache node modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -27,14 +25,11 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Run action
-        uses: ./
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: npm install
-      - name: Release (dry-run)
-        run: npm run release -- --dry-run
+      - name: Build
+        run: npm run all
+      - name: Release
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

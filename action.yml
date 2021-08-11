@@ -3,13 +3,13 @@ description: 'Send GitHub vulnerability alerts to multiple platforms'
 author: '@kunalnagarco'
 inputs:
   token:
-    description: 'GitHub token'
+    description: 'GitHub Personal Access Token'
   slack_webhook:
     required: true
-    description: 'Blah'
+    description: 'Slack Webhook URL'
 branding:
-  icon: 'check-circle'
-  color: 'green'
+  icon: 'alert-octagon'
+  color: 'red'
 runs:
   using: 'node12'
   main: 'dist/index.js'

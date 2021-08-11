@@ -24,6 +24,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
 const webhook_1 = __nccwpck_require__(1095);
@@ -95,7 +96,7 @@ function run() {
                 blocks.push({
                     type: 'divider',
                 });
-                alerts.forEach((alert) => {
+                for (const alert of alerts) {
                     blocks.push({
                         type: 'section',
                         text: {
@@ -119,14 +120,18 @@ function run() {
                             url: alert.node.securityAdvisory.permalink,
                         },
                     });
-                });
-                console.log(blocks);
+                }
+                // console.log(blocks)
                 yield webhook.send({
                     blocks,
                     icon_url: 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
                     username: 'GitHub Action - @kunalnagarco/action-cve',
                 });
-                console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
+                // console.log(
+                //   JSON.stringify(
+                //     (result as any).organization.repository.vulnerabilityAlerts,
+                //   ),
+                // )
             }
         }
         catch (err) {

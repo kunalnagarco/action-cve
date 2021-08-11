@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { context, getOctokit } from '@actions/github'
 import { info, getInput, setFailed } from '@actions/core'
 import { IncomingWebhook } from '@slack/webhook'
@@ -68,7 +69,7 @@ async function run(): Promise<void> {
       blocks.push({
         type: 'divider',
       })
-      alerts.forEach((alert: any) => {
+      for (const alert of alerts) {
         blocks.push({
           type: 'section',
           text: {
@@ -92,19 +93,19 @@ async function run(): Promise<void> {
             url: alert.node.securityAdvisory.permalink,
           },
         })
-      })
-      console.log(blocks)
+      }
+      // console.log(blocks)
       await webhook.send({
         blocks,
         icon_url:
           'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
         username: 'GitHub Action - @kunalnagarco/action-cve',
       })
-      console.log(
-        JSON.stringify(
-          (result as any).organization.repository.vulnerabilityAlerts,
-        ),
-      )
+      // console.log(
+      //   JSON.stringify(
+      //     (result as any).organization.repository.vulnerabilityAlerts,
+      //   ),
+      // )
     }
   } catch (err) {
     setFailed(err)

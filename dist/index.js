@@ -24,9 +24,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable github/array-foreach */
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
 const webhook_1 = __nccwpck_require__(1095);
@@ -92,11 +89,11 @@ function run() {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`
-                    }
+                        text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`,
+                    },
                 });
                 blocks.push({
-                    type: 'divider'
+                    type: 'divider',
                 });
                 alerts.forEach((alert) => {
                     blocks.push({
@@ -108,25 +105,25 @@ function run() {
 *Vulnerability Version Range:* ${alert.node.securityVulnerability.vulnerableVersionRange}
 *Severity:* ${alert.node.securityAdvisory.severity}
 *Summary:* ${alert.node.securityVulnerability.advisory.summary}
-            `
+            `,
                         },
                         accessory: {
                             type: 'button',
                             text: {
                                 type: 'plain_text',
                                 text: 'View Advisory',
-                                emoji: true
+                                emoji: true,
                             },
                             style: 'danger',
-                            url: alert.node.securityAdvisory.permalink
-                        }
+                            url: alert.node.securityAdvisory.permalink,
+                        },
                     });
                 });
                 console.log(blocks);
                 yield webhook.send({
                     blocks,
-                    icon_emoji: "🐛",
-                    username: "boop"
+                    icon_url: 'https://github.com/kunalnagarco/action-cve/tree/main/icons/ladybug.png',
+                    username: 'GitHub Action - @kunalnagarco/action-cve',
                 });
                 console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
             }

@@ -10,10 +10,12 @@ async function run(): Promise<void> {
     const token = getInput('token')
     const webhookUrl = getInput('slack_webhook')
     const octokit = getOctokit(token)
+    const owner = context.repo.owner
+    const repo = context.repo.repo
     const result = await octokit.graphql(`
       query {
-        organization(login:"${context.repo.owner}") {
-          repository(name:"${context.repo.repo}") {
+        organization(login:"${owner}") {
+          repository(name:"${repo}") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {
@@ -63,7 +65,7 @@ async function run(): Promise<void> {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `You have ${alerts.length} vulnerabilities in *kunalnagarco/action-cve*`
+          text: `You have ${alerts.length} vulnerabilities in *${owner}/${repo}*`
         }
       })
       blocks.push({
@@ -88,13 +90,16 @@ async function run(): Promise<void> {
               text: 'View Advisory',
               emoji: true
             },
+            style: 'danger',
             url: alert.node.securityAdvisory.permalink
           }
         })
       })
       console.log(blocks)
       await webhook.send({
-        blocks
+        blocks,
+        icon_emoji: "🐛",
+        username: "boop"
       })
       console.log(
         JSON.stringify(

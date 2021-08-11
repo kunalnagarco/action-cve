@@ -96,7 +96,7 @@ async function run(): Promise<void> {
       await webhook.send({
         blocks,
         icon_url:
-          'https://github.com/kunalnagarco/action-cve/tree/main/icons/ladybug.png',
+          'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
         username: 'GitHub Action - @kunalnagarco/action-cve',
       })
       console.log(

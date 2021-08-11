@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable github/array-foreach */
-import {getOctokit} from '@actions/github'
-import {info, getInput, setFailed} from '@actions/core'
-import {IncomingWebhook} from '@slack/webhook'
+import { context, getOctokit } from '@actions/github'
+import { info, getInput, setFailed } from '@actions/core'
+import { IncomingWebhook } from '@slack/webhook'
 
 async function run(): Promise<void> {
   try {
@@ -12,8 +12,8 @@ async function run(): Promise<void> {
     const octokit = getOctokit(token)
     const result = await octokit.graphql(`
       query {
-        organization(login:"kunalnagarco") {
-          repository(name:"action-cve") {
+        organization(login:"${context.repo.owner}") {
+          repository(name:"${context.repo.repo}") {
             vulnerabilityAlerts(first: 20) {
               edges {
                 node {

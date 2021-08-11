@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.2](https://github.com/kunalnagarco/action-cve/compare/v1.0.1...v1.0.2) (2021-08-11)
+
+
+### Bug Fixes
+
+* Action name ([f304074](https://github.com/kunalnagarco/action-cve/commit/f3040746d0c05a2caea52d112e8e87b1093f4100))
+
 ### [1.0.1](https://github.com/kunalnagarco/action-cve/compare/v1.0.0...v1.0.1) (2021-08-11)
 
 

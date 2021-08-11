@@ -1,4 +1,4 @@
-name: 'cve'
+name: 'check-cve'
 description: 'Send GitHub vulnerability alerts to multiple platforms'
 author: '@kunalnagarco'
 inputs:

@@ -95,8 +95,9 @@ async function run(): Promise<void> {
       console.log(blocks)
       await webhook.send({
         blocks,
-        icon_emoji: '🐛',
-        username: 'boop',
+        icon_url:
+          'https://github.com/kunalnagarco/action-cve/tree/main/icons/ladybug.png',
+        username: 'GitHub Action - @kunalnagarco/action-cve',
       })
       console.log(
         JSON.stringify(

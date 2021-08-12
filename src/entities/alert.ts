@@ -1,10 +1,10 @@
-import { IRepository } from './repository'
+// import { IRepository } from './repository'
 
-export interface IAlert {
-  createdAt: string
-  repository: IRepository
-}
+// export interface IAlert {
+//   createdAt: string
+//   repository: IRepository
+// }
 
-const a: IAlert = {
-  createdAt: '123123123123',
-}
+// const a: IAlert = {
+//   createdAt: '123123123123',
+// }

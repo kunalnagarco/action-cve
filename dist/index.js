@@ -24,6 +24,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
@@ -34,8 +36,10 @@ function run() {
             const token = core_1.getInput('token');
             const webhookUrl = core_1.getInput('slack_webhook');
             const octokit = github_1.getOctokit(token);
-            const owner = github_1.context.repo.owner;
-            const repo = github_1.context.repo.repo;
+            // const owner = context.repo.owner
+            const owner = 'kunalnagar';
+            // const repo = context.repo.repo
+            const repo = 'cve-base';
             const result = yield octokit.graphql(`
       query {
         organization(login:"${owner}") {
@@ -67,6 +71,7 @@ function run() {
                     advisory {
                       cvss {
                         score
+                        vectorString
                       }
                       summary
                     }
@@ -122,16 +127,13 @@ function run() {
                     });
                 }
                 // console.log(blocks)
-                yield webhook.send({
-                    blocks,
-                    icon_url: 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
-                    username: 'GitHub Action - @kunalnagarco/action-cve',
-                });
-                // console.log(
-                //   JSON.stringify(
-                //     (result as any).organization.repository.vulnerabilityAlerts,
-                //   ),
-                // )
+                // await webhook.send({
+                //   blocks,
+                //   icon_url:
+                //     'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
+                //   username: 'GitHub Action - @kunalnagarco/action-cve',
+                // })
+                console.log(JSON.stringify(result.organization.repository.vulnerabilityAlerts));
             }
         }
         catch (err) {

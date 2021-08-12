@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     const webhookUrl = getInput('slack_webhook')
     const octokit = getOctokit(token)
     // const owner = context.repo.owner
-    const owner = 'kunalnagar'
+    const owner = 'kunalnagarco'
     // const repo = context.repo.repo
     const repo = 'cve-base'
     const result = await octokit.graphql(`

@@ -37,7 +37,7 @@ function run() {
             const webhookUrl = core_1.getInput('slack_webhook');
             const octokit = github_1.getOctokit(token);
             // const owner = context.repo.owner
-            const owner = 'kunalnagar';
+            const owner = 'kunalnagarco';
             // const repo = context.repo.repo
             const repo = 'cve-base';
             const result = yield octokit.graphql(`

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { context, getOctokit } from '@actions/github'
 import { info, getInput, setFailed } from '@actions/core'
@@ -8,8 +10,10 @@ async function run(): Promise<void> {
     const token = getInput('token')
     const webhookUrl = getInput('slack_webhook')
     const octokit = getOctokit(token)
-    const owner = context.repo.owner
-    const repo = context.repo.repo
+    // const owner = context.repo.owner
+    const owner = 'kunalnagar'
+    // const repo = context.repo.repo
+    const repo = 'cve-base'
     const result = await octokit.graphql(`
       query {
         organization(login:"${owner}") {
@@ -41,6 +45,7 @@ async function run(): Promise<void> {
                     advisory {
                       cvss {
                         score
+                        vectorString
                       }
                       summary
                     }
@@ -95,17 +100,17 @@ async function run(): Promise<void> {
         })
       }
       // console.log(blocks)
-      await webhook.send({
-        blocks,
-        icon_url:
-          'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
-        username: 'GitHub Action - @kunalnagarco/action-cve',
-      })
-      // console.log(
-      //   JSON.stringify(
-      //     (result as any).organization.repository.vulnerabilityAlerts,
-      //   ),
-      // )
+      // await webhook.send({
+      //   blocks,
+      //   icon_url:
+      //     'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
+      //   username: 'GitHub Action - @kunalnagarco/action-cve',
+      // })
+      console.log(
+        JSON.stringify(
+          (result as any).organization.repository.vulnerabilityAlerts,
+        ),
+      )
     }
   } catch (err) {
     setFailed(err)

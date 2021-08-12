@@ -4,7 +4,6 @@ A [GitHub action](https://github.com/features/actions) that sends Dependabot Vul
 
 ![image](https://user-images.githubusercontent.com/2741371/129027223-291b5900-2531-4088-8c3c-afca5befee58.png)
 
-
 ### Usage
 
 ```yaml
@@ -31,3 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+## Attributions
+
+- Bug icon: Made by Freepik from [https://www.flaticon.com/](https://www.flaticon.com/)

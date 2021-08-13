@@ -5,6 +5,7 @@ import { RepositoryVulnerabilityAlert } from '@octokit/graphql-schema'
 
 export interface Alert {
   repository: Repository
+  packageName: string
   advisory?: Advisory
   vulnerability?: Vulnerability
   manifest: string
@@ -15,6 +16,8 @@ export const toAlert = (
   repositoryVulnerabilityAlert: RepositoryVulnerabilityAlert,
 ): Alert => ({
   repository: toRepository(repositoryVulnerabilityAlert.repository),
+  packageName:
+    repositoryVulnerabilityAlert.securityVulnerability?.package.name || '',
   advisory: repositoryVulnerabilityAlert.securityAdvisory
     ? toAdvisory(repositoryVulnerabilityAlert.securityAdvisory)
     : undefined,

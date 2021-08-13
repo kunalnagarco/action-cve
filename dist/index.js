@@ -33,17 +33,21 @@ exports.toAlert = void 0;
 const advisory_1 = __nccwpck_require__(9750);
 const repository_1 = __nccwpck_require__(7359);
 const vulnerability_1 = __nccwpck_require__(3005);
-const toAlert = (repositoryVulnerabilityAlert) => ({
-    repository: repository_1.toRepository(repositoryVulnerabilityAlert.repository),
-    advisory: repositoryVulnerabilityAlert.securityAdvisory
-        ? advisory_1.toAdvisory(repositoryVulnerabilityAlert.securityAdvisory)
-        : undefined,
-    vulnerability: repositoryVulnerabilityAlert.securityVulnerability
-        ? vulnerability_1.toVulnerability(repositoryVulnerabilityAlert.securityVulnerability)
-        : undefined,
-    manifest: repositoryVulnerabilityAlert.vulnerableManifestFilename,
-    createdAt: repositoryVulnerabilityAlert.createdAt,
-});
+const toAlert = (repositoryVulnerabilityAlert) => {
+    var _a;
+    return ({
+        repository: repository_1.toRepository(repositoryVulnerabilityAlert.repository),
+        packageName: ((_a = repositoryVulnerabilityAlert.securityVulnerability) === null || _a === void 0 ? void 0 : _a.package.name) || '',
+        advisory: repositoryVulnerabilityAlert.securityAdvisory
+            ? advisory_1.toAdvisory(repositoryVulnerabilityAlert.securityAdvisory)
+            : undefined,
+        vulnerability: repositoryVulnerabilityAlert.securityVulnerability
+            ? vulnerability_1.toVulnerability(repositoryVulnerabilityAlert.securityVulnerability)
+            : undefined,
+        manifest: repositoryVulnerabilityAlert.vulnerableManifestFilename,
+        createdAt: repositoryVulnerabilityAlert.createdAt,
+    });
+};
 exports.toAlert = toAlert;
 
 
@@ -125,7 +129,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fetchAlerts = void 0;
-/* eslint-disable no-console */
 const github_1 = __nccwpck_require__(5438);
 const entities_1 = __nccwpck_require__(7604);
 const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner, count) => __awaiter(void 0, void 0, void 0, function* () {
@@ -179,7 +182,6 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
     }
   `);
     const gitHubAlerts = (_a = repository.vulnerabilityAlerts) === null || _a === void 0 ? void 0 : _a.edges;
-    console.log(JSON.stringify(gitHubAlerts));
     if (gitHubAlerts) {
         const alerts = [];
         for (const gitHubAlert of gitHubAlerts) {

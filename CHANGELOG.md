@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.5](https://github.com/kunalnagarco/action-cve/compare/v1.0.4...v1.0.5) (2021-08-13)
+
+
+### Bug Fixes
+
+* ESLint + Add Count ([#16](https://github.com/kunalnagarco/action-cve/issues/16)) ([aa9491c](https://github.com/kunalnagarco/action-cve/commit/aa9491c021126e59ce0770fbe4c162ae01672d37))
+
 ### [1.0.4](https://github.com/kunalnagarco/action-cve/compare/v1.0.3...v1.0.4) (2021-08-13)
 
 

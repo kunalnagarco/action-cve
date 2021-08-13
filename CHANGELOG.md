@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.4](https://github.com/kunalnagarco/action-cve/compare/v1.0.3...v1.0.4) (2021-08-13)
+
+
+### Bug Fixes
+
+* GitHub Token in dry-run ([74f18a8](https://github.com/kunalnagarco/action-cve/commit/74f18a8c5a126e6300ff9b45ccf69c80fc787eb4))
+
 ### [1.0.3](https://github.com/kunalnagarco/action-cve/compare/v1.0.2...v1.0.3) (2021-08-13)
 
 

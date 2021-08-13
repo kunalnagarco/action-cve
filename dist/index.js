@@ -138,6 +138,12 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
           edges {
             node {
               id
+              repository {
+                name
+                owner {
+                  login
+                }
+              }
               securityAdvisory {
                 id
                 description

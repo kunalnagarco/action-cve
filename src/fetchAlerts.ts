@@ -19,6 +19,12 @@ export const fetchAlerts = async (
           edges {
             node {
               id
+              repository {
+                name
+                owner {
+                  login
+                }
+              }
               securityAdvisory {
                 id
                 description

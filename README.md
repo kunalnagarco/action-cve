@@ -2,7 +2,7 @@
 
 A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources, starting with Slack.
 
-![image](https://user-images.githubusercontent.com/2741371/129027223-291b5900-2531-4088-8c3c-afca5befee58.png)
+![image](https://user-images.githubusercontent.com/2741371/129387647-f5fdead5-a002-4e3d-9d55-cb7ebe988ff1.png)
 
 
 ### Usage

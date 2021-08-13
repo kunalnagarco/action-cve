@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import { getInput, setFailed } from '@actions/core'
 import { getOctokit } from '@actions/github'
+import { sendAlertsToSlack } from './destinations'
 import { fetchAlerts } from './fetchAlerts'
 
 async function run(): Promise<void> {
@@ -14,7 +14,7 @@ async function run(): Promise<void> {
     // const repo = context.repo.repo
     const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner)
-    console.log(JSON.stringify(alerts))
+    await sendAlertsToSlack(webhookUrl, alerts)
   } catch (err) {
     setFailed(err)
   }

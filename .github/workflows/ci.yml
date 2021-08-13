@@ -33,3 +33,5 @@ jobs:
         run: npm install
       - name: Release (dry-run)
         run: npm run release -- --dry-run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.3](https://github.com/kunalnagarco/action-cve/compare/v1.0.2...v1.0.3) (2021-08-13)
+
+
+### Chores
+
+* Refactor code ([#13](https://github.com/kunalnagarco/action-cve/issues/13)) ([3e824c0](https://github.com/kunalnagarco/action-cve/commit/3e824c0ec5b65018c8e035a407ffd1b0bade33ab))
+
 ### [1.0.2](https://github.com/kunalnagarco/action-cve/compare/v1.0.1...v1.0.2) (2021-08-11)
 
 

@@ -59,6 +59,8 @@ export const fetchAlerts = async (
     }
   `)
   const gitHubAlerts = repository.vulnerabilityAlerts?.edges
+  // eslint-disable-next-line no-console
+  console.log(JSON.stringify(gitHubAlerts))
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {

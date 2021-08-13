@@ -10,8 +10,10 @@ async function run(): Promise<void> {
     const owner = context.repo.owner
     const repo = context.repo.repo
     const alerts = await fetchAlerts(token, repo, owner)
-    if (slackWebhookUrl) {
-      await sendAlertsToSlack(slackWebhookUrl, alerts)
+    if (alerts.length > 0) {
+      if (slackWebhookUrl) {
+        await sendAlertsToSlack(slackWebhookUrl, alerts)
+      }
     }
   } catch (err) {
     setFailed(err)

@@ -289,6 +289,8 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
     }
   `);
     const gitHubAlerts = (_a = repository.vulnerabilityAlerts) === null || _a === void 0 ? void 0 : _a.edges;
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(gitHubAlerts));
     if (gitHubAlerts) {
         const alerts = [];
         for (const gitHubAlert of gitHubAlerts) {
@@ -332,8 +334,10 @@ function run() {
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
             const alerts = yield fetchAlerts_1.fetchAlerts(token, repo, owner);
-            if (slackWebhookUrl) {
-                yield destinations_1.sendAlertsToSlack(slackWebhookUrl, alerts);
+            if (alerts.length > 0) {
+                if (slackWebhookUrl) {
+                    yield destinations_1.sendAlertsToSlack(slackWebhookUrl, alerts);
+                }
             }
         }
         catch (err) {

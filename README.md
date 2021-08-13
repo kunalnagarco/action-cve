@@ -27,8 +27,9 @@ jobs:
           # Create a Slack Incoming Webhook URL:
           #     https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Number of vulnerability alerts
+          # Default: 20
+          count: 10
 ```
 
 ## Attributions

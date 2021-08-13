@@ -320,7 +320,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-/* eslint-disable @typescript-eslint/no-unused-vars */
 const core_1 = __nccwpck_require__(2186);
 const github_1 = __nccwpck_require__(5438);
 const destinations_1 = __nccwpck_require__(8395);
@@ -329,14 +328,13 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core_1.getInput('token');
-            const webhookUrl = core_1.getInput('slack_webhook');
-            const octokit = github_1.getOctokit(token);
-            // const owner = context.repo.owner
-            const owner = 'kunalnagarco';
-            // const repo = context.repo.repo
-            const repo = 'cve-base';
+            const slackWebhookUrl = core_1.getInput('slack_webhook');
+            const owner = github_1.context.repo.owner;
+            const repo = github_1.context.repo.repo;
             const alerts = yield fetchAlerts_1.fetchAlerts(token, repo, owner);
-            yield destinations_1.sendAlertsToSlack(webhookUrl, alerts);
+            if (slackWebhookUrl) {
+                yield destinations_1.sendAlertsToSlack(slackWebhookUrl, alerts);
+            }
         }
         catch (err) {
             core_1.setFailed(err);

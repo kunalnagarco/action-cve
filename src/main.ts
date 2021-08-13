@@ -1,20 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getInput, setFailed } from '@actions/core'
-import { getOctokit } from '@actions/github'
+import { context } from '@actions/github'
 import { sendAlertsToSlack } from './destinations'
 import { fetchAlerts } from './fetchAlerts'
 
 async function run(): Promise<void> {
   try {
     const token = getInput('token')
-    const webhookUrl = getInput('slack_webhook')
-    const octokit = getOctokit(token)
-    // const owner = context.repo.owner
-    const owner = 'kunalnagarco'
-    // const repo = context.repo.repo
-    const repo = 'cve-base'
+    const slackWebhookUrl = getInput('slack_webhook')
+    const owner = context.repo.owner
+    const repo = context.repo.repo
     const alerts = await fetchAlerts(token, repo, owner)
-    await sendAlertsToSlack(webhookUrl, alerts)
+    if (slackWebhookUrl) {
+      await sendAlertsToSlack(slackWebhookUrl, alerts)
+    }
   } catch (err) {
     setFailed(err)
   }

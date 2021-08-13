@@ -46,6 +46,7 @@
   "dependencies": {
     "@actions/core": "1.4.0",
     "@actions/github": "5.0.0",
+    "@octokit/graphql-schema": "^10.60.1",
     "@slack/webhook": "^6.0.0"
   },
   "devDependencies": {

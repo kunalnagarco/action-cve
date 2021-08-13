@@ -27,7 +27,7 @@
     "build": "tsc",
     "format": "prettier --write src/**/*.ts",
     "format-check": "prettier --check src/**/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint --fix src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
@@ -49,11 +49,13 @@
     "@slack/webhook": "6.0.0"
   },
   "devDependencies": {
+    "@octokit/graphql-schema": "^10.60.1",
     "@semantic-release/changelog": "5.0.1",
     "@semantic-release/commit-analyzer": "8.0.1",
     "@semantic-release/git": "9.0.0",
     "@semantic-release/github": "7.2.3",
     "@semantic-release/release-notes-generator": "9.0.3",
+    "@slack/types": "^2.1.0",
     "@types/jest": "26.0.24",
     "@types/node": "14.14.9",
     "@typescript-eslint/eslint-plugin": "4.29.1",

@@ -1,12 +1,12 @@
-import { getOctokit } from '@actions/github'
-import { Repository } from '@octokit/graphql-schema'
 import { Alert, toAlert } from './entities'
+import { Repository } from '@octokit/graphql-schema'
+import { getOctokit } from '@actions/github'
 
 export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
   repositoryName: string,
   repositoryOwner: string,
-  count?: number,
+  count: number,
 ): Promise<Alert[] | []> => {
   const octokit = getOctokit(gitHubPersonalAccessToken)
   const { repository } = await octokit.graphql<{
@@ -14,7 +14,7 @@ export const fetchAlerts = async (
   }>(`
     query {
       repository(owner:"${repositoryOwner}" name:"${repositoryName}") {
-        vulnerabilityAlerts(last: ${count || 20}) {
+        vulnerabilityAlerts(last: ${count}) {
           edges {
             node {
               id

@@ -6,6 +6,9 @@ inputs:
     description: 'GitHub Personal Access Token'
   slack_webhook:
     description: 'Slack Webhook URL'
+  count:
+    description: 'Number of vulnerability alerts to send'
+    default: 20
 branding:
   icon: 'alert-octagon'
   color: 'red'

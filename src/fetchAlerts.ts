@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getOctokit } from '@actions/github'
 import { Repository } from '@octokit/graphql-schema'
 import { Alert, toAlert } from './entities'
@@ -53,6 +54,7 @@ export const fetchAlerts = async (
     }
   `)
   const gitHubAlerts = repository.vulnerabilityAlerts?.edges
+  console.log(JSON.stringify(gitHubAlerts))
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {

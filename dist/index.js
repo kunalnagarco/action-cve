@@ -125,6 +125,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fetchAlerts = void 0;
+/* eslint-disable no-console */
 const github_1 = __nccwpck_require__(5438);
 const entities_1 = __nccwpck_require__(7604);
 const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner, count) => __awaiter(void 0, void 0, void 0, function* () {
@@ -172,6 +173,7 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
     }
   `);
     const gitHubAlerts = (_a = repository.vulnerabilityAlerts) === null || _a === void 0 ? void 0 : _a.edges;
+    console.log(JSON.stringify(gitHubAlerts));
     if (gitHubAlerts) {
         const alerts = [];
         for (const gitHubAlert of gitHubAlerts) {
@@ -218,7 +220,7 @@ function run() {
             const owner = 'kunalnagarco';
             // const repo = context.repo.repo
             const repo = 'cve-base';
-            const alerts = fetchAlerts_1.fetchAlerts(token, repo, owner);
+            const alerts = yield fetchAlerts_1.fetchAlerts(token, repo, owner);
             console.log(JSON.stringify(alerts));
         }
         catch (err) {

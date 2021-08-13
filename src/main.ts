@@ -13,7 +13,7 @@ async function run(): Promise<void> {
     const owner = 'kunalnagarco'
     // const repo = context.repo.repo
     const repo = 'cve-base'
-    const alerts = fetchAlerts(token, repo, owner)
+    const alerts = await fetchAlerts(token, repo, owner)
     console.log(JSON.stringify(alerts))
   } catch (err) {
     setFailed(err)

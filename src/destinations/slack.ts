@@ -1,6 +1,6 @@
+import { Alert } from '../entities'
 import { IncomingWebhook } from '@slack/webhook'
 import { KnownBlock } from '@slack/types'
-import { Alert } from '../entities'
 
 const createSummaryBlock = (
   alertCount: number,

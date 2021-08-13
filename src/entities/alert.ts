@@ -1,6 +1,6 @@
 import { Advisory, toAdvisory } from './advisory'
 import { Repository, toRepository } from './repository'
-import { toVulnerability, Vulnerability } from './vulnerability'
+import { Vulnerability, toVulnerability } from './vulnerability'
 import { RepositoryVulnerabilityAlert } from '@octokit/graphql-schema'
 
 export interface Alert {

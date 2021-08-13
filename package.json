@@ -27,7 +27,7 @@
     "build": "tsc",
     "format": "prettier --write src/**/*.ts",
     "format-check": "prettier --check src/**/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint --fix src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test",

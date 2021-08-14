@@ -11,7 +11,7 @@ export const sendAlertsToPagerDuty = async (
       routing_key: routingKey,
       event_action: 'trigger',
       payload: {
-        summary: `You have ${alerts.length} vulnerabilities in *${alerts[0].repository.owner}/${alerts[0].repository.name}*`,
+        summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
         source: 'GitHub Dependabot Alerts',
         severity: 'info',
         custom_details: { ...alerts },
@@ -25,5 +25,7 @@ export const sendAlertsToPagerDuty = async (
       ],
     },
   })
-  console.log(JSON.stringify(result.response))
+  const response = result.response
+  console.log(JSON.stringify(response.body))
+  console.log(response.status, response.ok)
 }

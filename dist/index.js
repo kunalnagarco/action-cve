@@ -54,7 +54,7 @@ const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, 
             routing_key: routingKey,
             event_action: 'trigger',
             payload: {
-                summary: `You have ${alerts.length} vulnerabilities in *${alerts[0].repository.owner}/${alerts[0].repository.name}*`,
+                summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
                 source: 'GitHub Dependabot Alerts',
                 severity: 'info',
                 custom_details: Object.assign({}, alerts),
@@ -68,7 +68,9 @@ const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, 
             ],
         },
     });
-    console.log(JSON.stringify(result.response));
+    const response = result.response;
+    console.log(JSON.stringify(response.body));
+    console.log(response.status, response.ok);
 });
 exports.sendAlertsToPagerDuty = sendAlertsToPagerDuty;
 

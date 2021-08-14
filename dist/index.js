@@ -49,7 +49,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToPagerDuty = void 0;
 const pdjs_1 = __nccwpck_require__(8512);
 const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield pdjs_1.event({
+    const result = yield pdjs_1.event({
         data: {
             routing_key: routingKey,
             event_action: 'trigger',
@@ -57,7 +57,7 @@ const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, 
                 summary: `You have ${alerts.length} vulnerabilities in *${alerts[0].repository.owner}/${alerts[0].repository.name}*`,
                 source: 'GitHub Dependabot Alerts',
                 severity: 'info',
-                custom_details: alerts,
+                custom_details: Object.assign({}, alerts),
             },
             images: [
                 {
@@ -68,7 +68,7 @@ const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, 
             ],
         },
     });
-    console.log(JSON.stringify(response));
+    console.log(JSON.stringify(result.response));
 });
 exports.sendAlertsToPagerDuty = sendAlertsToPagerDuty;
 

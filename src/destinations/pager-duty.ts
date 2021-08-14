@@ -6,7 +6,7 @@ export const sendAlertsToPagerDuty = async (
   routingKey: string,
   alerts: Alert[],
 ): Promise<void> => {
-  const response = await event({
+  const result = await event({
     data: {
       routing_key: routingKey,
       event_action: 'trigger',
@@ -14,7 +14,7 @@ export const sendAlertsToPagerDuty = async (
         summary: `You have ${alerts.length} vulnerabilities in *${alerts[0].repository.owner}/${alerts[0].repository.name}*`,
         source: 'GitHub Dependabot Alerts',
         severity: 'info',
-        custom_details: alerts,
+        custom_details: { ...alerts },
       },
       images: [
         {
@@ -25,5 +25,5 @@ export const sendAlertsToPagerDuty = async (
       ],
     },
   })
-  console.log(JSON.stringify(response))
+  console.log(JSON.stringify(result.response))
 }

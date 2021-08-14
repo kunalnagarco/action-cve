@@ -1,7 +1,7 @@
 import { getInput, setFailed } from '@actions/core'
+import { sendAlertsToSlack, validateSlackWebhookUrl } from './destinations'
 import { context } from '@actions/github'
 import { fetchAlerts } from './fetch-alerts'
-import { sendAlertsToSlack } from './destinations'
 
 async function run(): Promise<void> {
   try {
@@ -13,7 +13,11 @@ async function run(): Promise<void> {
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
       if (slackWebhookUrl) {
-        await sendAlertsToSlack(slackWebhookUrl, alerts)
+        if (!validateSlackWebhookUrl(slackWebhookUrl)) {
+          setFailed(new Error('Invalid Slack Webhook URL'))
+        } else {
+          await sendAlertsToSlack(slackWebhookUrl, alerts)
+        }
       }
     }
   } catch (err) {

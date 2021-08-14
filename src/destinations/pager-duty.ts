@@ -1,14 +1,13 @@
-/* eslint-disable no-console */
 import { Alert } from '../entities'
 import { event } from '@pagerduty/pdjs'
 
 export const sendAlertsToPagerDuty = async (
-  routingKey: string,
+  integrationKey: string,
   alerts: Alert[],
 ): Promise<void> => {
-  const result = await event({
+  await event({
     data: {
-      routing_key: routingKey,
+      routing_key: integrationKey,
       event_action: 'trigger',
       payload: {
         summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
@@ -25,7 +24,4 @@ export const sendAlertsToPagerDuty = async (
       ],
     },
   })
-  const response = result.response
-  console.log(JSON.stringify(response.body))
-  console.log(response.status, response.ok)
 }

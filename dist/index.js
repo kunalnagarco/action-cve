@@ -48,10 +48,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToPagerDuty = void 0;
 const pdjs_1 = __nccwpck_require__(8512);
-const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield pdjs_1.event({
+const sendAlertsToPagerDuty = (integrationKey, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    yield pdjs_1.event({
         data: {
-            routing_key: routingKey,
+            routing_key: integrationKey,
             event_action: 'trigger',
             payload: {
                 summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
@@ -68,9 +68,6 @@ const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, 
             ],
         },
     });
-    const response = result.response;
-    console.log(JSON.stringify(response.body));
-    console.log(response.status, response.ok);
 });
 exports.sendAlertsToPagerDuty = sendAlertsToPagerDuty;
 

@@ -1,13 +1,13 @@
 name: 'check-cve'
-description: 'Send GitHub vulnerability alerts to multiple platforms'
+description: 'Send GitHub vulnerability alerts to multiple platforms like Slack, PagerDuty.'
 author: '@kunalnagar'
 inputs:
   token:
     description: 'GitHub Personal Access Token'
   slack_webhook:
-    description: 'Slack Webhook URL'
+    description: 'Slack Webhook URL. More info: https://api.slack.com/messaging/webhooks'
   pager_duty_integration_key:
-    description: 'Pager Duty Integration Key. More instructions: https://support.pagerduty.com/docs/services-and-integrations'
+    description: 'Pager Duty Integration Key. More info: https://support.pagerduty.com/docs/services-and-integrations'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

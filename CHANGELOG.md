@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/kunalnagarco/action-cve/compare/v1.0.5...v1.1.0) (2021-08-14)
+
+
+### Features
+
+* Validate Slack Webhook URL ([#18](https://github.com/kunalnagarco/action-cve/issues/18)) ([71c0afe](https://github.com/kunalnagarco/action-cve/commit/71c0afee6694806b657a29d4b8cd740cf5f8397f))
+
 ### [1.0.5](https://github.com/kunalnagarco/action-cve/compare/v1.0.4...v1.0.5) (2021-08-13)
 
 

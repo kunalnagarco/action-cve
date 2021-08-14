@@ -46,6 +46,7 @@
   "dependencies": {
     "@actions/core": "1.4.0",
     "@actions/github": "5.0.0",
+    "@pagerduty/pdjs": "^2.2.2",
     "@slack/webhook": "6.0.0"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["@slack/webhook@6.0.0","/home/runner/work/action-cve/action-cve"]],"_from":"@slack/webhook@6.0.0","_id":"@slack/webhook@6.0.0","_inBundle":false,"_integrity":"sha512-2fohfhLI9lkAmOSWt1R457JBsB3iFNqahu4GqdFZRtcp/bT+xeG/kPn/hQa78JS74poRjWTt5G/qJjNaWMGOEQ==","_location":"/@slack/webhook","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"@slack/webhook@6.0.0","name":"@slack/webhook","escapedName":"@slack%2fwebhook","scope":"@slack","rawSpec":"6.0.0","saveSpec":null,"fetchSpec":"6.0.0"},"_requiredBy":["/"],"_resolved":"https://registry.npmjs.org/@slack/webhook/-/webhook-6.0.0.tgz","_spec":"6.0.0","_where":"/home/runner/work/action-cve/action-cve","author":{"name":"Slack Technologies, Inc."},"bugs":{"url":"https://github.com/slackapi/node-slack-sdk/issues"},"dependencies":{"@slack/types":"^1.2.1","@types/node":">=12.0.0","axios":"^0.21.1"},"description":"Official library for using the Slack Platform\'s Incoming Webhooks","devDependencies":{"@microsoft/api-extractor":"^7.3.4","@types/chai":"^4.1.7","@types/mocha":"^5.2.6","chai":"^4.2.0","codecov":"^3.2.0","mocha":"^6.0.2","nock":"^10.0.6","nyc":"^14.1.1","shx":"^0.3.2","sinon":"^7.2.7","source-map-support":"^0.5.10","ts-node":"^8.0.3","tslint":"^5.13.1","tslint-config-airbnb":"^5.11.1","typescript":"^4.1.0"},"engines":{"node":">= 12.13.0","npm":">= 6.12.0"},"files":["dist/**/*"],"homepage":"https://slack.dev/node-slack-sdk/webhook","keywords":["slack","request","client","http","api","proxy"],"license":"MIT","main":"dist/index.js","name":"@slack/webhook","publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/slackapi/node-slack-sdk.git"},"scripts":{"build":"npm run build:clean && tsc","build:clean":"shx rm -rf ./dist ./coverage ./.nyc_output","coverage":"codecov -F webhook --root=$PWD","lint":"tslint --project .","prepare":"npm run build","ref-docs:model":"api-extractor run","test":"npm run build && nyc mocha --config .mocharc.json src/*.spec.js"},"types":"./dist/index.d.ts","version":"6.0.0"}');
+module.exports = JSON.parse('{"_from":"@slack/webhook","_id":"@slack/webhook@6.0.0","_inBundle":false,"_integrity":"sha512-2fohfhLI9lkAmOSWt1R457JBsB3iFNqahu4GqdFZRtcp/bT+xeG/kPn/hQa78JS74poRjWTt5G/qJjNaWMGOEQ==","_location":"/@slack/webhook","_phantomChildren":{},"_requested":{"type":"tag","registry":true,"raw":"@slack/webhook","name":"@slack/webhook","escapedName":"@slack%2fwebhook","scope":"@slack","rawSpec":"","saveSpec":null,"fetchSpec":"latest"},"_requiredBy":["#USER","/"],"_resolved":"https://registry.npmjs.org/@slack/webhook/-/webhook-6.0.0.tgz","_shasum":"844593c1e864a966e549f60bb640586628f3c1c4","_spec":"@slack/webhook","_where":"/Users/kunalnagar/Documents/Code/kunalnagarco/action-cve","author":{"name":"Slack Technologies, Inc."},"bugs":{"url":"https://github.com/slackapi/node-slack-sdk/issues"},"bundleDependencies":false,"dependencies":{"@slack/types":"^1.2.1","@types/node":">=12.0.0","axios":"^0.21.1"},"deprecated":false,"description":"Official library for using the Slack Platform\'s Incoming Webhooks","devDependencies":{"@microsoft/api-extractor":"^7.3.4","@types/chai":"^4.1.7","@types/mocha":"^5.2.6","chai":"^4.2.0","codecov":"^3.2.0","mocha":"^6.0.2","nock":"^10.0.6","nyc":"^14.1.1","shx":"^0.3.2","sinon":"^7.2.7","source-map-support":"^0.5.10","ts-node":"^8.0.3","tslint":"^5.13.1","tslint-config-airbnb":"^5.11.1","typescript":"^4.1.0"},"engines":{"node":">= 12.13.0","npm":">= 6.12.0"},"files":["dist/**/*"],"homepage":"https://slack.dev/node-slack-sdk/webhook","keywords":["slack","request","client","http","api","proxy"],"license":"MIT","main":"dist/index.js","name":"@slack/webhook","publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/slackapi/node-slack-sdk.git"},"scripts":{"build":"npm run build:clean && tsc","build:clean":"shx rm -rf ./dist ./coverage ./.nyc_output","coverage":"codecov -F webhook --root=$PWD","lint":"tslint --project .","prepare":"npm run build","ref-docs:model":"api-extractor run","test":"npm run build && nyc mocha --config .mocharc.json src/*.spec.js"},"types":"./dist/index.d.ts","version":"6.0.0"}');
 
 /***/ }),
 
@@ -26,6 +26,51 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(8706), exports);
+__exportStar(__nccwpck_require__(5952), exports);
+
+
+/***/ }),
+
+/***/ 5952:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sendAlertsToPagerDuty = void 0;
+const pdjs_1 = __nccwpck_require__(8512);
+const sendAlertsToPagerDuty = (routingKey, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield pdjs_1.event({
+        data: {
+            routing_key: routingKey,
+            event_action: 'trigger',
+            payload: {
+                summary: `You have ${alerts.length} vulnerabilities in *${alerts[0].repository.owner}/${alerts[0].repository.name}*`,
+                source: 'GitHub Dependabot Alerts',
+                severity: 'info',
+                custom_details: alerts,
+            },
+            images: [
+                {
+                    src: 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
+                    alt: 'GitHub Action Icon',
+                    href: 'https://github.com/kunalnagarco/action-cve',
+                },
+            ],
+        },
+    });
+    console.log(JSON.stringify(response));
+});
+exports.sendAlertsToPagerDuty = sendAlertsToPagerDuty;
 
 
 /***/ }),
@@ -327,16 +372,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const destinations_1 = __nccwpck_require__(8395);
-const github_1 = __nccwpck_require__(5438);
+// import { context } from '@actions/github'
 const fetch_alerts_1 = __nccwpck_require__(9028);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core_1.getInput('token');
             const slackWebhookUrl = core_1.getInput('slack_webhook');
+            const pagerDutyIntegrationKey = core_1.getInput('pager_duty_integration_key');
             const count = parseInt(core_1.getInput('count'));
-            const owner = github_1.context.repo.owner;
-            const repo = github_1.context.repo.repo;
+            // const owner = context.repo.owner
+            const owner = 'kunalnagar';
+            // const repo = context.repo.repo
+            const repo = 'cve-base';
             const alerts = yield fetch_alerts_1.fetchAlerts(token, repo, owner, count);
             if (alerts.length > 0) {
                 if (slackWebhookUrl) {
@@ -346,6 +394,9 @@ function run() {
                     else {
                         yield destinations_1.sendAlertsToSlack(slackWebhookUrl, alerts);
                     }
+                }
+                if (pagerDutyIntegrationKey) {
+                    yield destinations_1.sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts);
                 }
             }
         }
@@ -4185,6 +4236,332 @@ exports.request = request;
 
 /***/ }),
 
+/***/ 6793:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.api = void 0;
+const common_1 = __nccwpck_require__(8867);
+function api(apiParameters) {
+    var _a;
+    // If the apiParameters don't include `endpoint` treat it as a partial
+    // application.
+    if (!apiParameters.endpoint && !apiParameters.url) {
+        return partialCall(apiParameters);
+    }
+    const types = {
+        bearer: 'Bearer ',
+        token: 'Token token=',
+    };
+    const { endpoint, server = 'api.pagerduty.com', token, tokenType = apiParameters.tokenType || 'token', url, version = 2, data, ...rest } = apiParameters;
+    const config = {
+        method: 'GET',
+        ...rest,
+        headers: {
+            Accept: `application/vnd.pagerduty+json;version=${version}`,
+            Authorization: `${types[tokenType]}${token}`,
+            ...rest.headers,
+        },
+    };
+    // Allow `data` for `queryParameters` for requests without bodies.
+    if (isReadonlyRequest(config.method) && data) {
+        config.queryParameters =
+            (_a = config.queryParameters) !== null && _a !== void 0 ? _a : data;
+    }
+    else {
+        config.body = JSON.stringify(data);
+    }
+    return apiRequest(url !== null && url !== void 0 ? url : `https://${server}/${endpoint.replace(/^\/+/, '')}`, config);
+}
+exports.api = api;
+function apiRequest(url, options) {
+    return common_1.request(url, options).then((response) => {
+        const apiResponse = response;
+        apiResponse.response = response;
+        if (response.status === 204) {
+            return Promise.resolve(apiResponse);
+        }
+        return response
+            .json()
+            .then((data) => {
+            const resource = resourceKey(url);
+            apiResponse.next = nextFunc(url, options, data);
+            apiResponse.data = data;
+            apiResponse.resource = resource ? data[resource] : null;
+            return apiResponse;
+        })
+            .catch(() => Promise.reject(apiResponse));
+    });
+}
+function resourceKey(url) {
+    const resource = url.match(/.+.com\/(?<resource>[\w]+)/);
+    if (resource) {
+        return resource[1];
+    }
+    return null;
+}
+function isReadonlyRequest(method) {
+    var _a;
+    return !['PUT', 'POST', 'DELETE', 'PATCH'].includes((_a = method.toUpperCase()) !== null && _a !== void 0 ? _a : 'GET');
+}
+function isOffsetPagination(data) {
+    if (data.offset !== undefined) {
+        return true;
+    }
+    return false;
+}
+function isCursorPagination(data) {
+    if (data.cursor !== undefined) {
+        return true;
+    }
+    return false;
+}
+function nextFunc(url, options, data) {
+    if (isOffsetPagination(data)) {
+        if ((data === null || data === void 0 ? void 0 : data.more) && typeof data.offset !== undefined && data.limit) {
+            return () => apiRequest(url, {
+                ...options,
+                queryParameters: {
+                    ...options.queryParameters,
+                    limit: data.limit.toString(),
+                    offset: (data.limit + data.offset).toString(),
+                },
+            });
+        }
+    }
+    else if (isCursorPagination(data)) {
+        if (data === null || data === void 0 ? void 0 : data.cursor) {
+            return () => apiRequest(url, {
+                ...options,
+                queryParameters: {
+                    ...options.queryParameters,
+                    cursor: data.cursor,
+                    limit: data.limit.toString(),
+                },
+            });
+        }
+    }
+    return undefined;
+}
+function partialCall(apiParameters) {
+    const partialParameters = apiParameters;
+    const partial = ((apiParameters) => api({ ...partialParameters, ...apiParameters }));
+    const shorthand = (method) => (endpoint, shorthandParameters) => api({
+        endpoint,
+        method,
+        ...partialParameters,
+        ...shorthandParameters,
+    });
+    partial.get = shorthand('get');
+    partial.post = shorthand('post');
+    partial.put = shorthand('put');
+    partial.patch = shorthand('patch');
+    partial.delete = shorthand('delete');
+    partial.all = (endpoint, shorthandParameters) => {
+        function allInner(responses) {
+            const response = responses[responses.length - 1];
+            if (!response.next) {
+                // Base case, resolve and return all responses.
+                return Promise.resolve(responses);
+            }
+            // If there are still more resources to get then concat and repeat.
+            return response
+                .next()
+                .then(response => allInner(responses.concat([response])));
+        }
+        function repackResponses(responses) {
+            // Repack the responses object to make it more user friendly.
+            const repackedResponse = responses.shift(); // Use the first response to build the standard response object
+            repackedResponse.data = [repackedResponse.data];
+            responses.forEach(response => {
+                repackedResponse.data = repackedResponse.data.concat(response.data);
+                repackedResponse.resource = repackedResponse.resource.concat(response.resource);
+            });
+            return Promise.resolve(repackedResponse);
+        }
+        const method = 'get';
+        return api({
+            endpoint,
+            method,
+            ...partialParameters,
+            ...shorthandParameters,
+        })
+            .then(response => allInner([response]))
+            .then(responses => repackResponses(responses));
+    };
+    return partial;
+}
+//# sourceMappingURL=api.js.map
+
+/***/ }),
+
+/***/ 8867:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.request = void 0;
+/* LEGACY-BROWSER-SUPPORT-START */
+const cross_fetch_1 = __nccwpck_require__(9805);
+const cjs_ponyfill_1 = __nccwpck_require__(3713);
+const browser_or_node_1 = __nccwpck_require__(9107);
+/* LEGACY-BROWSER-SUPPORT-END */
+const VERSION = '2.0.0';
+function request(url, options = {}) {
+    const { queryParameters, requestTimeout = 30000, ...rest } = options;
+    url = new URL(url.toString());
+    url = applyParameters(url, queryParameters);
+    options = applyTimeout(options, requestTimeout);
+    return fetch_retry(url.toString(), 3, {
+        ...rest,
+        headers: new cross_fetch_1.Headers({
+            'Content-Type': 'application/json; charset=utf-8',
+            /* LEGACY-BROWSER-SUPPORT-START */
+            ...userAgentHeader(),
+            /* LEGACY-BROWSER-SUPPORT-END */
+            ...rest.headers,
+        }),
+    });
+}
+exports.request = request;
+function fetch_retry(url, retries, options) {
+    return new Promise((resolve, reject) => {
+        cross_fetch_1.default(url, options)
+            .then(response => {
+            // We don't want to `reject` when retries have finished
+            // Instead simply stop trying and return.
+            if (retries === 0)
+                return resolve(response);
+            if (response.status === 429) {
+                const { retryTimeout = 20000 } = options;
+                retryTimeoutPromise(retryTimeout).then(() => {
+                    fetch_retry(url, retries - 1, options)
+                        .then(resolve)
+                        .catch(reject);
+                });
+            }
+            else {
+                resolve(response);
+            }
+        })
+            .catch(reject);
+    });
+}
+const retryTimeoutPromise = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
+function userAgentHeader() {
+    if (browser_or_node_1.isBrowser)
+        return {};
+    return {
+        'User-Agent': `pdjs/${VERSION} (${process.version}/${process.platform})`,
+    };
+}
+function applyParameters(url, queryParameters) {
+    if (!queryParameters)
+        return url;
+    const combinedParameters = url.searchParams;
+    for (const key of Object.keys(queryParameters)) {
+        const parameter = queryParameters[key];
+        if (Array.isArray(parameter)) {
+            // Support for array based keys like `additional_fields[]`
+            parameter.forEach(item => {
+                combinedParameters.append(key, item);
+            });
+        }
+        else {
+            combinedParameters.append(key, parameter);
+        }
+    }
+    url.search = combinedParameters.toString();
+    return url;
+}
+function applyTimeout(init, timeout) {
+    if (!timeout)
+        return init;
+    const controller = new cjs_ponyfill_1.AbortController();
+    setTimeout(() => controller.abort(), timeout);
+    return {
+        ...init,
+        signal: controller.signal,
+    };
+}
+//# sourceMappingURL=common.js.map
+
+/***/ }),
+
+/***/ 3307:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.change = exports.resolve = exports.acknowledge = exports.trigger = exports.event = void 0;
+const common_1 = __nccwpck_require__(8867);
+function event(eventParameters) {
+    const { server = 'events.pagerduty.com', type = 'event', data, ...config } = eventParameters;
+    let url = `https://${server}/v2/enqueue`;
+    if (type === 'change') {
+        url = `https://${server}/v2/change/enqueue`;
+    }
+    return eventFetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        ...config,
+    });
+}
+exports.event = event;
+const shorthand = (action) => (eventParameters) => {
+    const typeField = 'event_action';
+    return event({
+        ...eventParameters,
+        data: {
+            ...eventParameters.data,
+            [typeField]: action,
+        },
+    });
+};
+exports.trigger = shorthand('trigger');
+exports.acknowledge = shorthand('acknowledge');
+exports.resolve = shorthand('resolve');
+const change = (eventParameters) => event({ ...eventParameters, type: 'change' });
+exports.change = change;
+function eventFetch(url, options) {
+    return common_1.request(url, options).then((response) => {
+        const apiResponse = response;
+        return response.json().then((data) => {
+            apiResponse.data = data;
+            apiResponse.response = response;
+            return apiResponse;
+        });
+    });
+}
+//# sourceMappingURL=events.js.map
+
+/***/ }),
+
+/***/ 8512:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolve = exports.acknowledge = exports.trigger = exports.change = exports.event = exports.api = void 0;
+var api_1 = __nccwpck_require__(6793);
+Object.defineProperty(exports, "api", ({ enumerable: true, get: function () { return api_1.api; } }));
+var events_1 = __nccwpck_require__(3307);
+Object.defineProperty(exports, "event", ({ enumerable: true, get: function () { return events_1.event; } }));
+Object.defineProperty(exports, "change", ({ enumerable: true, get: function () { return events_1.change; } }));
+Object.defineProperty(exports, "trigger", ({ enumerable: true, get: function () { return events_1.trigger; } }));
+Object.defineProperty(exports, "acknowledge", ({ enumerable: true, get: function () { return events_1.acknowledge; } }));
+Object.defineProperty(exports, "resolve", ({ enumerable: true, get: function () { return events_1.resolve; } }));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ 3178:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -4385,6 +4762,497 @@ function getUserAgent() {
 }
 exports.getUserAgent = getUserAgent;
 //# sourceMappingURL=instrument.js.map
+
+/***/ }),
+
+/***/ 3713:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = _getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    _get = Reflect.get;
+  } else {
+    _get = function _get(target, property, receiver) {
+      var base = _superPropBase(target, property);
+
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
+}
+
+var Emitter = /*#__PURE__*/function () {
+  function Emitter() {
+    _classCallCheck(this, Emitter);
+
+    Object.defineProperty(this, 'listeners', {
+      value: {},
+      writable: true,
+      configurable: true
+    });
+  }
+
+  _createClass(Emitter, [{
+    key: "addEventListener",
+    value: function addEventListener(type, callback, options) {
+      if (!(type in this.listeners)) {
+        this.listeners[type] = [];
+      }
+
+      this.listeners[type].push({
+        callback: callback,
+        options: options
+      });
+    }
+  }, {
+    key: "removeEventListener",
+    value: function removeEventListener(type, callback) {
+      if (!(type in this.listeners)) {
+        return;
+      }
+
+      var stack = this.listeners[type];
+
+      for (var i = 0, l = stack.length; i < l; i++) {
+        if (stack[i].callback === callback) {
+          stack.splice(i, 1);
+          return;
+        }
+      }
+    }
+  }, {
+    key: "dispatchEvent",
+    value: function dispatchEvent(event) {
+      if (!(event.type in this.listeners)) {
+        return;
+      }
+
+      var stack = this.listeners[event.type];
+      var stackToCall = stack.slice();
+
+      for (var i = 0, l = stackToCall.length; i < l; i++) {
+        var listener = stackToCall[i];
+
+        try {
+          listener.callback.call(this, event);
+        } catch (e) {
+          Promise.resolve().then(function () {
+            throw e;
+          });
+        }
+
+        if (listener.options && listener.options.once) {
+          this.removeEventListener(event.type, listener.callback);
+        }
+      }
+
+      return !event.defaultPrevented;
+    }
+  }]);
+
+  return Emitter;
+}();
+
+var AbortSignal = /*#__PURE__*/function (_Emitter) {
+  _inherits(AbortSignal, _Emitter);
+
+  var _super = _createSuper(AbortSignal);
+
+  function AbortSignal() {
+    var _this;
+
+    _classCallCheck(this, AbortSignal);
+
+    _this = _super.call(this); // Some versions of babel does not transpile super() correctly for IE <= 10, if the parent
+    // constructor has failed to run, then "this.listeners" will still be undefined and then we call
+    // the parent constructor directly instead as a workaround. For general details, see babel bug:
+    // https://github.com/babel/babel/issues/3041
+    // This hack was added as a fix for the issue described here:
+    // https://github.com/Financial-Times/polyfill-library/pull/59#issuecomment-477558042
+
+    if (!_this.listeners) {
+      Emitter.call(_assertThisInitialized(_this));
+    } // Compared to assignment, Object.defineProperty makes properties non-enumerable by default and
+    // we want Object.keys(new AbortController().signal) to be [] for compat with the native impl
+
+
+    Object.defineProperty(_assertThisInitialized(_this), 'aborted', {
+      value: false,
+      writable: true,
+      configurable: true
+    });
+    Object.defineProperty(_assertThisInitialized(_this), 'onabort', {
+      value: null,
+      writable: true,
+      configurable: true
+    });
+    return _this;
+  }
+
+  _createClass(AbortSignal, [{
+    key: "toString",
+    value: function toString() {
+      return '[object AbortSignal]';
+    }
+  }, {
+    key: "dispatchEvent",
+    value: function dispatchEvent(event) {
+      if (event.type === 'abort') {
+        this.aborted = true;
+
+        if (typeof this.onabort === 'function') {
+          this.onabort.call(this, event);
+        }
+      }
+
+      _get(_getPrototypeOf(AbortSignal.prototype), "dispatchEvent", this).call(this, event);
+    }
+  }]);
+
+  return AbortSignal;
+}(Emitter);
+var AbortController = /*#__PURE__*/function () {
+  function AbortController() {
+    _classCallCheck(this, AbortController);
+
+    // Compared to assignment, Object.defineProperty makes properties non-enumerable by default and
+    // we want Object.keys(new AbortController()) to be [] for compat with the native impl
+    Object.defineProperty(this, 'signal', {
+      value: new AbortSignal(),
+      writable: true,
+      configurable: true
+    });
+  }
+
+  _createClass(AbortController, [{
+    key: "abort",
+    value: function abort() {
+      var event;
+
+      try {
+        event = new Event('abort');
+      } catch (e) {
+        if (typeof document !== 'undefined') {
+          if (!document.createEvent) {
+            // For Internet Explorer 8:
+            event = document.createEventObject();
+            event.type = 'abort';
+          } else {
+            // For Internet Explorer 11:
+            event = document.createEvent('Event');
+            event.initEvent('abort', false, false);
+          }
+        } else {
+          // Fallback where document isn't available:
+          event = {
+            type: 'abort',
+            bubbles: false,
+            cancelable: false
+          };
+        }
+      }
+
+      this.signal.dispatchEvent(event);
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      return '[object AbortController]';
+    }
+  }]);
+
+  return AbortController;
+}();
+
+if (typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+  // These are necessary to make sure that we get correct output for:
+  // Object.prototype.toString.call(new AbortController())
+  AbortController.prototype[Symbol.toStringTag] = 'AbortController';
+  AbortSignal.prototype[Symbol.toStringTag] = 'AbortSignal';
+}
+
+function polyfillNeeded(self) {
+  if (self.__FORCE_INSTALL_ABORTCONTROLLER_POLYFILL) {
+    console.log('__FORCE_INSTALL_ABORTCONTROLLER_POLYFILL=true is set, will force install polyfill');
+    return true;
+  } // Note that the "unfetch" minimal fetch polyfill defines fetch() without
+  // defining window.Request, and this polyfill need to work on top of unfetch
+  // so the below feature detection needs the !self.AbortController part.
+  // The Request.prototype check is also needed because Safari versions 11.1.2
+  // up to and including 12.1.x has a window.AbortController present but still
+  // does NOT correctly implement abortable fetch:
+  // https://bugs.webkit.org/show_bug.cgi?id=174980#c2
+
+
+  return typeof self.Request === 'function' && !self.Request.prototype.hasOwnProperty('signal') || !self.AbortController;
+}
+
+/**
+ * Note: the "fetch.Request" default value is available for fetch imported from
+ * the "node-fetch" package and not in browsers. This is OK since browsers
+ * will be importing umd-polyfill.js from that path "self" is passed the
+ * decorator so the default value will not be used (because browsers that define
+ * fetch also has Request). One quirky setup where self.fetch exists but
+ * self.Request does not is when the "unfetch" minimal fetch polyfill is used
+ * on top of IE11; for this case the browser will try to use the fetch.Request
+ * default value which in turn will be undefined but then then "if (Request)"
+ * will ensure that you get a patched fetch but still no Request (as expected).
+ * @param {fetch, Request = fetch.Request}
+ * @returns {fetch: abortableFetch, Request: AbortableRequest}
+ */
+
+function abortableFetchDecorator(patchTargets) {
+  if ('function' === typeof patchTargets) {
+    patchTargets = {
+      fetch: patchTargets
+    };
+  }
+
+  var _patchTargets = patchTargets,
+      fetch = _patchTargets.fetch,
+      _patchTargets$Request = _patchTargets.Request,
+      NativeRequest = _patchTargets$Request === void 0 ? fetch.Request : _patchTargets$Request,
+      NativeAbortController = _patchTargets.AbortController,
+      _patchTargets$__FORCE = _patchTargets.__FORCE_INSTALL_ABORTCONTROLLER_POLYFILL,
+      __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL = _patchTargets$__FORCE === void 0 ? false : _patchTargets$__FORCE;
+
+  if (!polyfillNeeded({
+    fetch: fetch,
+    Request: NativeRequest,
+    AbortController: NativeAbortController,
+    __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL: __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL
+  })) {
+    return {
+      fetch: fetch,
+      Request: Request
+    };
+  }
+
+  var Request = NativeRequest; // Note that the "unfetch" minimal fetch polyfill defines fetch() without
+  // defining window.Request, and this polyfill need to work on top of unfetch
+  // hence we only patch it if it's available. Also we don't patch it if signal
+  // is already available on the Request prototype because in this case support
+  // is present and the patching below can cause a crash since it assigns to
+  // request.signal which is technically a read-only property. This latter error
+  // happens when you run the main5.js node-fetch example in the repo
+  // "abortcontroller-polyfill-examples". The exact error is:
+  //   request.signal = init.signal;
+  //   ^
+  // TypeError: Cannot set property signal of #<Request> which has only a getter
+
+  if (Request && !Request.prototype.hasOwnProperty('signal') || __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL) {
+    Request = function Request(input, init) {
+      var signal;
+
+      if (init && init.signal) {
+        signal = init.signal; // Never pass init.signal to the native Request implementation when the polyfill has
+        // been installed because if we're running on top of a browser with a
+        // working native AbortController (i.e. the polyfill was installed due to
+        // __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL being set), then passing our
+        // fake AbortSignal to the native fetch will trigger:
+        // TypeError: Failed to construct 'Request': member signal is not of type AbortSignal.
+
+        delete init.signal;
+      }
+
+      var request = new NativeRequest(input, init);
+
+      if (signal) {
+        Object.defineProperty(request, 'signal', {
+          writable: false,
+          enumerable: false,
+          configurable: true,
+          value: signal
+        });
+      }
+
+      return request;
+    };
+
+    Request.prototype = NativeRequest.prototype;
+  }
+
+  var realFetch = fetch;
+
+  var abortableFetch = function abortableFetch(input, init) {
+    var signal = Request && Request.prototype.isPrototypeOf(input) ? input.signal : init ? init.signal : undefined;
+
+    if (signal) {
+      var abortError;
+
+      try {
+        abortError = new DOMException('Aborted', 'AbortError');
+      } catch (err) {
+        // IE 11 does not support calling the DOMException constructor, use a
+        // regular error object on it instead.
+        abortError = new Error('Aborted');
+        abortError.name = 'AbortError';
+      } // Return early if already aborted, thus avoiding making an HTTP request
+
+
+      if (signal.aborted) {
+        return Promise.reject(abortError);
+      } // Turn an event into a promise, reject it once `abort` is dispatched
+
+
+      var cancellation = new Promise(function (_, reject) {
+        signal.addEventListener('abort', function () {
+          return reject(abortError);
+        }, {
+          once: true
+        });
+      });
+
+      if (init && init.signal) {
+        // Never pass .signal to the native implementation when the polyfill has
+        // been installed because if we're running on top of a browser with a
+        // working native AbortController (i.e. the polyfill was installed due to
+        // __FORCE_INSTALL_ABORTCONTROLLER_POLYFILL being set), then passing our
+        // fake AbortSignal to the native fetch will trigger:
+        // TypeError: Failed to execute 'fetch' on 'Window': member signal is not of type AbortSignal.
+        delete init.signal;
+      } // Return the fastest promise (don't need to wait for request to finish)
+
+
+      return Promise.race([cancellation, realFetch(input, init)]);
+    }
+
+    return realFetch(input, init);
+  };
+
+  return {
+    fetch: abortableFetch,
+    Request: Request
+  };
+}
+
+exports.AbortController = AbortController;
+exports.AbortSignal = AbortSignal;
+exports.abortableFetch = abortableFetchDecorator;
+
 
 /***/ }),
 
@@ -6623,6 +7491,73 @@ function removeHook(state, name, method) {
 
   state.registry[name].splice(index, 1);
 }
+
+
+/***/ }),
+
+/***/ 9107:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/* global window self */
+
+var isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
+/* eslint-disable no-restricted-globals */
+var isWebWorker = (typeof self === 'undefined' ? 'undefined' : _typeof(self)) === 'object' && self.constructor && self.constructor.name === 'DedicatedWorkerGlobalScope';
+/* eslint-enable no-restricted-globals */
+
+var isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+
+/**
+ * @see https://github.com/jsdom/jsdom/releases/tag/12.0.0
+ * @see https://github.com/jsdom/jsdom/issues/1537
+ */
+/* eslint-disable no-undef */
+var isJsDom = function isJsDom() {
+  return typeof window !== 'undefined' && window.name === 'nodejs' || navigator.userAgent.includes('Node.js') || navigator.userAgent.includes('jsdom');
+};
+
+exports.isBrowser = isBrowser;
+exports.isWebWorker = isWebWorker;
+exports.isNode = isNode;
+exports.isJsDom = isJsDom;
+
+/***/ }),
+
+/***/ 9805:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+const nodeFetch = __nccwpck_require__(467)
+const realFetch = nodeFetch.default || nodeFetch
+
+const fetch = function (url, options) {
+  // Support schemaless URIs on the server for parity with the browser.
+  // Ex: //github.com/ -> https://github.com/
+  if (/^\/\//.test(url)) {
+    url = 'https:' + url
+  }
+  return realFetch.call(this, url, options)
+}
+
+fetch.ponyfill = true
+
+module.exports = exports = fetch
+exports.fetch = fetch
+exports.Headers = nodeFetch.Headers
+exports.Request = nodeFetch.Request
+exports.Response = nodeFetch.Response
+
+// Needed for TypeScript consumers without esModuleInterop.
+exports.default = fetch
 
 
 /***/ }),
@@ -13616,7 +14551,7 @@ function wrappy (fn, cb) {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.1","/home/runner/work/action-cve/action-cve"]],"_from":"axios@0.21.1","_id":"axios@0.21.1","_inBundle":false,"_integrity":"sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.1","name":"axios","escapedName":"axios","rawSpec":"0.21.1","saveSpec":null,"fetchSpec":"0.21.1"},"_requiredBy":["/@slack/webhook"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.1.tgz","_spec":"0.21.1","_where":"/home/runner/work/action-cve/action-cve","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.10.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"bundlesize":"^0.17.0","coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.0.2","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^20.1.0","grunt-karma":"^2.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.2.0","karma-coverage":"^1.1.1","karma-firefox-launcher":"^1.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.2.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^5.2.0","sinon":"^4.5.0","typescript":"^2.8.1","url-search-params":"^0.10.0","webpack":"^1.13.1","webpack-dev-server":"^1.14.1"},"homepage":"https://github.com/axios/axios","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test && bundlesize","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.1"}');
+module.exports = JSON.parse('{"_from":"axios@^0.21.1","_id":"axios@0.21.1","_inBundle":false,"_integrity":"sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"range","registry":true,"raw":"axios@^0.21.1","name":"axios","escapedName":"axios","rawSpec":"^0.21.1","saveSpec":null,"fetchSpec":"^0.21.1"},"_requiredBy":["/@slack/webhook"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.1.tgz","_shasum":"22563481962f4d6bde9a76d516ef0e5d3c09b2b8","_spec":"axios@^0.21.1","_where":"/Users/kunalnagar/Documents/Code/kunalnagarco/action-cve/node_modules/@slack/webhook","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundleDependencies":false,"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.10.0"},"deprecated":false,"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"bundlesize":"^0.17.0","coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.0.2","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^20.1.0","grunt-karma":"^2.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.2.0","karma-coverage":"^1.1.1","karma-firefox-launcher":"^1.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.2.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^5.2.0","sinon":"^4.5.0","typescript":"^2.8.1","url-search-params":"^0.10.0","webpack":"^1.13.1","webpack-dev-server":"^1.14.1"},"homepage":"https://github.com/axios/axios","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test && bundlesize","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.1"}');
 
 /***/ }),
 

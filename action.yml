@@ -6,6 +6,8 @@ inputs:
     description: 'GitHub Personal Access Token'
   slack_webhook:
     description: 'Slack Webhook URL'
+  pager_duty_integration_key:
+    description: 'Pager Duty Integration Key. More instructions: https://support.pagerduty.com/docs/services-and-integrations'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

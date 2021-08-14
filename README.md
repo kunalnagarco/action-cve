@@ -7,7 +7,7 @@ A [GitHub action](https://github.com/features/actions) that sends Dependabot Vul
 - Slack
 - PagerDuty
 
-### Getting Started
+## Getting Started
 
 There are a few things you need to setup on the repository before this action can be used:
 
@@ -23,7 +23,7 @@ Ideally, you'd want to send these alerts to a dedicated Slack channel. Create a 
 
 Create a [Service Integration](https://support.pagerduty.com/docs/services-and-integrations#section-events-api-v2) in PagerDuty for the GitHub app. This will give you an Integration key that can be used in the action.
 
-### Usage
+## Usage
 
 ```yaml
 name: 'Check for Vulnerabilities'
@@ -36,23 +36,16 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      # X.X.X - Latest version available at:
-      #         https://github.com/kunalnagarco/action-cve/releases
+      # X.X.X - Latest version available at: https://github.com/kunalnagarco/action-cve/releases
       - uses: kunalnagarco/action-cve@vX.X.X
         with:
-          # Create a Personal Access Token here:
-          #     https://github.com/settings/tokens
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          # Create a Slack Incoming Webhook URL:
-          #     https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
-          # Number of vulnerability alerts
-          # Default: 20
           count: 10
 ```
 
-### Action Inputs
+## Action Inputs
 
 | Input                        | Description                                                                                                                                                         |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

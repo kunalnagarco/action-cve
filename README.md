@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/2741371/129387647-f5fdead5-a002-4e3d-9d55-cb7ebe988ff1.png)
+![image](/icons/marketing.png)
 
 ## @kunalnagarco/action-cve
 

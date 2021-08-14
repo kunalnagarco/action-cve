@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getInput, setFailed } from '@actions/core'
 import { sendAlertsToSlack, validateSlackWebhookUrl } from './destinations'
 // import { context } from '@actions/github'
@@ -13,7 +14,9 @@ async function run(): Promise<void> {
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
       if (slackWebhookUrl) {
-        if (!validateSlackWebhookUrl(slackWebhookUrl)) {
+        const result = validateSlackWebhookUrl(slackWebhookUrl)
+        console.log(result)
+        if (!result) {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {
           await sendAlertsToSlack(slackWebhookUrl, alerts)

@@ -371,7 +371,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const destinations_1 = __nccwpck_require__(8395);
-// import { context } from '@actions/github'
+const github_1 = __nccwpck_require__(5438);
 const fetch_alerts_1 = __nccwpck_require__(9028);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -380,10 +380,8 @@ function run() {
             const slackWebhookUrl = core_1.getInput('slack_webhook');
             const pagerDutyIntegrationKey = core_1.getInput('pager_duty_integration_key');
             const count = parseInt(core_1.getInput('count'));
-            // const owner = context.repo.owner
-            const owner = 'kunalnagar';
-            // const repo = context.repo.repo
-            const repo = 'cve-base';
+            const owner = github_1.context.repo.owner;
+            const repo = github_1.context.repo.repo;
             const alerts = yield fetch_alerts_1.fetchAlerts(token, repo, owner, count);
             if (alerts.length > 0) {
                 if (slackWebhookUrl) {

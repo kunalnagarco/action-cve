@@ -1,8 +1,11 @@
+![image](https://user-images.githubusercontent.com/2741371/129387647-f5fdead5-a002-4e3d-9d55-cb7ebe988ff1.png)
+
 ## @kunalnagarco/action-cve
 
-A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources, starting with Slack.
+A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources:
 
-![image](https://user-images.githubusercontent.com/2741371/129387647-f5fdead5-a002-4e3d-9d55-cb7ebe988ff1.png)
+- Slack
+- PagerDuty
 
 ### Usage
 
@@ -27,6 +30,9 @@ jobs:
           # Create a Slack Incoming Webhook URL:
           #     https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
           slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          # Create a Service Integration:
+          #     https://support.pagerduty.com/docs/services-and-integrations#section-events-api-v2
+          pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
           # Number of vulnerability alerts
           # Default: 20
           count: 10

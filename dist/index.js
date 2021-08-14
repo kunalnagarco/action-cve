@@ -88,7 +88,7 @@ const createAlertBlock = (alert) => {
     };
 };
 const validateSlackWebhookUrl = (url) => {
-    const regexPattern = new RegExp(/^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8}\/B[a-zA-Z0-9_]{8}\/[a-zA-Z0-9_]{24}/);
+    const regexPattern = new RegExp(/^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/);
     return regexPattern.test(url);
 };
 exports.validateSlackWebhookUrl = validateSlackWebhookUrl;

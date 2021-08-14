@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/kunalnagarco/action-cve/compare/v1.1.0...v1.2.0) (2021-08-14)
+
+
+### Features
+
+* Send alerts to PagerDuty ([#20](https://github.com/kunalnagarco/action-cve/issues/20)) ([3c6283c](https://github.com/kunalnagarco/action-cve/commit/3c6283cf4b909acf8c339ed4f11ea47e673af7eb))
+
 ## [1.1.0](https://github.com/kunalnagarco/action-cve/compare/v1.0.5...v1.1.0) (2021-08-14)
 
 

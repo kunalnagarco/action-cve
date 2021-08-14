@@ -48,6 +48,13 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
   }
 }
 
+export const validateSlackWebhookUrl = (url: string): boolean => {
+  const regexPattern = new RegExp(
+    /^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8}\/B[a-zA-Z0-9_]{8}\/[a-zA-Z0-9_]{24}/,
+  )
+  return regexPattern.test(url)
+}
+
 export const sendAlertsToSlack = async (
   webhookUrl: string,
   alerts: Alert[],

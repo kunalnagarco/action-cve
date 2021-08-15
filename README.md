@@ -7,7 +7,7 @@ A [GitHub action](https://github.com/features/actions) that sends Dependabot Vul
 - Slack
 - PagerDuty
 
-**For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki/Getting-Started).**
+**For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki).**
 
 ## Attributions
 

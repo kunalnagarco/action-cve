@@ -1,3 +1,4 @@
+import { ACTION_ICON, ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
 import { IncomingWebhook } from '@slack/webhook'
 import { KnownBlock } from '@slack/types'
@@ -74,8 +75,7 @@ export const sendAlertsToSlack = async (
       createDividerBlock(),
       ...alertBlocks,
     ],
-    icon_url:
-      'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
-    username: 'GitHub Action - @kunalnagarco/action-cve',
+    icon_url: ACTION_ICON,
+    username: ACTION_SHORT_SUMMARY,
   })
 }

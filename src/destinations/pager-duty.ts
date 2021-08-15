@@ -1,3 +1,4 @@
+import { ACTION_ICON, ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert } from '../entities'
 import { event } from '@pagerduty/pdjs'
 
@@ -17,9 +18,9 @@ export const sendAlertsToPagerDuty = async (
       },
       images: [
         {
-          src: 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png',
-          alt: 'GitHub Action Icon',
-          href: 'https://github.com/kunalnagarco/action-cve',
+          src: ACTION_ICON,
+          alt: ACTION_SHORT_SUMMARY,
+          href: ACTION_URL,
         },
       ],
     },

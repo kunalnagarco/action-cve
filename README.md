@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/2741371/129387647-f5fdead5-a002-4e3d-9d55-cb7ebe988ff1.png)
+![marketing](https://user-images.githubusercontent.com/2741371/129468484-bc0cb5f5-1db5-4ea0-96c6-7f1d2d0aa347.png)
 
 ## @kunalnagarco/action-cve
 
@@ -7,36 +7,7 @@ A [GitHub action](https://github.com/features/actions) that sends Dependabot Vul
 - Slack
 - PagerDuty
 
-### Usage
-
-```yaml
-name: 'Check for Vulnerabilities'
-
-on:
-  schedule:
-    - cron: '0 */6 * * *' # every 6 hours
-
-jobs:
-  main:
-    runs-on: ubuntu-latest
-    steps:
-      # X.X.X - Latest version available at:
-      #         https://github.com/kunalnagarco/action-cve/releases
-      - uses: kunalnagarco/action-cve@vX.X.X
-        with:
-          # Create a Personal Access Token here:
-          #     https://github.com/settings/tokens
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          # Create a Slack Incoming Webhook URL:
-          #     https://slack.com/apps/A0F7XDUAZ-incoming-webhooks
-          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
-          # Create a Service Integration:
-          #     https://support.pagerduty.com/docs/services-and-integrations#section-events-api-v2
-          pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
-          # Number of vulnerability alerts
-          # Default: 20
-          count: 10
-```
+**For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki/Getting-Started).**
 
 ## Attributions
 

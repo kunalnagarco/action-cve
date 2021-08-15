@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.1](https://github.com/kunalnagarco/action-cve/compare/v1.2.0...v1.2.1) (2021-08-15)
+
+
+### Chores
+
+* Cleanup + Docs ([#22](https://github.com/kunalnagarco/action-cve/issues/22)) ([f1831b9](https://github.com/kunalnagarco/action-cve/commit/f1831b99962d5060a56208ea1badddfc7bfd4b94))
+
 ## [1.2.0](https://github.com/kunalnagarco/action-cve/compare/v1.1.0...v1.2.0) (2021-08-14)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.2](https://github.com/kunalnagarco/action-cve/compare/v1.2.1...v1.2.2) (2021-09-06)
+
+
+### Bug Fixes
+
+* Broken build due to try/catch setFailed ([d8855df](https://github.com/kunalnagarco/action-cve/commit/d8855df8f0ed1840125023ffda162fe6644e4315))
+
 ### [1.2.1](https://github.com/kunalnagarco/action-cve/compare/v1.2.0...v1.2.1) (2021-08-15)
 
 

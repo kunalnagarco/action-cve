@@ -32,6 +32,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: npm install
+      - name: Build
+        run: npm run all
       - name: Release (dry-run)
         run: npm run release -- --dry-run
         env:

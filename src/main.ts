@@ -29,7 +29,9 @@ async function run(): Promise<void> {
       }
     }
   } catch (err) {
-    setFailed(err)
+    if (err instanceof Error) {
+      setFailed(err)
+    }
   }
 }
 

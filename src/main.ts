@@ -14,19 +14,42 @@ async function run(): Promise<void> {
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
-    const repo = context.repo.repo
-    const alerts = await fetchAlerts(token, repo, owner, count)
-    if (alerts.length > 0) {
-      if (slackWebhookUrl) {
-        if (!validateSlackWebhookUrl(slackWebhookUrl)) {
-          setFailed(new Error('Invalid Slack Webhook URL'))
-        } else {
-          await sendAlertsToSlack(slackWebhookUrl, alerts)
+    let arr = [
+      "api-examples",
+      "Common",
+      "CsReports",
+      "DataOverridesService",
+      "DenominatorCheck",
+      "DeskAssets",
+      "ExchangeRates",
+      "FIRDS",
+      "jurassic-park",
+      "MarketData",
+      "Rapportr",
+      "RapptrDatabase",
+      "RapptrNotifications",
+      "RapptrOneTimeSetup",
+      "RegulatoryData",
+      "RuleCommentary",
+      "Tasks",
+      "tenant-config"
+    ]
+    for (var val of arr) {
+      const repo = val
+      const alerts = await fetchAlerts(token, repo, owner, count)
+      if (alerts.length > 0) {
+        if (slackWebhookUrl) {
+          if (!validateSlackWebhookUrl(slackWebhookUrl)) {
+            setFailed(new Error('Invalid Slack Webhook URL'))
+          } else {
+            await sendAlertsToSlack(slackWebhookUrl, alerts)
+          }
         }
-      }
-      if (pagerDutyIntegrationKey) {
-        await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
-      }
+        if (pagerDutyIntegrationKey) {
+          await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
+        }
+    }
+    
     }
   } catch (err) {
     if (err instanceof Error) {

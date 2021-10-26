@@ -11,6 +11,8 @@ inputs:
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20
+  list_repos:
+    description: 'List of repos'
 branding:
   icon: 'alert-octagon'
   color: 'red'

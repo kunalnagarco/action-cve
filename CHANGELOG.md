@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/kunalnagarco/action-cve/compare/v1.2.2...v1.3.0) (2021-10-26)
+
+
+### Features
+
+* Amend the Slack WebHook validation ([#34](https://github.com/kunalnagarco/action-cve/issues/34)) ([4d8fa15](https://github.com/kunalnagarco/action-cve/commit/4d8fa15d9cc20941dc242f7366dd3c840b097dd0))
+
 ### [1.2.2](https://github.com/kunalnagarco/action-cve/compare/v1.2.1...v1.2.2) (2021-09-06)
 
 

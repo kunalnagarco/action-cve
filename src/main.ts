@@ -12,7 +12,8 @@ async function run(): Promise<void> {
     const token = getInput('token')
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
-    const repos = getInput('list_repos')).json()
+    //const repos = getInput('list_repos')).json()
+    const repos = JSON.parse(getInput('list_repos'))
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
     for (var val of repos) {

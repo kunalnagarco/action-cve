@@ -1,4 +1,4 @@
-import { getInput, setFailed } from '@actions/core'
+import { getInput, setFailed, info } from '@actions/core'
 import {
   sendAlertsToPagerDuty,
   sendAlertsToSlack,

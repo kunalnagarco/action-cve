@@ -20,7 +20,7 @@ async function run(): Promise<void> {
     for (var val of repos) {
       const repo = val
       const alerts = await fetchAlerts(token, repo, owner, count)
-      info(token + " " + repo + " " owner + " " + count )
+      info(token + " " + repo + " " + owner + " " + count )
       info(alerts)
       if (alerts.length > 0) {
         if (slackWebhookUrl) {

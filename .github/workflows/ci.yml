@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           # pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
-          list_repos: "['action-cve-multiple-repos']"
+          list_repos: '["action-cve-multiple-repos"]'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies

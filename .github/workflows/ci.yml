@@ -25,7 +25,7 @@ jobs:
       - name: Run action
         uses: ./
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           # pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
         env:

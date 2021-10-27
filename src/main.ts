@@ -14,6 +14,7 @@ async function run(): Promise<void> {
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const repos = JSON.parse(getInput('list_repos'))
     info(repos)
+    info("E is amazing")
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
     for (var val of repos) {

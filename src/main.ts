@@ -1,4 +1,4 @@
-import { getInput, setFailed, info } from '@actions/core'
+import { getInput, info, setFailed } from '@actions/core'
 import {
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
@@ -14,13 +14,13 @@ async function run(): Promise<void> {
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const repos = JSON.parse(getInput('list_repos'))
     info(repos)
-    info("E is amazing")
+    info('E is amazing')
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
-    for (var val of repos) {
+    for (const val of repos) {
       const repo = val
       const alerts = await fetchAlerts(token, repo, owner, count)
-      info(token + " " + repo + " " + owner + " " + count )
+      info(`${token} ${repo} ${owner} ${count}`)
       info(alerts.toString())
       if (alerts.length > 0) {
         if (slackWebhookUrl) {
@@ -33,8 +33,7 @@ async function run(): Promise<void> {
         if (pagerDutyIntegrationKey) {
           await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
         }
-    }
-    
+      }
     }
   } catch (err) {
     if (err instanceof Error) {

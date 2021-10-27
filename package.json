@@ -1,5 +1,5 @@
 {
-  "name": "@kunalnagarco/action-cve",
+  "name": "@Vincent-FundApps/action-cve-multiple-repos",
   "version": "0.0.0",
   "private": true,
   "description": "Send GitHub vulnerability alerts to multiple platforms",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kunalnagarco/action-cve.git"
+    "url": "git+https://github.com/Vincent-FundApps/action-cve-multiple-repos.git"
   },
   "license": "MIT",
   "author": "Kunal Nagar <knlnagar@gmail.com>",

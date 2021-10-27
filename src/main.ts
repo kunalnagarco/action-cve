@@ -13,14 +13,14 @@ async function run(): Promise<void> {
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const repos = JSON.parse(getInput('list_repos'))
-    core.info(repos)
+    info(repos)
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
     for (var val of repos) {
       const repo = val
       const alerts = await fetchAlerts(token, repo, owner, count)
-      core.info(token + " " + repo + " " owner + " " + count )
-      core.info(alerts)
+      info(token + " " + repo + " " owner + " " + count )
+      info(alerts)
       if (alerts.length > 0) {
         if (slackWebhookUrl) {
           if (!validateSlackWebhookUrl(slackWebhookUrl)) {

@@ -79,4 +79,3 @@ export const sendAlertsToSlack = async (
     username: ACTION_SHORT_SUMMARY,
   })
 }
-

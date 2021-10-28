@@ -1,14 +1,16 @@
-![marketing](https://user-images.githubusercontent.com/2741371/129468484-bc0cb5f5-1db5-4ea0-96c6-7f1d2d0aa347.png)
+### This is a fork of @kunalnagarco/action-cve
 
-## @kunalnagarco/action-cve
+Click [here](https://github.com/kunalnagarco/action-cve) for the original GitHub Action.
 
-A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources:
+
+## @Vincent-FundApps/action-cve-multiple-repos
+
+A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts from MULTIPLE REPOSITORIES from a given organization to multiple sources:
 
 - Slack
 - PagerDuty
 
-**For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki).**
+**For more info and getting started, check out the [Wiki](https://github.com/Vincent-FundApps/action-cve-multiple-repos/wiki).**
 
 ## Attributions
-
-- Bug icon: Made by Freepik from [https://www.flaticon.com/](https://www.flaticon.com/)
+This is a fork from @kunalnagarco/action-cve

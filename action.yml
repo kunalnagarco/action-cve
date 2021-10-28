@@ -14,8 +14,8 @@ inputs:
   list_repos:
     description: 'List of repos'
 branding:
-  icon: 'alert-octagon'
-  color: 'red'
+  icon: 'alert-triangle'
+  color: 'orange'
 runs:
   using: 'node12'
   main: 'dist/index.js'

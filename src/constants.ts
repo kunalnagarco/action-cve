@@ -1,6 +1,6 @@
 export const ACTION_ICON =
-  'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png'
+  'https://https://github.com/Vincent-FundApps/action-cve-multiple-repos/raw/main/icons/Disapproving.png'
 
-export const ACTION_SHORT_SUMMARY = 'GitHub Action - @kunalnagarco/action-cve'
+export const ACTION_SHORT_SUMMARY = 'GitHub Action - @Vincent-FundApps/action-cve-multiple-repos'
 
-export const ACTION_URL = 'https://github.com/kunalnagarco/action-cve'
+export const ACTION_URL = 'https://github.com/Vincent-FundApps/action-cve-multiple-repos'

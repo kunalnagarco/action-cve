@@ -16,9 +16,9 @@ module.exports = JSON.parse('{"name":"@slack/webhook","version":"6.0.0","descrip
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ACTION_URL = exports.ACTION_SHORT_SUMMARY = exports.ACTION_ICON = void 0;
-exports.ACTION_ICON = 'https://github.com/kunalnagarco/action-cve/raw/main/icons/ladybug.png';
-exports.ACTION_SHORT_SUMMARY = 'GitHub Action - @kunalnagarco/action-cve';
-exports.ACTION_URL = 'https://github.com/kunalnagarco/action-cve';
+exports.ACTION_ICON = 'https://github.com/Vincent-FundApps/action-cve-multiple-repos/raw/main/icons/Disapproving.png';
+exports.ACTION_SHORT_SUMMARY = 'GitHub Action - @Vincent-FundApps/action-cve-multiple-repos';
+exports.ACTION_URL = 'https://github.com/Vincent-FundApps/action-cve-multiple-repos';
 
 
 /***/ }),
@@ -396,15 +396,11 @@ function run() {
             const slackWebhookUrl = (0, core_1.getInput)('slack_webhook');
             const pagerDutyIntegrationKey = (0, core_1.getInput)('pager_duty_integration_key');
             const repos = JSON.parse((0, core_1.getInput)('list_repos'));
-            (0, core_1.info)(repos);
-            (0, core_1.info)('E is amazing');
             const count = parseInt((0, core_1.getInput)('count'));
             const owner = github_1.context.repo.owner;
             for (const val of repos) {
                 const repo = val;
                 const alerts = yield (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, count);
-                (0, core_1.info)(`${token} ${repo} ${owner} ${count}`);
-                (0, core_1.info)(alerts.toString());
                 if (alerts.length > 0) {
                     if (slackWebhookUrl) {
                         if (!(0, destinations_1.validateSlackWebhookUrl)(slackWebhookUrl)) {

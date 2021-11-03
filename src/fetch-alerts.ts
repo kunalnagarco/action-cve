@@ -52,6 +52,7 @@ export const fetchAlerts = async (
                   summary
                 }
               }
+              dismissedAt
             }
           }
         }
@@ -62,7 +63,7 @@ export const fetchAlerts = async (
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node) {
+      if (gitHubAlert && gitHubAlert.node && !gitHubAlert.node.dismissedAt) {
         alerts.push(toAlert(gitHubAlert.node))
       }
     }

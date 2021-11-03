@@ -10,6 +10,7 @@ export interface Alert {
   vulnerability?: Vulnerability
   manifest: string
   createdAt: string
+  dismissedAt: string
 }
 
 export const toAlert = (
@@ -26,4 +27,5 @@ export const toAlert = (
     : undefined,
   manifest: repositoryVulnerabilityAlert.vulnerableManifestFilename,
   createdAt: repositoryVulnerabilityAlert.createdAt,
+  dismissedAt: repositoryVulnerabilityAlert.dismissedAt,
 })

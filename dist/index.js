@@ -218,6 +218,7 @@ const toAlert = (repositoryVulnerabilityAlert) => {
             : undefined,
         manifest: repositoryVulnerabilityAlert.vulnerableManifestFilename,
         createdAt: repositoryVulnerabilityAlert.createdAt,
+        dismissedAt: repositoryVulnerabilityAlert.dismissedAt,
     });
 };
 exports.toAlert = toAlert;
@@ -347,6 +348,7 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
                   summary
                 }
               }
+              dismissedAt
             }
           }
         }
@@ -357,7 +359,7 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
     if (gitHubAlerts) {
         const alerts = [];
         for (const gitHubAlert of gitHubAlerts) {
-            if (gitHubAlert && gitHubAlert.node) {
+            if (gitHubAlert && gitHubAlert.node && !gitHubAlert.node.dismissedAt) {
                 alerts.push((0, entities_1.toAlert)(gitHubAlert.node));
             }
         }

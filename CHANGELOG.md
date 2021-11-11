@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.3.2](https://github.com/kunalnagarco/action-cve/compare/v1.3.1...v1.3.2) (2021-11-11)
+
+
+### Bug Fixes
+
+* set-value CVE-2021-23440 ([f73da83](https://github.com/kunalnagarco/action-cve/commit/f73da83194e9a37ba5ed569966df9617a22315b2))
+* Upgrade ts-jest to fix Jest failing ([ec2a164](https://github.com/kunalnagarco/action-cve/commit/ec2a164b9b8ba2eabb2db5cdd7c690da9b3205a3))
+
 ### [1.3.1](https://github.com/kunalnagarco/action-cve/compare/v1.3.0...v1.3.1) (2021-11-11)
 
 

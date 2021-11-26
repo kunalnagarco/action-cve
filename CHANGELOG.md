@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.3.3](https://github.com/kunalnagarco/action-cve/compare/v1.3.2...v1.3.3) (2021-11-26)
+
+
+### Chores
+
+* Lock file maintenance ([#38](https://github.com/kunalnagarco/action-cve/issues/38)) ([fe3bf41](https://github.com/kunalnagarco/action-cve/commit/fe3bf4161e6e6ae355399cf0291bc982ac17ecf6))
+
 ### [1.3.2](https://github.com/kunalnagarco/action-cve/compare/v1.3.1...v1.3.2) (2021-11-11)
 
 

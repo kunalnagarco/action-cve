@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/kunalnagarco/action-cve/compare/v1.3.3...v1.4.0) (2021-12-20)
+
+
+### Features
+
+* Add destination - Zenduty ([#45](https://github.com/kunalnagarco/action-cve/issues/45)) ([b721e89](https://github.com/kunalnagarco/action-cve/commit/b721e89f86a31871252d4997336b7383f8c75cfd))
+
 ### [1.3.3](https://github.com/kunalnagarco/action-cve/compare/v1.3.2...v1.3.3) (2021-11-26)
 
 

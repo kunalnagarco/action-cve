@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable import/no-commonjs */
@@ -11,6 +12,8 @@ export const sendAlertsToZenduty = async (
   escalationPolicyId: string,
   alerts: Alert[],
 ): Promise<void> => {
+  console.log(zenduty)
+  console.log(JSON.stringify(zenduty))
   const apiObject = zenduty.IncidentsApi(zenduty.ApiClient(apiKey))
   const payload = {
     service: serviceId,

@@ -188,14 +188,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
 /* eslint-disable no-console */
+__nccwpck_require__(8543);
 const constants_1 = __nccwpck_require__(5105);
-const unfetch_1 = __importDefault(__nccwpck_require__(3970));
 const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = {
         service: serviceId,
@@ -211,7 +208,7 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
     // eslint-disable-next-line i18n-text/no-en
     const bearer = `Bearer ${apiKey}`;
     try {
-        const response = yield (0, unfetch_1.default)('https://www.zenduty.com/api/incidents', {
+        const response = yield fetch('https://www.zenduty.com/api/incidents', {
             method: 'POST',
             headers: {
                 Authorization: bearer,
@@ -13073,11 +13070,10 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 3970:
-/***/ ((module) => {
+/***/ 8543:
+/***/ (() => {
 
-module.exports=function(e,n){return n=n||{},new Promise(function(t,r){var s=new XMLHttpRequest,o=[],u=[],i={},a=function(){return{ok:2==(s.status/100|0),statusText:s.statusText,status:s.status,url:s.responseURL,text:function(){return Promise.resolve(s.responseText)},json:function(){return Promise.resolve(s.responseText).then(JSON.parse)},blob:function(){return Promise.resolve(new Blob([s.response]))},clone:a,headers:{keys:function(){return o},entries:function(){return u},get:function(e){return i[e.toLowerCase()]},has:function(e){return e.toLowerCase()in i}}}};for(var l in s.open(n.method||"get",e,!0),s.onload=function(){s.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm,function(e,n,t){o.push(n=n.toLowerCase()),u.push([n,t]),i[n]=i[n]?i[n]+","+t:t}),t(a())},s.onerror=r,s.withCredentials="include"==n.credentials,n.headers)s.setRequestHeader(l,n.headers[l]);s.send(n.body||null)})};
-//# sourceMappingURL=unfetch.js.map
+self.fetch||(self.fetch=function(e,n){return n=n||{},new Promise(function(t,s){var r=new XMLHttpRequest,o=[],u=[],i={},a=function(){return{ok:2==(r.status/100|0),statusText:r.statusText,status:r.status,url:r.responseURL,text:function(){return Promise.resolve(r.responseText)},json:function(){return Promise.resolve(r.responseText).then(JSON.parse)},blob:function(){return Promise.resolve(new Blob([r.response]))},clone:a,headers:{keys:function(){return o},entries:function(){return u},get:function(e){return i[e.toLowerCase()]},has:function(e){return e.toLowerCase()in i}}}};for(var c in r.open(n.method||"get",e,!0),r.onload=function(){r.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm,function(e,n,t){o.push(n=n.toLowerCase()),u.push([n,t]),i[n]=i[n]?i[n]+","+t:t}),t(a())},r.onerror=s,r.withCredentials="include"==n.credentials,n.headers)r.setRequestHeader(c,n.headers[c]);r.send(n.body||null)})});
 
 
 /***/ }),

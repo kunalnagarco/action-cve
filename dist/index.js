@@ -188,15 +188,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable import/no-commonjs */
 const constants_1 = __nccwpck_require__(5105);
-const zenduty_sdk_1 = __importDefault(__nccwpck_require__(2604));
+const zenduty = __nccwpck_require__(2604);
 const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    const apiObject = zenduty_sdk_1.default.IncidentsApi(zenduty_sdk_1.default.ApiClient(apiKey));
+    const apiObject = zenduty.IncidentsApi(zenduty.ApiClient(apiKey));
     const payload = {
         service: serviceId,
         escalation_policy: escalationPolicyId,

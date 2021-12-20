@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable import/no-commonjs */
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
-import zenduty from 'zenduty-sdk'
+const zenduty = require('zenduty-sdk')
 
 export const sendAlertsToZenduty = async (
   apiKey: string,

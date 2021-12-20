@@ -28,6 +28,9 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           # pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
+          zenduty_api_key: ${{ secrets.ZENDUTY_API_KEY }}
+          zenduty_service_id: ${{ secrets.ZENDUTY_SERVICE_ID }}
+          zenduty_escalation_policy_id: ${{ secrets.ZENDUTY_ESCALATION_POLICY_ID }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies

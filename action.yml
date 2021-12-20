@@ -8,6 +8,12 @@ inputs:
     description: 'Slack Webhook URL. More info: https://api.slack.com/messaging/webhooks'
   pager_duty_integration_key:
     description: 'Pager Duty Integration Key. More info: https://support.pagerduty.com/docs/services-and-integrations'
+  zenduty_api_key:
+    description: 'Create a Zenduty API Key by visiting Account Settings > API Keys'
+  zenduty_service_id:
+    description: 'Zenduty Service ID: https://docs.zenduty.com/docs/services'
+  zenduty_escalation_policy_id:
+    description: 'Zenduty Escalation Policy ID: https://docs.zenduty.com/docs/escalationpolicies'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

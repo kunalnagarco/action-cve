@@ -2,6 +2,7 @@ import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
+  sendAlertsToZenduty,
   validateSlackWebhookUrl,
 } from './destinations'
 import { context } from '@actions/github'
@@ -12,6 +13,9 @@ async function run(): Promise<void> {
     const token = getInput('token')
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
+    const zenDutyApiKey = getInput('zenduty_api_key')
+    const zenDutyServiceId = getInput('zenduty_service_id')
+    const zenDutyEscalationPolicyId = getInput('zenduty_escalation_policy_id')
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
     const repo = context.repo.repo
@@ -26,6 +30,20 @@ async function run(): Promise<void> {
       }
       if (pagerDutyIntegrationKey) {
         await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
+      }
+      if (zenDutyApiKey) {
+        if (zenDutyServiceId && zenDutyEscalationPolicyId) {
+          await sendAlertsToZenduty(
+            zenDutyApiKey,
+            zenDutyServiceId,
+            zenDutyEscalationPolicyId,
+            alerts,
+          )
+        } else {
+          setFailed(
+            new Error('Check your Zenduty Service ID and Escalation Policy ID'),
+          )
+        }
       }
     }
   } catch (err) {

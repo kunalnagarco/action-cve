@@ -215,10 +215,11 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
             method: 'POST',
             headers: {
                 Authorization: bearer,
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload),
         });
-        console.log(yield response.json(), response.body, yield response.text());
+        console.log(yield response.json());
     }
     catch (err) {
         console.log(err);

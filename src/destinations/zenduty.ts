@@ -29,10 +29,11 @@ export const sendAlertsToZenduty = async (
       method: 'POST',
       headers: {
         Authorization: bearer,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
     })
-    console.log(await response.json(), response.body, await response.text())
+    console.log(await response.json())
   } catch (err) {
     console.log(err)
   }

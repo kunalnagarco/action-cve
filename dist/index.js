@@ -193,37 +193,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
-/* eslint-disable no-console */
 const constants_1 = __nccwpck_require__(5105);
 const node_fetch_1 = __importDefault(__nccwpck_require__(467));
 const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    let summary = `
+    You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}
+
+    ---
+
+  `;
+    for (const alert of alerts) {
+        summary += `
+      Package name: ${alert.packageName}
+      Vulnerability Version Range: ${(_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange}
+      Patched Version: ${(_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion}
+      Severity: ${(_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity}
+      Summary: ${(_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary}
+    `;
+    }
+    summary += `
+
+    ---
+  `;
     const payload = {
         service: serviceId,
         escalation_policy: escalationPolicyId,
         title: `${constants_1.ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}`,
         urgency: 0,
-        summary: `
-      You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}
-
-      ${Object.assign({}, alerts)}
-    `,
+        summary,
     };
     // eslint-disable-next-line i18n-text/no-en
     const bearer = `Token ${apiKey}`;
-    try {
-        const response = yield (0, node_fetch_1.default)('https://www.zenduty.com/api/incidents/', {
-            method: 'POST',
-            headers: {
-                Authorization: bearer,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
-        console.log(yield response.text());
-    }
-    catch (err) {
-        console.log(err);
-    }
+    yield (0, node_fetch_1.default)('https://www.zenduty.com/api/incidents/', {
+        method: 'POST',
+        headers: {
+            Authorization: bearer,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
 });
 exports.sendAlertsToZenduty = sendAlertsToZenduty;
 

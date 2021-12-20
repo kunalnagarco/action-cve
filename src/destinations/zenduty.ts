@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
 import fetch from 'node-fetch'
@@ -9,32 +8,41 @@ export const sendAlertsToZenduty = async (
   escalationPolicyId: string,
   alerts: Alert[],
 ): Promise<void> => {
+  let summary = `
+    You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}
+
+    ---
+
+  `
+  for (const alert of alerts) {
+    summary += `
+      Package name: ${alert.packageName}
+      Vulnerability Version Range: ${alert.vulnerability?.vulnerableVersionRange}
+      Patched Version: ${alert.vulnerability?.firstPatchedVersion}
+      Severity: ${alert.advisory?.severity}
+      Summary: ${alert.advisory?.summary}
+    `
+  }
+
+  summary += `
+
+    ---
+  `
   const payload = {
     service: serviceId,
     escalation_policy: escalationPolicyId,
     title: `${ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}`,
     urgency: 0,
-    summary: `
-      You have ${alerts.length} vulnerabilities in ${
-      alerts[0].repository.owner
-    }/${alerts[0].repository.name}
-
-      ${{ ...alerts }}
-    `,
+    summary,
   }
   // eslint-disable-next-line i18n-text/no-en
   const bearer = `Token ${apiKey}`
-  try {
-    const response = await fetch('https://www.zenduty.com/api/incidents/', {
-      method: 'POST',
-      headers: {
-        Authorization: bearer,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-    console.log(await response.text())
-  } catch (err) {
-    console.log(err)
-  }
+  await fetch('https://www.zenduty.com/api/incidents/', {
+    method: 'POST',
+    headers: {
+      Authorization: bearer,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
 }

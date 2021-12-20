@@ -32,7 +32,7 @@ export const sendAlertsToZenduty = async (
       },
       body: JSON.stringify(payload),
     })
-    console.log(await response.json())
+    console.log(await response.json(), response.body, await response.text())
   } catch (err) {
     console.log(err)
   }

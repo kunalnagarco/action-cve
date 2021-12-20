@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import 'unfetch/polyfill'
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
+import fetch from 'node-fetch'
 
 export const sendAlertsToZenduty = async (
   apiKey: string,

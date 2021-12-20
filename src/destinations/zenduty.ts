@@ -1,6 +1,6 @@
+import * as zenduty from 'zenduty-sdk'
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
-import zenduty from 'zenduty-sdk'
 
 export const sendAlertsToZenduty = async (
   apiKey: string,

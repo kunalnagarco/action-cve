@@ -1,10 +1,6 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable import/no-commonjs */
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
-const zenduty = require('zenduty-sdk')
+import fetch from 'unfetch'
 
 export const sendAlertsToZenduty = async (
   apiKey: string,
@@ -12,9 +8,6 @@ export const sendAlertsToZenduty = async (
   escalationPolicyId: string,
   alerts: Alert[],
 ): Promise<void> => {
-  console.log(zenduty)
-  console.log(JSON.stringify(zenduty))
-  const apiObject = zenduty.IncidentsApi(zenduty.ApiClient(apiKey))
   const payload = {
     service: serviceId,
     escalation_policy: escalationPolicyId,
@@ -28,5 +21,13 @@ export const sendAlertsToZenduty = async (
       ${{ ...alerts }}
     `,
   }
-  await apiObject.create_incident(payload)
+  // eslint-disable-next-line i18n-text/no-en
+  const bearer = `Bearer ${apiKey}`
+  fetch('https://www.zenduty.com/api/incidents', {
+    method: 'POST',
+    headers: {
+      Authorization: bearer,
+    },
+    body: JSON.stringify(payload),
+  })
 }

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToPagerDuty,
@@ -34,7 +33,6 @@ async function run(): Promise<void> {
       }
       if (zenDutyApiKey) {
         if (zenDutyServiceId && zenDutyEscalationPolicyId) {
-          console.log('calling zenduty method with alerts', alerts)
           await sendAlertsToZenduty(
             zenDutyApiKey,
             zenDutyServiceId,

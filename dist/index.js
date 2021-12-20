@@ -188,18 +188,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable import/no-commonjs */
 const constants_1 = __nccwpck_require__(5105);
-const zenduty = __nccwpck_require__(2604);
+const unfetch_1 = __importDefault(__nccwpck_require__(3970));
 const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(zenduty);
-    console.log(JSON.stringify(zenduty));
-    const apiObject = zenduty.IncidentsApi(zenduty.ApiClient(apiKey));
     const payload = {
         service: serviceId,
         escalation_policy: escalationPolicyId,
@@ -211,7 +207,15 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
       ${Object.assign({}, alerts)}
     `,
     };
-    yield apiObject.create_incident(payload);
+    // eslint-disable-next-line i18n-text/no-en
+    const bearer = `Bearer ${apiKey}`;
+    (0, unfetch_1.default)('https://www.zenduty.com/api/incidents', {
+        method: 'POST',
+        headers: {
+            Authorization: bearer,
+        },
+        body: JSON.stringify(payload),
+    });
 });
 exports.sendAlertsToZenduty = sendAlertsToZenduty;
 
@@ -430,7 +434,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-/* eslint-disable no-console */
 const core_1 = __nccwpck_require__(2186);
 const destinations_1 = __nccwpck_require__(8395);
 const github_1 = __nccwpck_require__(5438);
@@ -462,7 +465,6 @@ function run() {
                 }
                 if (zenDutyApiKey) {
                     if (zenDutyServiceId && zenDutyEscalationPolicyId) {
-                        console.log('calling zenduty method with alerts', alerts);
                         yield (0, destinations_1.sendAlertsToZenduty)(zenDutyApiKey, zenDutyServiceId, zenDutyEscalationPolicyId, alerts);
                     }
                     else {
@@ -9886,50 +9888,6 @@ exports.Deprecation = Deprecation;
 
 /***/ }),
 
-/***/ 1566:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-var fetch = __nccwpck_require__(467);
-
-function wrapFetchForNode(fetch) {
-  // Support schemaless URIs on the server for parity with the browser.
-  // https://github.com/matthew-andrews/isomorphic-fetch/pull/10
-  return function (u, options) {
-    if (typeof u === 'string' && u.slice(0, 2) === '//') {
-      return fetch('https:' + u, options);
-    }
-
-    return fetch(u, options);
-  };
-}
-
-module.exports = function (context) {
-  // Support webpack module import weirdness.
-  var fetchFn = fetch.default ? fetch.default : fetch;
-
-  // This modifies the global `node-fetch` object, which isn't great, since
-  // different callers to `fetch-ponyfill` which pass a different Promise
-  // implementation would each expect to have their implementation used. But,
-  // given the way `node-fetch` is implemented, this is the only way to make
-  // it work at all.
-  if (context && context.Promise) {
-    fetchFn.Promise = context.Promise;
-  }
-
-  return {
-    fetch: wrapFetchForNode(fetchFn),
-    Headers: fetch.Headers,
-    Request: fetch.Request,
-    Response: fetch.Response
-  };
-};
-
-
-/***/ }),
-
 /***/ 1133:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -13106,6 +13064,15 @@ exports.debug = debug; // for test
 
 /***/ }),
 
+/***/ 3970:
+/***/ ((module) => {
+
+module.exports=function(e,n){return n=n||{},new Promise(function(t,r){var s=new XMLHttpRequest,o=[],u=[],i={},a=function(){return{ok:2==(s.status/100|0),statusText:s.statusText,status:s.status,url:s.responseURL,text:function(){return Promise.resolve(s.responseText)},json:function(){return Promise.resolve(s.responseText).then(JSON.parse)},blob:function(){return Promise.resolve(new Blob([s.response]))},clone:a,headers:{keys:function(){return o},entries:function(){return u},get:function(e){return i[e.toLowerCase()]},has:function(e){return e.toLowerCase()in i}}}};for(var l in s.open(n.method||"get",e,!0),s.onload=function(){s.getAllResponseHeaders().replace(/^(.*?):[^\S\n]*([\s\S]*?)$/gm,function(e,n,t){o.push(n=n.toLowerCase()),u.push([n,t]),i[n]=i[n]?i[n]+","+t:t}),t(a())},s.onerror=r,s.withCredentials="include"==n.credentials,n.headers)s.setRequestHeader(l,n.headers[l]);s.send(n.body||null)})};
+//# sourceMappingURL=unfetch.js.map
+
+
+/***/ }),
+
 /***/ 5030:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -15128,610 +15095,6 @@ function wrappy (fn, cb) {
     }
     return ret
   }
-}
-
-
-/***/ }),
-
-/***/ 2604:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-//import api files
-const TeamsApi = __nccwpck_require__(3261);
-const ServicesApi = __nccwpck_require__(3230);
-const EscalationPoliciesApi = __nccwpck_require__(6869);
-const EventsApi = __nccwpck_require__(8203);
-const IncidentsApi = __nccwpck_require__(7255);
-const IntegrationsApi = __nccwpck_require__(5404);
-const MembersApi = __nccwpck_require__(2559);
-const SchedulesApi = __nccwpck_require__(5790);
-const ApiClient = __nccwpck_require__(8630);
-
-module.exports = {
-  IncidentsApi,
-  IntegrationsApi,
-  MembersApi,
-  ServicesApi,
-  TeamsApi,
-  EventsApi,
-  SchedulesApi,
-  EscalationPoliciesApi,
-  ApiClient
-};
-
-
-/***/ }),
-
-/***/ 6869:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-
-module.exports=class EscalationPoliciesApi{
-    constructor(api_client=None)
-    {
-        if (api_client == null){
-            api_client=ApiClient()
-        }
-        this.api_client = api_client
-    }
-
-getEscalationPoicy(team_id)
-{
-    //Returns the escalation policies belonging to one team
-    //team_id: unique id of team <str>
-   return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/`,'get')
-}
-createEscalationPolicy(team_id,payload)
-{
-        //Creates an escalation policy for one team
-        //params
-        //str team_id: unique id of team
-        //dict payload: contains the required details for creating escalation policy
-        //Sample payload=
-        //   {'name':name,
-        //     'summary':summary,
-        //     'description':description,
-        //     'rules':rules,
-        //     'unique_id':unique_id,
-        //     'team':team_id}
-        return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/`,'post',payload)
-}
-getEscalationById(team_id,ep_id)
-{    //Returns the escalation policy belongs to one team and has ep_id as its unique id
-        //params
-        //str team_id: unique id of team
-        //str ep_id: unique id of escalation
-        return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}`,'get')
-}
-updateEscalationPolicy(team_id,ep_id,payload)
-{
-    //Updates escalation policy, identified by ep_id
-        //params
-        //str team_id: unique id of team
-        //str ep_id: unqiue id of escalation policy
-        //dict body: contains all the updated values
-        //'rules' is a required part of the body
-        //Sample payload:
-        // payload={'summary':'changes description',
-        //       'rules':[{"delay":1,
-        //                 "targets":[{"target_type":2,
-        //                             "target_id":"826032d6-7ccd-4d58-b114-f"}],
-        //                 "position":1,
-        //          "unique_id":"c0dad09b-321b-491e-9c23-f816c7bd0339"}]}
-    return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}/`,'patch',payload)
-}
-deleteEscalationPolicy(team_id,ep_id)
-{
-    //Deletes escalation policy, identified by ep_id in a team
-    //params
-    //str team_id: unique id of team
-    //str ep_id: unqiue id of escalation policy
-    this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}/`,'delete')
-}
-}
-
-
-/***/ }),
-
-/***/ 8203:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient = __nccwpck_require__(8630);
-module.exports=class EventsApi {
-  constructor(api_client = null) {
-    if (api_client == null) api_client = ApiClient();
-
-    this.api_client = api_client;
-  }
-
-  createEvent(integration_key, payload) {
-    //Creates an incident event on zenduty
-    //params
-    //<str> integration_key: unique key provided for your integration
-    //<dict> payload: contains the details of the event
-    //   'message', 'summary' are required fields of the body
-    //   'alert_type' is "info" by default
-    //   'suppressed' is false by default
-    //   if no entity_id is provided, Zenduty provides one automatically
-    // Sample payload:
-    //          {'message':message,
-    //         'summary':summary,
-    //         'alert_type':alert_type,
-    //          'supressed':supressed}
-    return this.api_client.call_api(
-      `/api/events/${integration_key}/`,
-      "post",
-      payload
-    );
-  }
-}
-
-
-
-/***/ }),
-
-/***/ 7255:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient = __nccwpck_require__(8630);
-module.exports = class IncidentsApi {
-  constructor(api_client = null) {
-    if (api_client == null) api_client = ApiClient();
-    this.api_client = api_client;
-  }
-  getIncidents(payload) {
-    //provides incidents for the given payload
-    //params <dict> payload
-    // payload=
-    //        {
-    //            'page':1,
-    //      'status':5,
-    //      'team_id':['a2c6322b-4c1b-4884-8f7a-a7f270de98cb'],
-    //      'service_ids':[],
-    //      'user_ids':[]
-    //     }
-    return this.api_client.call_api(`/api/incidents/`, "get", payload);
-  }
-  getIncidentByNumber(incident_number) {
-    //returns incidents identified by incident_number
-    return this.api_client.call_api(
-      `/api/incidents/${incident_number}/`,
-      "get"
-    );
-  }
-  getIncidentAlerts(incident_number) {
-    //Returns all alerts of a particular incident
-    //params int incident_number: incident number of event
-    return this.api_client.call_api(
-      `/api/incidents/${incident_number}/alerts/`,
-      "get"
-    );
-  }
-  getIncidentNotes(incident_number) {
-    //Returns IncidentNotes
-    return this.api_client.call_api(
-      `/api/incidents/${incident_number}/note/`,
-      "get"
-    );
-  }
-  acknowledgeOrResolveIncident(incident_number, payload) {
-    //AcknowledgesOrResolvesIncident
-    //     payload={
-    //             'status':3,
-    //             'incident_number':12
-    //              }
-
-    return this.api_client.call_api(
-      `/api/incidents/${incident_number}/`,
-      "PATCH",
-      payload
-    );
-  }
-  createIncident(payload) {
-    //Used to create an incident for a particular service, identified by id
-    //params dict payload: contains necessary details for creating incident
-    // Sample payload:
-    //           {"service":"c7fff4c5-2def-41e8-9120-c63f649a825c",
-    //            "escalation_policy":"a70244c8-e343-4dd0-8d87-2f767115568a",
-    //            "user":null,
-    //            "title":"Name of trial",
-    //            "summary":"summary of trial"}
-    //  escalation_policy,service, title and summary are required fields.
-    //  if escalation_policy is not set (set to None then), then assigned_to is required, as follows
-    //           {"service":"b1559a26-c51f-45a1-886d-f6caeaf0fc7e",
-    //            "escalation_policy":null,
-    //            "assigned_to":"826032d6-7ccd-4d58-b114-f",
-    //            "title":"Name of trial",
-    //            "summary":"Summary of trial"}
-    return this.api_client.call_api("/api/incidents/", "post", payload);
-  }
-}
-
-
-/***/ }),
-
-/***/ 5404:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-module.exports=class IntegrationsApi{
-	constructor(api_client=null){
-        if (api_client==null)
-            api_client=ApiClient()
-
-        this.api_client = api_client
-    }
-getIntegrationInService(team_id,service_id)
-{
-	 //Returns the integrations in a service
-       	//params <str> team_id: unique id of team
-	//params <str> service_id: unique id of service
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}`,'get')
-}
-
-createIntegration(team_id,service_id,payload)
-{
-	//Creates Integration in a service
-	//params <str> team_id: unique id of team
-        //params <str> service_id: unique id of service
-	//params <dict> payload: contains the details of the new integration
-	// payload={
-	//     "name":"SDKNODE",
-	//     "summary":"testingphase",
-	//     "application":"f63f1c66-9fd9-4e54-8087-2734dda81ad8"
-	// }
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/`,'post',payload)
-}
-getIntegrationById(team_id,service_id,integration_id){
-
-	//Returns an integration belonging to a service in a team, identified by id
-        //params <str> team_id: unique id of team
-        //params <str> service_id: unique id of service
-	//params <str> integration_id: unique id of integration
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/${integration_id}/`,'get')
-}
-
-getAlertsInIntegration(team_id,service_id,integration_id)
-{
-	//Retruns alerts in a particular integration
-        //params str team_id: unique id of team
-        //params str service_id: unique id of service
-	//params str integration_id: unique id of integration
-    this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/${integration_id}/alerts/`,'get')
-}
-}
-
-
-
-/***/ }),
-
-/***/ 2559:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-module.exports=class MembersApi{
-   constructor(api_client=null){
-        if (api_client==null)
-            api_client=ApiClient()
-
-        this.api_client = api_client
-    }
-
-addMembers (team_id,payload){
-    //Adds a member to a given team, identified by id
-        //params <str> team_id: unique id of team
-        //params <dict> body: contains the details of the user being added and the team to add to
-        //Sample payload:
-        //payload={
-        //  "team":"0bb5a0ef-4ff8-418e-ab1f-2c460005e5df",
-        //  "user":"af9eeb60-5acb-406c-971e-3"
-        // }
-
-    return this.api_client.call_api(`/api/account/teams/${team_id}/members/`,'post',payload)
-}
-
-
-deleteMembers(team_id,member_id){
-    //Removes a member from a particular team
-        //params <str> team_id: unique id of a team
-        //<str> member_id: unique id of member to be deleted
-    this.api_client.call_api(`/api/account/teams/${team_id}/members/${member_id}/`,'delete')
-}
-}
-
-
-/***/ }),
-
-/***/ 5790:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-module.exports=class SchedulesApi{
-   constructor(api_client=null){
-        if (api_client==null)
-            api_client=ApiClient()
-
-        this.api_client = api_client
-
-}
-getSchedule(team_id){
-     //Returns the schedules in a particular team, identified by id
-      //params <str> team_id: unique id of a team
-    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/`,'get')
-}
-
-createSchedule(team_id,payload){
-   //Creates a schedule for a team
-        //params str team_id: unique id of team
-        //params dict body: contains the details of the schedule to be created
-        //Sample payload=
-        //{"name":"Name of schedule",
-        // "summary":"summary of schedule",
-        // "time_zone":"Asia/Kolkata",
-        // "team":"d4a777db-5bce-419c-a725-420ebb505c54",
-        // "layers":[]}
-    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/`,'post',payload)
-}
-
-getScheduleById(team_id,schedule_id){
-   //Returns a particular schedule from a team, identifed by id
-        //params <str> team_id: unique id of a team
-        //params <str> schedule_id: unique id of schedule
-    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'get')
-}
-
-updateSchedule(team_id,schedule_id,payload){
-    //Updates the schedule details for a given team, identified by id
-        //params str team_id: unique id of a team
-        //params str schedul_id: unique id of schedule
-        //params dict body: contains the updated values of  schedule
-        //   'unique_id' and 'team' are required. Other fields are just those which have been changed
-        //Sample payload:
-        //{"name":"Name of schedule",
-        // "summary":"summar of schedule",
-        // "time_zone":"Asia/Kamchatka",
-        // "team":"d4a777db-5bce-419c-a725-420ebb505c54",
-        // "unique_id":"f9b34bd3-818a-4b98-9d8a-04d8bd501cd0",
-        // "layers":[]}
-    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'patch',payload)
-}
-
-deleteSchedule(team_id,schedule_id){
-    //Deletes a schedule from a team
-        //params <str> team_id:unique id of team
-        //params <str> schedule_id: unique id of schedule
-    this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'delete')
-}
-
-}
-
-
-
-/***/ }),
-
-/***/ 3230:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-module.exports=class ServicesApi{
-  constructor(api_client=null){
-
-    if (api_client==null)
-    {
-            api_client=ApiClient()
-    }
-        this.api_client = api_client
-    }
-
-getServices (team_id)
-{
-    //Returns all the services in a team
-    //params str team_id: unnique id of team
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/`,'get')
-}
-addService  (team_id,payload)
-{
-  //Adds a new servie to a give team, identified by id
-        //params str team_id: unique id of team
-        //params dict body: contains the details of the new service to be added
-        //Sample body
-        //{"name":"Name of service",
-        // "description":"Description of service",
-        // "integrations":[{"application":"27c9800c-2856-490d-8119-790be1308dd4",
-        //                 "name":"API",
-        //                 "summary":"Edit summary for this integration"}],
-        // "escalation_policy":"5c9b6288-c105-418d-970b-91a93d0e919a",
-        // "acknowledgement_timeout":1,
-        // "auto_resolve_timeout":1}
-
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/`,'post',payload)
-}
-getServiceById (team_id,service_id)
-{
-    //Returns a particular service from a  team, identified by id
-        //params str team_id: unique id of team
-        //params str service_id: unique id of service
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,'get')
-}
-updateService (team_id,service_id,payload)
-{
-  //Updates the existing service in a team
-        //params
-        //<str> team_id: unique id of team
-        //<str> service_id: unique id of service
-        //<dict> body: contains the updated details of services
-        //payload:
-        //{"unique_id":"bc808ce3-46c0-41d0-bf1f-f405fdd0c1c3",
-        //"auto_resolve_timeout":0,
-        //"acknowledgement_timeout":0,
-        //"status":1,
-        //"escalation_policy":"5c9b6288-c105-418d-970b-91a93d0e919a"}
-    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,"PATCH",payload)
-}
-deleteService (team_id,service_id)
-{
-  //Deletes a particular service from a team
-        //params
-        //<str> team_id: unique id of team
-        //<str> service_id: unnique id of service
-    this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,'delete')
-}
-}
-
-
-/***/ }),
-
-/***/ 3261:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-//import ApiClient from zenduty.api_client
-const ApiClient=__nccwpck_require__(8630)
-module.exports=class TeamsApi{
-    constructor(api_client=null){
-        if (api_client==null)
-        {
-            api_client= new ApiClient.ApiClient()
-            console.log("running")
-        }
-        this.api_client = api_client
-    }
- getTeams(){
-     //Returns all the teams and their details from your Zenduty account
-   return this.api_client.call_api("/api/account/teams/",'get');
-}
-
- createTeam(payload){
-//      Creates a new team for your zenduty account
-//         params dict body: contains the details for your new team
-//         payload=
-//         'name' is a required field
-//         {'name':name}
-     return this.api_client.call_api("/api/account/teams/",'post',body=body)
-}
-
-getTeamDetails(team_id)
-{
-    // Returns a team form your zenduty acocunt, identified by id
-    // params <str> team_id: unique id of team
-    return this.api_client.call_api(`/api/account/teams/${team_id}/`,'get');
-}
-
-deleteTeam(team_id)
-{
-    //Deletes a team form your zenduty account
-    //params str team_id: unique id of team
-    this.api_client.call_api(`/api/account/teams/${team_id}/`,'delete');
-}
-}
-
-
-/***/ }),
-
-/***/ 8630:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-//importing files
-const FetchClientObject=__nccwpck_require__(976)
-const Configuration=__nccwpck_require__(5299)
-module.exports=class ApiClient
-{
-    constructor(access_token){
-        this.configuration = new Configuration.Configuration(access_token)
-        this.fetch_client= new FetchClientObject.FetchClientObject()
-     }
-    call_api(url,method,body={},headers={})
-    {
-        //#building the header
-        headers["Authorization"]='Token '+this.configuration.access_token
-        headers["Content-Type"]="application/json"
-        //making the request through FETCHClientObject
-        return this.fetch_client.request(url,method,body,headers)
-    }
-}
-
-
-/***/ }),
-
-/***/ 5299:
-/***/ ((module) => {
-
-//Store AccessToken
-class Configuration
-{
-    constructor(access_token)
-    {
-        this.access_token = access_token
-    }
-}
-module.exports={
-    Configuration
-}
-
-
-/***/ }),
-
-/***/ 976:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-//import fetch for performing various requests to api
-const {fetch}=__nccwpck_require__(1566)();
-const conf=new require("./configuration")
-class FetchClientObject {
-
-     constructor () {
-     this.apiUrl="https://www.zenduty.com"
-     }
-
-
-request(endpoint, method, body, headers) {
-      
-     //Preparing options i.e. options={ method,headers,body }
-     const options = {
-      method: method,
-      headers:headers
-    };
-     //Adding body parameter to options if method is not get
-    if(method!='get')
-      options["body"]=JSON.stringify(body)
-
-    //console.log(options)
-    //console.log(`${this.apiUrl}${endpoint}`)
-     
-    if(method!='delete')
-    {
-          return fetch(`${this.apiUrl}${endpoint}`, options).then(response => {
-          if (!response.ok) 
-          {
-             // console.log("This is not working ")
-              throw response;
-             
-           }
-          return response.json();
-
-          })
-          // .then(myJson=>{
-          // if(method!='delete')
-          // console.log(JSON.stringify(myJson))
-          // });
-    }
-    else
-    {
-          //DELETE
-          return fetch(`${this.apiUrl}${endpoint}`, options)
-    }
-  }
-}
-
-module.exports={
-  FetchClientObject
 }
 
 

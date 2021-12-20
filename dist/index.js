@@ -430,6 +430,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+/* eslint-disable no-console */
 const core_1 = __nccwpck_require__(2186);
 const destinations_1 = __nccwpck_require__(8395);
 const github_1 = __nccwpck_require__(5438);
@@ -461,6 +462,7 @@ function run() {
                 }
                 if (zenDutyApiKey) {
                     if (zenDutyServiceId && zenDutyEscalationPolicyId) {
+                        console.log('calling zenduty method with alerts', alerts);
                         yield (0, destinations_1.sendAlertsToZenduty)(zenDutyApiKey, zenDutyServiceId, zenDutyEscalationPolicyId, alerts);
                     }
                     else {

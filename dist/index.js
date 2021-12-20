@@ -211,7 +211,7 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
     // eslint-disable-next-line i18n-text/no-en
     const bearer = `Token ${apiKey}`;
     try {
-        const response = yield (0, node_fetch_1.default)('https://www.zenduty.com/api/incidents', {
+        const response = yield (0, node_fetch_1.default)('https://www.zenduty.com/api/incidents/', {
             method: 'POST',
             headers: {
                 Authorization: bearer,
@@ -219,7 +219,7 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
             },
             body: JSON.stringify(payload),
         });
-        console.log(yield response.json());
+        console.log(yield response.text());
     }
     catch (err) {
         console.log(err);

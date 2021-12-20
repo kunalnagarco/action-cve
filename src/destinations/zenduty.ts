@@ -25,7 +25,7 @@ export const sendAlertsToZenduty = async (
   // eslint-disable-next-line i18n-text/no-en
   const bearer = `Token ${apiKey}`
   try {
-    const response = await fetch('https://www.zenduty.com/api/incidents', {
+    const response = await fetch('https://www.zenduty.com/api/incidents/', {
       method: 'POST',
       headers: {
         Authorization: bearer,
@@ -33,7 +33,7 @@ export const sendAlertsToZenduty = async (
       },
       body: JSON.stringify(payload),
     })
-    console.log(await response.json())
+    console.log(await response.text())
   } catch (err) {
     console.log(err)
   }

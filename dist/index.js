@@ -209,7 +209,7 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
     `,
     };
     // eslint-disable-next-line i18n-text/no-en
-    const bearer = `Bearer ${apiKey}`;
+    const bearer = `Token ${apiKey}`;
     try {
         const response = yield (0, node_fetch_1.default)('https://www.zenduty.com/api/incidents', {
             method: 'POST',

@@ -218,7 +218,7 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
             },
             body: JSON.stringify(payload),
         });
-        console.log(response.json());
+        console.log(yield response.json());
     }
     catch (err) {
         console.log(err);

@@ -12,8 +12,8 @@ export const sendAlertsToZenduty = async (
   const payload = {
     service: serviceId,
     escalation_policy: escalationPolicyId,
-    user: null,
     title: `${ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}`,
+    urgency: 0,
     summary: `
       You have ${alerts.length} vulnerabilities in ${
       alerts[0].repository.owner

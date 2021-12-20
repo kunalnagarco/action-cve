@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
 import fetch from 'unfetch'
@@ -23,11 +24,16 @@ export const sendAlertsToZenduty = async (
   }
   // eslint-disable-next-line i18n-text/no-en
   const bearer = `Bearer ${apiKey}`
-  fetch('https://www.zenduty.com/api/incidents', {
-    method: 'POST',
-    headers: {
-      Authorization: bearer,
-    },
-    body: JSON.stringify(payload),
-  })
+  try {
+    const response = await fetch('https://www.zenduty.com/api/incidents', {
+      method: 'POST',
+      headers: {
+        Authorization: bearer,
+      },
+      body: JSON.stringify(payload),
+    })
+    console.log(response.json())
+  } catch (err) {
+    console.log(err)
+  }
 }

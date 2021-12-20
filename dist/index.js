@@ -193,6 +193,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
+/* eslint-disable no-console */
 const constants_1 = __nccwpck_require__(5105);
 const unfetch_1 = __importDefault(__nccwpck_require__(3970));
 const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
@@ -209,13 +210,19 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
     };
     // eslint-disable-next-line i18n-text/no-en
     const bearer = `Bearer ${apiKey}`;
-    (0, unfetch_1.default)('https://www.zenduty.com/api/incidents', {
-        method: 'POST',
-        headers: {
-            Authorization: bearer,
-        },
-        body: JSON.stringify(payload),
-    });
+    try {
+        const response = yield (0, unfetch_1.default)('https://www.zenduty.com/api/incidents', {
+            method: 'POST',
+            headers: {
+                Authorization: bearer,
+            },
+            body: JSON.stringify(payload),
+        });
+        console.log(response.json());
+    }
+    catch (err) {
+        console.log(err);
+    }
 });
 exports.sendAlertsToZenduty = sendAlertsToZenduty;
 

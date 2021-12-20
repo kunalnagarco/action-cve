@@ -5,7 +5,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["@slack/webhook@6.0.0","/home/runner/work/action-cve/action-cve"]],"_from":"@slack/webhook@6.0.0","_id":"@slack/webhook@6.0.0","_inBundle":false,"_integrity":"sha512-2fohfhLI9lkAmOSWt1R457JBsB3iFNqahu4GqdFZRtcp/bT+xeG/kPn/hQa78JS74poRjWTt5G/qJjNaWMGOEQ==","_location":"/@slack/webhook","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"@slack/webhook@6.0.0","name":"@slack/webhook","escapedName":"@slack%2fwebhook","scope":"@slack","rawSpec":"6.0.0","saveSpec":null,"fetchSpec":"6.0.0"},"_requiredBy":["/"],"_resolved":"https://registry.npmjs.org/@slack/webhook/-/webhook-6.0.0.tgz","_spec":"6.0.0","_where":"/home/runner/work/action-cve/action-cve","author":{"name":"Slack Technologies, Inc."},"bugs":{"url":"https://github.com/slackapi/node-slack-sdk/issues"},"dependencies":{"@slack/types":"^1.2.1","@types/node":">=12.0.0","axios":"^0.21.1"},"description":"Official library for using the Slack Platform\'s Incoming Webhooks","devDependencies":{"@microsoft/api-extractor":"^7.3.4","@types/chai":"^4.1.7","@types/mocha":"^5.2.6","chai":"^4.2.0","codecov":"^3.2.0","mocha":"^6.0.2","nock":"^10.0.6","nyc":"^14.1.1","shx":"^0.3.2","sinon":"^7.2.7","source-map-support":"^0.5.10","ts-node":"^8.0.3","tslint":"^5.13.1","tslint-config-airbnb":"^5.11.1","typescript":"^4.1.0"},"engines":{"node":">= 12.13.0","npm":">= 6.12.0"},"files":["dist/**/*"],"homepage":"https://slack.dev/node-slack-sdk/webhook","keywords":["slack","request","client","http","api","proxy"],"license":"MIT","main":"dist/index.js","name":"@slack/webhook","publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/slackapi/node-slack-sdk.git"},"scripts":{"build":"npm run build:clean && tsc","build:clean":"shx rm -rf ./dist ./coverage ./.nyc_output","coverage":"codecov -F webhook --root=$PWD","lint":"tslint --project .","prepare":"npm run build","ref-docs:model":"api-extractor run","test":"npm run build && nyc mocha --config .mocharc.json src/*.spec.js"},"types":"./dist/index.d.ts","version":"6.0.0"}');
+module.exports = JSON.parse('{"_from":"@slack/webhook","_id":"@slack/webhook@6.0.0","_inBundle":false,"_integrity":"sha512-2fohfhLI9lkAmOSWt1R457JBsB3iFNqahu4GqdFZRtcp/bT+xeG/kPn/hQa78JS74poRjWTt5G/qJjNaWMGOEQ==","_location":"/@slack/webhook","_phantomChildren":{},"_requested":{"type":"tag","registry":true,"raw":"@slack/webhook","name":"@slack/webhook","escapedName":"@slack%2fwebhook","scope":"@slack","rawSpec":"","saveSpec":null,"fetchSpec":"latest"},"_requiredBy":["#USER","/"],"_resolved":"https://registry.npmjs.org/@slack/webhook/-/webhook-6.0.0.tgz","_shasum":"844593c1e864a966e549f60bb640586628f3c1c4","_spec":"@slack/webhook","_where":"/Users/kunalnagar/Documents/Code/kunalnagarco/action-cve","author":{"name":"Slack Technologies, Inc."},"bugs":{"url":"https://github.com/slackapi/node-slack-sdk/issues"},"bundleDependencies":false,"dependencies":{"@slack/types":"^1.2.1","@types/node":">=12.0.0","axios":"^0.21.1"},"deprecated":false,"description":"Official library for using the Slack Platform\'s Incoming Webhooks","devDependencies":{"@microsoft/api-extractor":"^7.3.4","@types/chai":"^4.1.7","@types/mocha":"^5.2.6","chai":"^4.2.0","codecov":"^3.2.0","mocha":"^6.0.2","nock":"^10.0.6","nyc":"^14.1.1","shx":"^0.3.2","sinon":"^7.2.7","source-map-support":"^0.5.10","ts-node":"^8.0.3","tslint":"^5.13.1","tslint-config-airbnb":"^5.11.1","typescript":"^4.1.0"},"engines":{"node":">= 12.13.0","npm":">= 6.12.0"},"files":["dist/**/*"],"homepage":"https://slack.dev/node-slack-sdk/webhook","keywords":["slack","request","client","http","api","proxy"],"license":"MIT","main":"dist/index.js","name":"@slack/webhook","publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/slackapi/node-slack-sdk.git"},"scripts":{"build":"npm run build:clean && tsc","build:clean":"shx rm -rf ./dist ./coverage ./.nyc_output","coverage":"codecov -F webhook --root=$PWD","lint":"tslint --project .","prepare":"npm run build","ref-docs:model":"api-extractor run","test":"npm run build && nyc mocha --config .mocharc.json src/*.spec.js"},"types":"./dist/index.d.ts","version":"6.0.0"}');
 
 /***/ }),
 
@@ -41,6 +41,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(8706), exports);
 __exportStar(__nccwpck_require__(5952), exports);
+__exportStar(__nccwpck_require__(2403), exports);
 
 
 /***/ }),
@@ -169,6 +170,47 @@ const sendAlertsToSlack = (webhookUrl, alerts) => __awaiter(void 0, void 0, void
     });
 });
 exports.sendAlertsToSlack = sendAlertsToSlack;
+
+
+/***/ }),
+
+/***/ 2403:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sendAlertsToZenduty = void 0;
+const constants_1 = __nccwpck_require__(5105);
+const zenduty_sdk_1 = __importDefault(__nccwpck_require__(2604));
+const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    const apiObject = zenduty_sdk_1.default.IncidentsApi(zenduty_sdk_1.default.ApiClient(apiKey));
+    const payload = {
+        service: serviceId,
+        escalation_policy: escalationPolicyId,
+        user: null,
+        title: `${constants_1.ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}`,
+        summary: `
+      You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}
+
+      ${Object.assign({}, alerts)}
+    `,
+    };
+    yield apiObject.create_incident(payload);
+});
+exports.sendAlertsToZenduty = sendAlertsToZenduty;
 
 
 /***/ }),
@@ -395,6 +437,9 @@ function run() {
             const token = (0, core_1.getInput)('token');
             const slackWebhookUrl = (0, core_1.getInput)('slack_webhook');
             const pagerDutyIntegrationKey = (0, core_1.getInput)('pager_duty_integration_key');
+            const zenDutyApiKey = (0, core_1.getInput)('zenduty_api_key');
+            const zenDutyServiceId = (0, core_1.getInput)('zenduty_service_id');
+            const zenDutyEscalationPolicyId = (0, core_1.getInput)('zenduty_escalation_policy_id');
             const count = parseInt((0, core_1.getInput)('count'));
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
@@ -410,6 +455,14 @@ function run() {
                 }
                 if (pagerDutyIntegrationKey) {
                     yield (0, destinations_1.sendAlertsToPagerDuty)(pagerDutyIntegrationKey, alerts);
+                }
+                if (zenDutyApiKey) {
+                    if (zenDutyServiceId && zenDutyEscalationPolicyId) {
+                        yield (0, destinations_1.sendAlertsToZenduty)(zenDutyApiKey, zenDutyServiceId, zenDutyEscalationPolicyId, alerts);
+                    }
+                    else {
+                        (0, core_1.setFailed)(new Error('Check your Zenduty Service ID and Escalation Policy ID'));
+                    }
                 }
             }
         }
@@ -9828,6 +9881,50 @@ exports.Deprecation = Deprecation;
 
 /***/ }),
 
+/***/ 1566:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+var fetch = __nccwpck_require__(467);
+
+function wrapFetchForNode(fetch) {
+  // Support schemaless URIs on the server for parity with the browser.
+  // https://github.com/matthew-andrews/isomorphic-fetch/pull/10
+  return function (u, options) {
+    if (typeof u === 'string' && u.slice(0, 2) === '//') {
+      return fetch('https:' + u, options);
+    }
+
+    return fetch(u, options);
+  };
+}
+
+module.exports = function (context) {
+  // Support webpack module import weirdness.
+  var fetchFn = fetch.default ? fetch.default : fetch;
+
+  // This modifies the global `node-fetch` object, which isn't great, since
+  // different callers to `fetch-ponyfill` which pass a different Promise
+  // implementation would each expect to have their implementation used. But,
+  // given the way `node-fetch` is implemented, this is the only way to make
+  // it work at all.
+  if (context && context.Promise) {
+    fetchFn.Promise = context.Promise;
+  }
+
+  return {
+    fetch: wrapFetchForNode(fetchFn),
+    Headers: fetch.Headers,
+    Request: fetch.Request,
+    Response: fetch.Response
+  };
+};
+
+
+/***/ }),
+
 /***/ 1133:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -15031,6 +15128,610 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 2604:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+//import api files
+const TeamsApi = __nccwpck_require__(3261);
+const ServicesApi = __nccwpck_require__(3230);
+const EscalationPoliciesApi = __nccwpck_require__(6869);
+const EventsApi = __nccwpck_require__(8203);
+const IncidentsApi = __nccwpck_require__(7255);
+const IntegrationsApi = __nccwpck_require__(5404);
+const MembersApi = __nccwpck_require__(2559);
+const SchedulesApi = __nccwpck_require__(5790);
+const ApiClient = __nccwpck_require__(8630);
+
+module.exports = {
+  IncidentsApi,
+  IntegrationsApi,
+  MembersApi,
+  ServicesApi,
+  TeamsApi,
+  EventsApi,
+  SchedulesApi,
+  EscalationPoliciesApi,
+  ApiClient
+};
+
+
+/***/ }),
+
+/***/ 6869:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+
+module.exports=class EscalationPoliciesApi{
+    constructor(api_client=None)
+    {
+        if (api_client == null){
+            api_client=ApiClient()
+        }
+        this.api_client = api_client
+    }
+
+getEscalationPoicy(team_id)
+{
+    //Returns the escalation policies belonging to one team
+    //team_id: unique id of team <str>
+   return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/`,'get')
+}
+createEscalationPolicy(team_id,payload)
+{
+        //Creates an escalation policy for one team
+        //params
+        //str team_id: unique id of team
+        //dict payload: contains the required details for creating escalation policy
+        //Sample payload=
+        //   {'name':name,
+        //     'summary':summary,
+        //     'description':description,
+        //     'rules':rules,
+        //     'unique_id':unique_id,
+        //     'team':team_id}
+        return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/`,'post',payload)
+}
+getEscalationById(team_id,ep_id)
+{    //Returns the escalation policy belongs to one team and has ep_id as its unique id
+        //params
+        //str team_id: unique id of team
+        //str ep_id: unique id of escalation
+        return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}`,'get')
+}
+updateEscalationPolicy(team_id,ep_id,payload)
+{
+    //Updates escalation policy, identified by ep_id
+        //params
+        //str team_id: unique id of team
+        //str ep_id: unqiue id of escalation policy
+        //dict body: contains all the updated values
+        //'rules' is a required part of the body
+        //Sample payload:
+        // payload={'summary':'changes description',
+        //       'rules':[{"delay":1,
+        //                 "targets":[{"target_type":2,
+        //                             "target_id":"826032d6-7ccd-4d58-b114-f"}],
+        //                 "position":1,
+        //          "unique_id":"c0dad09b-321b-491e-9c23-f816c7bd0339"}]}
+    return this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}/`,'patch',payload)
+}
+deleteEscalationPolicy(team_id,ep_id)
+{
+    //Deletes escalation policy, identified by ep_id in a team
+    //params
+    //str team_id: unique id of team
+    //str ep_id: unqiue id of escalation policy
+    this.api_client.call_api(`/api/account/teams/${team_id}/escalation_policies/${ep_id}/`,'delete')
+}
+}
+
+
+/***/ }),
+
+/***/ 8203:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient = __nccwpck_require__(8630);
+module.exports=class EventsApi {
+  constructor(api_client = null) {
+    if (api_client == null) api_client = ApiClient();
+
+    this.api_client = api_client;
+  }
+
+  createEvent(integration_key, payload) {
+    //Creates an incident event on zenduty
+    //params
+    //<str> integration_key: unique key provided for your integration
+    //<dict> payload: contains the details of the event
+    //   'message', 'summary' are required fields of the body
+    //   'alert_type' is "info" by default
+    //   'suppressed' is false by default
+    //   if no entity_id is provided, Zenduty provides one automatically
+    // Sample payload:
+    //          {'message':message,
+    //         'summary':summary,
+    //         'alert_type':alert_type,
+    //          'supressed':supressed}
+    return this.api_client.call_api(
+      `/api/events/${integration_key}/`,
+      "post",
+      payload
+    );
+  }
+}
+
+
+
+/***/ }),
+
+/***/ 7255:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient = __nccwpck_require__(8630);
+module.exports = class IncidentsApi {
+  constructor(api_client = null) {
+    if (api_client == null) api_client = ApiClient();
+    this.api_client = api_client;
+  }
+  getIncidents(payload) {
+    //provides incidents for the given payload
+    //params <dict> payload
+    // payload=
+    //        {
+    //            'page':1,
+    //      'status':5,
+    //      'team_id':['a2c6322b-4c1b-4884-8f7a-a7f270de98cb'],
+    //      'service_ids':[],
+    //      'user_ids':[]
+    //     }
+    return this.api_client.call_api(`/api/incidents/`, "get", payload);
+  }
+  getIncidentByNumber(incident_number) {
+    //returns incidents identified by incident_number
+    return this.api_client.call_api(
+      `/api/incidents/${incident_number}/`,
+      "get"
+    );
+  }
+  getIncidentAlerts(incident_number) {
+    //Returns all alerts of a particular incident
+    //params int incident_number: incident number of event
+    return this.api_client.call_api(
+      `/api/incidents/${incident_number}/alerts/`,
+      "get"
+    );
+  }
+  getIncidentNotes(incident_number) {
+    //Returns IncidentNotes
+    return this.api_client.call_api(
+      `/api/incidents/${incident_number}/note/`,
+      "get"
+    );
+  }
+  acknowledgeOrResolveIncident(incident_number, payload) {
+    //AcknowledgesOrResolvesIncident
+    //     payload={
+    //             'status':3,
+    //             'incident_number':12
+    //              }
+
+    return this.api_client.call_api(
+      `/api/incidents/${incident_number}/`,
+      "PATCH",
+      payload
+    );
+  }
+  createIncident(payload) {
+    //Used to create an incident for a particular service, identified by id
+    //params dict payload: contains necessary details for creating incident
+    // Sample payload:
+    //           {"service":"c7fff4c5-2def-41e8-9120-c63f649a825c",
+    //            "escalation_policy":"a70244c8-e343-4dd0-8d87-2f767115568a",
+    //            "user":null,
+    //            "title":"Name of trial",
+    //            "summary":"summary of trial"}
+    //  escalation_policy,service, title and summary are required fields.
+    //  if escalation_policy is not set (set to None then), then assigned_to is required, as follows
+    //           {"service":"b1559a26-c51f-45a1-886d-f6caeaf0fc7e",
+    //            "escalation_policy":null,
+    //            "assigned_to":"826032d6-7ccd-4d58-b114-f",
+    //            "title":"Name of trial",
+    //            "summary":"Summary of trial"}
+    return this.api_client.call_api("/api/incidents/", "post", payload);
+  }
+}
+
+
+/***/ }),
+
+/***/ 5404:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+module.exports=class IntegrationsApi{
+	constructor(api_client=null){
+        if (api_client==null)
+            api_client=ApiClient()
+
+        this.api_client = api_client
+    }
+getIntegrationInService(team_id,service_id)
+{
+	 //Returns the integrations in a service
+       	//params <str> team_id: unique id of team
+	//params <str> service_id: unique id of service
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}`,'get')
+}
+
+createIntegration(team_id,service_id,payload)
+{
+	//Creates Integration in a service
+	//params <str> team_id: unique id of team
+        //params <str> service_id: unique id of service
+	//params <dict> payload: contains the details of the new integration
+	// payload={
+	//     "name":"SDKNODE",
+	//     "summary":"testingphase",
+	//     "application":"f63f1c66-9fd9-4e54-8087-2734dda81ad8"
+	// }
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/`,'post',payload)
+}
+getIntegrationById(team_id,service_id,integration_id){
+
+	//Returns an integration belonging to a service in a team, identified by id
+        //params <str> team_id: unique id of team
+        //params <str> service_id: unique id of service
+	//params <str> integration_id: unique id of integration
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/${integration_id}/`,'get')
+}
+
+getAlertsInIntegration(team_id,service_id,integration_id)
+{
+	//Retruns alerts in a particular integration
+        //params str team_id: unique id of team
+        //params str service_id: unique id of service
+	//params str integration_id: unique id of integration
+    this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/integrations/${integration_id}/alerts/`,'get')
+}
+}
+
+
+
+/***/ }),
+
+/***/ 2559:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+module.exports=class MembersApi{
+   constructor(api_client=null){
+        if (api_client==null)
+            api_client=ApiClient()
+
+        this.api_client = api_client
+    }
+
+addMembers (team_id,payload){
+    //Adds a member to a given team, identified by id
+        //params <str> team_id: unique id of team
+        //params <dict> body: contains the details of the user being added and the team to add to
+        //Sample payload:
+        //payload={
+        //  "team":"0bb5a0ef-4ff8-418e-ab1f-2c460005e5df",
+        //  "user":"af9eeb60-5acb-406c-971e-3"
+        // }
+
+    return this.api_client.call_api(`/api/account/teams/${team_id}/members/`,'post',payload)
+}
+
+
+deleteMembers(team_id,member_id){
+    //Removes a member from a particular team
+        //params <str> team_id: unique id of a team
+        //<str> member_id: unique id of member to be deleted
+    this.api_client.call_api(`/api/account/teams/${team_id}/members/${member_id}/`,'delete')
+}
+}
+
+
+/***/ }),
+
+/***/ 5790:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+module.exports=class SchedulesApi{
+   constructor(api_client=null){
+        if (api_client==null)
+            api_client=ApiClient()
+
+        this.api_client = api_client
+
+}
+getSchedule(team_id){
+     //Returns the schedules in a particular team, identified by id
+      //params <str> team_id: unique id of a team
+    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/`,'get')
+}
+
+createSchedule(team_id,payload){
+   //Creates a schedule for a team
+        //params str team_id: unique id of team
+        //params dict body: contains the details of the schedule to be created
+        //Sample payload=
+        //{"name":"Name of schedule",
+        // "summary":"summary of schedule",
+        // "time_zone":"Asia/Kolkata",
+        // "team":"d4a777db-5bce-419c-a725-420ebb505c54",
+        // "layers":[]}
+    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/`,'post',payload)
+}
+
+getScheduleById(team_id,schedule_id){
+   //Returns a particular schedule from a team, identifed by id
+        //params <str> team_id: unique id of a team
+        //params <str> schedule_id: unique id of schedule
+    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'get')
+}
+
+updateSchedule(team_id,schedule_id,payload){
+    //Updates the schedule details for a given team, identified by id
+        //params str team_id: unique id of a team
+        //params str schedul_id: unique id of schedule
+        //params dict body: contains the updated values of  schedule
+        //   'unique_id' and 'team' are required. Other fields are just those which have been changed
+        //Sample payload:
+        //{"name":"Name of schedule",
+        // "summary":"summar of schedule",
+        // "time_zone":"Asia/Kamchatka",
+        // "team":"d4a777db-5bce-419c-a725-420ebb505c54",
+        // "unique_id":"f9b34bd3-818a-4b98-9d8a-04d8bd501cd0",
+        // "layers":[]}
+    return this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'patch',payload)
+}
+
+deleteSchedule(team_id,schedule_id){
+    //Deletes a schedule from a team
+        //params <str> team_id:unique id of team
+        //params <str> schedule_id: unique id of schedule
+    this.api_client.call_api(`/api/account/teams/${team_id}/schedules/${schedule_id}/`,'delete')
+}
+
+}
+
+
+
+/***/ }),
+
+/***/ 3230:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+module.exports=class ServicesApi{
+  constructor(api_client=null){
+
+    if (api_client==null)
+    {
+            api_client=ApiClient()
+    }
+        this.api_client = api_client
+    }
+
+getServices (team_id)
+{
+    //Returns all the services in a team
+    //params str team_id: unnique id of team
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/`,'get')
+}
+addService  (team_id,payload)
+{
+  //Adds a new servie to a give team, identified by id
+        //params str team_id: unique id of team
+        //params dict body: contains the details of the new service to be added
+        //Sample body
+        //{"name":"Name of service",
+        // "description":"Description of service",
+        // "integrations":[{"application":"27c9800c-2856-490d-8119-790be1308dd4",
+        //                 "name":"API",
+        //                 "summary":"Edit summary for this integration"}],
+        // "escalation_policy":"5c9b6288-c105-418d-970b-91a93d0e919a",
+        // "acknowledgement_timeout":1,
+        // "auto_resolve_timeout":1}
+
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/`,'post',payload)
+}
+getServiceById (team_id,service_id)
+{
+    //Returns a particular service from a  team, identified by id
+        //params str team_id: unique id of team
+        //params str service_id: unique id of service
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,'get')
+}
+updateService (team_id,service_id,payload)
+{
+  //Updates the existing service in a team
+        //params
+        //<str> team_id: unique id of team
+        //<str> service_id: unique id of service
+        //<dict> body: contains the updated details of services
+        //payload:
+        //{"unique_id":"bc808ce3-46c0-41d0-bf1f-f405fdd0c1c3",
+        //"auto_resolve_timeout":0,
+        //"acknowledgement_timeout":0,
+        //"status":1,
+        //"escalation_policy":"5c9b6288-c105-418d-970b-91a93d0e919a"}
+    return this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,"PATCH",payload)
+}
+deleteService (team_id,service_id)
+{
+  //Deletes a particular service from a team
+        //params
+        //<str> team_id: unique id of team
+        //<str> service_id: unnique id of service
+    this.api_client.call_api(`/api/account/teams/${team_id}/services/${service_id}/`,'delete')
+}
+}
+
+
+/***/ }),
+
+/***/ 3261:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+//import ApiClient from zenduty.api_client
+const ApiClient=__nccwpck_require__(8630)
+module.exports=class TeamsApi{
+    constructor(api_client=null){
+        if (api_client==null)
+        {
+            api_client= new ApiClient.ApiClient()
+            console.log("running")
+        }
+        this.api_client = api_client
+    }
+ getTeams(){
+     //Returns all the teams and their details from your Zenduty account
+   return this.api_client.call_api("/api/account/teams/",'get');
+}
+
+ createTeam(payload){
+//      Creates a new team for your zenduty account
+//         params dict body: contains the details for your new team
+//         payload=
+//         'name' is a required field
+//         {'name':name}
+     return this.api_client.call_api("/api/account/teams/",'post',body=body)
+}
+
+getTeamDetails(team_id)
+{
+    // Returns a team form your zenduty acocunt, identified by id
+    // params <str> team_id: unique id of team
+    return this.api_client.call_api(`/api/account/teams/${team_id}/`,'get');
+}
+
+deleteTeam(team_id)
+{
+    //Deletes a team form your zenduty account
+    //params str team_id: unique id of team
+    this.api_client.call_api(`/api/account/teams/${team_id}/`,'delete');
+}
+}
+
+
+/***/ }),
+
+/***/ 8630:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+//importing files
+const FetchClientObject=__nccwpck_require__(976)
+const Configuration=__nccwpck_require__(5299)
+module.exports=class ApiClient
+{
+    constructor(access_token){
+        this.configuration = new Configuration.Configuration(access_token)
+        this.fetch_client= new FetchClientObject.FetchClientObject()
+     }
+    call_api(url,method,body={},headers={})
+    {
+        //#building the header
+        headers["Authorization"]='Token '+this.configuration.access_token
+        headers["Content-Type"]="application/json"
+        //making the request through FETCHClientObject
+        return this.fetch_client.request(url,method,body,headers)
+    }
+}
+
+
+/***/ }),
+
+/***/ 5299:
+/***/ ((module) => {
+
+//Store AccessToken
+class Configuration
+{
+    constructor(access_token)
+    {
+        this.access_token = access_token
+    }
+}
+module.exports={
+    Configuration
+}
+
+
+/***/ }),
+
+/***/ 976:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+//import fetch for performing various requests to api
+const {fetch}=__nccwpck_require__(1566)();
+const conf=new require("./configuration")
+class FetchClientObject {
+
+     constructor () {
+     this.apiUrl="https://www.zenduty.com"
+     }
+
+
+request(endpoint, method, body, headers) {
+      
+     //Preparing options i.e. options={ method,headers,body }
+     const options = {
+      method: method,
+      headers:headers
+    };
+     //Adding body parameter to options if method is not get
+    if(method!='get')
+      options["body"]=JSON.stringify(body)
+
+    //console.log(options)
+    //console.log(`${this.apiUrl}${endpoint}`)
+     
+    if(method!='delete')
+    {
+          return fetch(`${this.apiUrl}${endpoint}`, options).then(response => {
+          if (!response.ok) 
+          {
+             // console.log("This is not working ")
+              throw response;
+             
+           }
+          return response.json();
+
+          })
+          // .then(myJson=>{
+          // if(method!='delete')
+          // console.log(JSON.stringify(myJson))
+          // });
+    }
+    else
+    {
+          //DELETE
+          return fetch(`${this.apiUrl}${endpoint}`, options)
+    }
+  }
+}
+
+module.exports={
+  FetchClientObject
+}
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -15043,7 +15744,7 @@ module.exports = eval("require")("encoding");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","/home/runner/work/action-cve/action-cve"]],"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["/@slack/webhook"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"/home/runner/work/action-cve/action-cve","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","/Users/kunalnagar/Documents/Code/kunalnagarco/action-cve"]],"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["/@slack/webhook"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"/Users/kunalnagar/Documents/Code/kunalnagarco/action-cve","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ }),
 

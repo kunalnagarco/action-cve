@@ -6,6 +6,7 @@ A [GitHub action](https://github.com/features/actions) that sends Dependabot Vul
 
 - Slack
 - PagerDuty
+- Zenduty
 
 **For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki).**
 

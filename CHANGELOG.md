@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.4.1](https://github.com/kunalnagarco/action-cve/compare/v1.4.0...v1.4.1) (2021-12-22)
+
+
+### Chores
+
+* Add fetch wrapper ([#47](https://github.com/kunalnagarco/action-cve/issues/47)) ([e33610d](https://github.com/kunalnagarco/action-cve/commit/e33610d98ff6b9bc0d6b82038c0cd4d194c702f2))
+
 ## [1.4.0](https://github.com/kunalnagarco/action-cve/compare/v1.3.3...v1.4.0) (2021-12-20)
 
 

@@ -1,6 +1,6 @@
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
-import fetch from 'node-fetch'
+import { request } from '../utils'
 
 export const sendAlertsToZenduty = async (
   apiKey: string,
@@ -37,7 +37,7 @@ export const sendAlertsToZenduty = async (
   }
   // eslint-disable-next-line i18n-text/no-en
   const bearer = `Token ${apiKey}`
-  await fetch('https://www.zenduty.com/api/incidents/', {
+  await request('https://www.zenduty.com/api/incidents/', {
     method: 'POST',
     headers: {
       Authorization: bearer,

@@ -5,7 +5,7 @@ import {
   sendAlertsToZenduty,
   validateSlackWebhookUrl,
 } from './destinations'
-import { context } from '@actions/github'
+// import { context } from '@actions/github'
 import { fetchAlerts } from './fetch-alerts'
 
 async function run(): Promise<void> {
@@ -17,8 +17,10 @@ async function run(): Promise<void> {
     const zenDutyServiceId = getInput('zenduty_service_id')
     const zenDutyEscalationPolicyId = getInput('zenduty_escalation_policy_id')
     const count = parseInt(getInput('count'))
-    const owner = context.repo.owner
-    const repo = context.repo.repo
+    // const owner = context.repo.owner
+    // const repo = context.repo.repo
+    const owner = 'kunalnagar'
+    const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
       if (slackWebhookUrl) {

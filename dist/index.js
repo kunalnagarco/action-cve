@@ -63,10 +63,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToMicrosoftTeams = void 0;
+/* eslint-disable i18n-text/no-en */
 /* eslint-disable no-console */
 const adaptivecards_1 = __nccwpck_require__(5477);
 const constants_1 = __nccwpck_require__(5105);
 const utils_1 = __nccwpck_require__(1606);
+const createTableHeaderCell = (text, bold) => {
+    const cell = new adaptivecards_1.Column();
+    const cellItem = new adaptivecards_1.TextBlock(text);
+    if (bold) {
+        cellItem.weight = adaptivecards_1.TextWeight.Bolder;
+    }
+    cell.addItem(cellItem);
+    return cell;
+};
+const createAlertAdvisoryButton = (url) => {
+    const cell = new adaptivecards_1.Column();
+    const viewAdvisoryActionSet = new adaptivecards_1.ActionSet();
+    const viewAdvisoryAction = new adaptivecards_1.OpenUrlAction();
+    viewAdvisoryAction.title = 'View Advisory';
+    viewAdvisoryAction.url = url;
+    viewAdvisoryActionSet.addAction(viewAdvisoryAction);
+    cell.addItem(viewAdvisoryActionSet);
+    return cell;
+};
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
@@ -76,34 +96,28 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     adaptiveCard.version = new adaptivecards_1.Version(1, 2);
     const titleTextBlock = new adaptivecards_1.TextBlock(`${constants_1.ACTION_SHORT_SUMMARY} - You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`);
     adaptiveCard.addItem(titleTextBlock);
-    const leftColumnSet = new adaptivecards_1.ColumnSet();
-    leftColumnSet.separator = true;
-    leftColumnSet.spacing = adaptivecards_1.Spacing.Medium;
-    const rightColumnSet = new adaptivecards_1.ColumnSet();
-    rightColumnSet.separator = true;
-    rightColumnSet.spacing = adaptivecards_1.Spacing.Medium;
-    const leftColumnSetColumn = new adaptivecards_1.Column();
-    leftColumnSetColumn.width = 'stretch';
-    const rightColumnSetColumn = new adaptivecards_1.Column();
-    rightColumnSetColumn.width = 'stretch';
+    const container = new adaptivecards_1.Container();
+    container.spacing = adaptivecards_1.Spacing.Large;
+    container.style = 'emphasis';
+    const tableHeaderColumnSet = new adaptivecards_1.ColumnSet();
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Package Name', true));
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Vulnerability Version Range', true));
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Patched Version', true));
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Severity', true));
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Summary', true));
+    tableHeaderColumnSet.addColumn(createTableHeaderCell('Action', true));
+    container.addItem(tableHeaderColumnSet);
     for (const alert of alerts) {
-        leftColumnSetColumn.addItem(new adaptivecards_1.TextBlock(`**Package name:** ${alert.packageName}`));
-        leftColumnSetColumn.addItem(new adaptivecards_1.TextBlock(`*Vulnerability Version Range:* ${(_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange}`));
-        leftColumnSetColumn.addItem(new adaptivecards_1.TextBlock(`*Patched Version:* ${(_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion}`));
-        leftColumnSetColumn.addItem(new adaptivecards_1.TextBlock(`*Severity:* ${(_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity}`));
-        leftColumnSetColumn.addItem(new adaptivecards_1.TextBlock(`*Summary:* ${(_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary}`));
-        const viewAdvisoryActionSet = new adaptivecards_1.ActionSet();
-        const viewAdvisoryAction = new adaptivecards_1.OpenUrlAction();
-        // eslint-disable-next-line i18n-text/no-en
-        viewAdvisoryAction.title = 'View Advisory';
-        viewAdvisoryAction.url = (_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url;
-        viewAdvisoryActionSet.addAction(viewAdvisoryAction);
-        rightColumnSetColumn.addItem(viewAdvisoryActionSet);
+        const alertColumnSet = new adaptivecards_1.ColumnSet();
+        alertColumnSet.addColumn(createTableHeaderCell(alert.packageName));
+        alertColumnSet.addColumn(createTableHeaderCell((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange));
+        alertColumnSet.addColumn(createTableHeaderCell((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion));
+        alertColumnSet.addColumn(createTableHeaderCell((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity));
+        alertColumnSet.addColumn(createTableHeaderCell((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary));
+        alertColumnSet.addColumn(createAlertAdvisoryButton((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url));
+        container.addItem(alertColumnSet);
     }
-    leftColumnSet.addColumn(leftColumnSetColumn);
-    rightColumnSet.addColumn(rightColumnSetColumn);
-    adaptiveCard.addItem(leftColumnSet);
-    adaptiveCard.addItem(rightColumnSet);
+    adaptiveCard.addItem(container);
     const body = {
         type: 'message',
         attachments: [

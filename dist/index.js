@@ -104,8 +104,17 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     rightColumnSet.addColumn(rightColumnSetColumn);
     adaptiveCard.addItem(leftColumnSet);
     adaptiveCard.addItem(rightColumnSet);
-    const body = adaptiveCard.toJSON();
-    console.log(webhookUrl, body);
+    const body = {
+        type: 'message',
+        attachments: [
+            {
+                contentType: 'application/vnd.microsoft.card.adaptive',
+                contentUrl: null,
+                content: adaptiveCard.toJSON(),
+            },
+        ],
+    };
+    console.log(body);
     yield (0, utils_1.request)(webhookUrl, {
         method: 'POST',
         headers: {

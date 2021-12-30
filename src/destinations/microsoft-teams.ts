@@ -78,8 +78,17 @@ export const sendAlertsToMicrosoftTeams = async (
   adaptiveCard.addItem(leftColumnSet)
   adaptiveCard.addItem(rightColumnSet)
 
-  const body = adaptiveCard.toJSON()
-  console.log(webhookUrl, body)
+  const body = {
+    type: 'message',
+    attachments: [
+      {
+        contentType: 'application/vnd.microsoft.card.adaptive',
+        contentUrl: null,
+        content: adaptiveCard.toJSON(),
+      },
+    ],
+  }
+  console.log(body)
   await request(webhookUrl, {
     method: 'POST',
     headers: {

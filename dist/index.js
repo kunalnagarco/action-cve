@@ -65,57 +65,63 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToMicrosoftTeams = void 0;
 /* eslint-disable i18n-text/no-en */
 /* eslint-disable no-console */
-const adaptivecards_1 = __nccwpck_require__(5477);
-const constants_1 = __nccwpck_require__(5105);
 const utils_1 = __nccwpck_require__(1606);
-const createTableHeaderCell = (text, bold) => {
-    const cell = new adaptivecards_1.Column();
-    const cellItem = new adaptivecards_1.TextBlock(text);
-    if (bold) {
-        cellItem.weight = adaptivecards_1.TextWeight.Bolder;
-    }
-    cell.addItem(cellItem);
-    return cell;
+const constants_1 = __nccwpck_require__(5105);
+const createTableHeader = () => {
+    const row = (0, utils_1.createRow)();
+    const packageNameColumn = (0, utils_1.createColumn)();
+    packageNameColumn.addItem((0, utils_1.createTextBlock)('Package Name', true));
+    row.addColumn(packageNameColumn);
+    const vulnerabilityVersionRangeColumn = (0, utils_1.createColumn)();
+    vulnerabilityVersionRangeColumn.addItem((0, utils_1.createTextBlock)('Vulnerability Version Range', true));
+    row.addColumn(vulnerabilityVersionRangeColumn);
+    const patchedVersionColumn = (0, utils_1.createColumn)();
+    patchedVersionColumn.addItem((0, utils_1.createTextBlock)('Patched Version', true));
+    row.addColumn(patchedVersionColumn);
+    const severityColumn = (0, utils_1.createColumn)();
+    severityColumn.addItem((0, utils_1.createTextBlock)('Severity', true));
+    row.addColumn(severityColumn);
+    const summaryColumn = (0, utils_1.createColumn)();
+    summaryColumn.addItem((0, utils_1.createTextBlock)('Summary', true));
+    row.addColumn(summaryColumn);
+    const actionColumn = (0, utils_1.createColumn)();
+    actionColumn.addItem((0, utils_1.createTextBlock)('Action', true));
+    row.addColumn(actionColumn);
+    return row;
 };
-const createAlertAdvisoryButton = (url) => {
-    const cell = new adaptivecards_1.Column();
-    const viewAdvisoryActionSet = new adaptivecards_1.ActionSet();
-    const viewAdvisoryAction = new adaptivecards_1.OpenUrlAction();
-    viewAdvisoryAction.title = 'View Advisory';
-    viewAdvisoryAction.url = url;
-    viewAdvisoryActionSet.addAction(viewAdvisoryAction);
-    cell.addItem(viewAdvisoryActionSet);
-    return cell;
+const createTableAlertRow = (alert) => {
+    var _a, _b, _c, _d, _e;
+    const row = (0, utils_1.createRow)();
+    const packageNameColumn = (0, utils_1.createColumn)();
+    packageNameColumn.addItem((0, utils_1.createTextBlock)(alert.packageName));
+    row.addColumn(packageNameColumn);
+    const vulnerabilityVersionRangeColumn = (0, utils_1.createColumn)();
+    vulnerabilityVersionRangeColumn.addItem((0, utils_1.createTextBlock)(((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
+    row.addColumn(vulnerabilityVersionRangeColumn);
+    const patchedVersionColumn = (0, utils_1.createColumn)();
+    patchedVersionColumn.addItem((0, utils_1.createTextBlock)(((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
+    row.addColumn(patchedVersionColumn);
+    const severityColumn = (0, utils_1.createColumn)();
+    severityColumn.addItem((0, utils_1.createTextBlock)(((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
+    row.addColumn(severityColumn);
+    const summaryColumn = (0, utils_1.createColumn)();
+    summaryColumn.addItem((0, utils_1.createTextBlock)(((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
+    row.addColumn(summaryColumn);
+    const actionColumn = (0, utils_1.createColumn)();
+    actionColumn.addItem((0, utils_1.createLinkButton)('View Advisory', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
+    row.addColumn(actionColumn);
+    return row;
 };
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
-    const adaptiveCard = new adaptivecards_1.AdaptiveCard();
-    adaptiveCard.version = new adaptivecards_1.Version(1, 2);
-    const titleTextBlock = new adaptivecards_1.TextBlock(`${constants_1.ACTION_SHORT_SUMMARY} - You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`);
-    adaptiveCard.addItem(titleTextBlock);
-    const container = new adaptivecards_1.Container();
-    container.spacing = adaptivecards_1.Spacing.Large;
-    container.style = 'emphasis';
-    const tableHeaderColumnSet = new adaptivecards_1.ColumnSet();
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Package Name', true));
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Vulnerability Version Range', true));
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Patched Version', true));
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Severity', true));
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Summary', true));
-    tableHeaderColumnSet.addColumn(createTableHeaderCell('Action', true));
-    container.addItem(tableHeaderColumnSet);
+    const adaptiveCard = (0, utils_1.createAdaptiveCard)();
+    adaptiveCard.addItem((0, utils_1.createTextBlock)(`${constants_1.ACTION_SHORT_SUMMARY} - You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
+    const container = (0, utils_1.createContainer)(true, true);
+    container.addItem(createTableHeader());
     for (const alert of alerts) {
-        const alertColumnSet = new adaptivecards_1.ColumnSet();
-        alertColumnSet.addColumn(createTableHeaderCell(alert.packageName));
-        alertColumnSet.addColumn(createTableHeaderCell((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange));
-        alertColumnSet.addColumn(createTableHeaderCell((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion));
-        alertColumnSet.addColumn(createTableHeaderCell((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity));
-        alertColumnSet.addColumn(createTableHeaderCell((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary));
-        alertColumnSet.addColumn(createAlertAdvisoryButton((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url));
-        container.addItem(alertColumnSet);
+        container.addItem(createTableAlertRow(alert));
     }
     adaptiveCard.addItem(container);
     const body = {
@@ -601,6 +607,60 @@ run();
 
 /***/ }),
 
+/***/ 8309:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createAdaptiveCard = exports.createLinkButton = exports.createColumn = exports.createTextBlock = exports.createRow = exports.createContainer = void 0;
+const adaptivecards_1 = __nccwpck_require__(5477);
+const createContainer = (isSpacingLarge, isStyleEmphasis) => {
+    const container = new adaptivecards_1.Container();
+    if (isSpacingLarge) {
+        container.spacing = adaptivecards_1.Spacing.Large;
+    }
+    if (isStyleEmphasis) {
+        container.style = 'emphasis';
+    }
+    return container;
+};
+exports.createContainer = createContainer;
+const createRow = () => {
+    return new adaptivecards_1.ColumnSet();
+};
+exports.createRow = createRow;
+const createTextBlock = (text, isBold = false) => {
+    const textBlock = new adaptivecards_1.TextBlock(text);
+    if (isBold) {
+        textBlock.weight = adaptivecards_1.TextWeight.Bolder;
+    }
+    return textBlock;
+};
+exports.createTextBlock = createTextBlock;
+const createColumn = () => {
+    return new adaptivecards_1.Column();
+};
+exports.createColumn = createColumn;
+const createLinkButton = (text, url) => {
+    const linkButton = new adaptivecards_1.ActionSet();
+    const action = new adaptivecards_1.OpenUrlAction();
+    action.title = text;
+    action.url = url;
+    linkButton.addAction(action);
+    return linkButton;
+};
+exports.createLinkButton = createLinkButton;
+const createAdaptiveCard = () => {
+    const adaptiveCard = new adaptivecards_1.AdaptiveCard();
+    adaptiveCard.version = new adaptivecards_1.Version(1, 2);
+    return adaptiveCard;
+};
+exports.createAdaptiveCard = createAdaptiveCard;
+
+
+/***/ }),
+
 /***/ 1606:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -618,6 +678,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(2063), exports);
+__exportStar(__nccwpck_require__(8309), exports);
 
 
 /***/ }),

@@ -63,6 +63,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToMicrosoftTeams = void 0;
+/* eslint-disable no-console */
 const adaptivecards_1 = __nccwpck_require__(5477);
 const constants_1 = __nccwpck_require__(5105);
 const utils_1 = __nccwpck_require__(1606);
@@ -104,6 +105,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     adaptiveCard.addItem(leftColumnSet);
     adaptiveCard.addItem(rightColumnSet);
     const body = adaptiveCard.toJSON();
+    console.log(webhookUrl, body);
     yield (0, utils_1.request)(webhookUrl, {
         method: 'POST',
         headers: {

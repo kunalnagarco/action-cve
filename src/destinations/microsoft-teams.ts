@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   ActionSet,
   AdaptiveCard,
@@ -78,6 +79,7 @@ export const sendAlertsToMicrosoftTeams = async (
   adaptiveCard.addItem(rightColumnSet)
 
   const body = adaptiveCard.toJSON()
+  console.log(webhookUrl, body)
   await request(webhookUrl, {
     method: 'POST',
     headers: {

@@ -67,52 +67,70 @@ exports.sendAlertsToMicrosoftTeams = void 0;
 /* eslint-disable no-console */
 const utils_1 = __nccwpck_require__(1606);
 const constants_1 = __nccwpck_require__(5105);
-const createTableHeader = () => {
+const createTableRow = (key, value) => {
     const row = (0, utils_1.createRow)();
-    const packageNameColumn = (0, utils_1.createColumn)();
-    packageNameColumn.addItem((0, utils_1.createTextBlock)('Package Name', true));
-    row.addColumn(packageNameColumn);
-    const vulnerabilityVersionRangeColumn = (0, utils_1.createColumn)();
-    vulnerabilityVersionRangeColumn.addItem((0, utils_1.createTextBlock)('Vulnerability Version Range', true));
-    row.addColumn(vulnerabilityVersionRangeColumn);
-    const patchedVersionColumn = (0, utils_1.createColumn)();
-    patchedVersionColumn.addItem((0, utils_1.createTextBlock)('Patched Version', true));
-    row.addColumn(patchedVersionColumn);
-    const severityColumn = (0, utils_1.createColumn)();
-    severityColumn.addItem((0, utils_1.createTextBlock)('Severity', true));
-    row.addColumn(severityColumn);
-    const summaryColumn = (0, utils_1.createColumn)();
-    summaryColumn.addItem((0, utils_1.createTextBlock)('Summary', true));
-    row.addColumn(summaryColumn);
-    const actionColumn = (0, utils_1.createColumn)();
-    actionColumn.addItem((0, utils_1.createTextBlock)('Action', true));
-    row.addColumn(actionColumn);
+    const keyColumn = (0, utils_1.createColumn)();
+    keyColumn.addItem((0, utils_1.createTextBlock)(key, true));
+    const valueColumn = (0, utils_1.createColumn)();
+    valueColumn.addItem((0, utils_1.createTextBlock)(value));
+    row.addColumn(keyColumn);
+    row.addColumn(valueColumn);
     return row;
 };
-const createTableAlertRow = (alert) => {
-    var _a, _b, _c, _d, _e;
-    const row = (0, utils_1.createRow)();
-    const packageNameColumn = (0, utils_1.createColumn)();
-    packageNameColumn.addItem((0, utils_1.createTextBlock)(alert.packageName));
-    row.addColumn(packageNameColumn);
-    const vulnerabilityVersionRangeColumn = (0, utils_1.createColumn)();
-    vulnerabilityVersionRangeColumn.addItem((0, utils_1.createTextBlock)(((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
-    row.addColumn(vulnerabilityVersionRangeColumn);
-    const patchedVersionColumn = (0, utils_1.createColumn)();
-    patchedVersionColumn.addItem((0, utils_1.createTextBlock)(((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
-    row.addColumn(patchedVersionColumn);
-    const severityColumn = (0, utils_1.createColumn)();
-    severityColumn.addItem((0, utils_1.createTextBlock)(((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
-    row.addColumn(severityColumn);
-    const summaryColumn = (0, utils_1.createColumn)();
-    summaryColumn.addItem((0, utils_1.createTextBlock)(((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
-    row.addColumn(summaryColumn);
-    const actionColumn = (0, utils_1.createColumn)();
-    actionColumn.addItem((0, utils_1.createLinkButton)('View Advisory', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
-    row.addColumn(actionColumn);
-    return row;
-};
+// const createTableHeader = (): Row => {
+//   const row = createRow()
+//   const packageNameColumn = createColumn()
+//   packageNameColumn.addItem(createTextBlock('Package Name', true))
+//   row.addColumn(packageNameColumn)
+//   const vulnerabilityVersionRangeColumn = createColumn()
+//   vulnerabilityVersionRangeColumn.addItem(
+//     createTextBlock('Vulnerability Version Range', true),
+//   )
+//   row.addColumn(vulnerabilityVersionRangeColumn)
+//   const patchedVersionColumn = createColumn()
+//   patchedVersionColumn.addItem(createTextBlock('Patched Version', true))
+//   row.addColumn(patchedVersionColumn)
+//   const severityColumn = createColumn()
+//   severityColumn.addItem(createTextBlock('Severity', true))
+//   row.addColumn(severityColumn)
+//   const summaryColumn = createColumn()
+//   summaryColumn.addItem(createTextBlock('Summary', true))
+//   row.addColumn(summaryColumn)
+//   const actionColumn = createColumn()
+//   actionColumn.addItem(createTextBlock('Action', true))
+//   row.addColumn(actionColumn)
+//   return row
+// }
+// const createTableAlertRow = (alert: Alert): Row => {
+//   const row = createRow()
+//   const packageNameColumn = createColumn()
+//   packageNameColumn.addItem(createTextBlock(alert.packageName))
+//   row.addColumn(packageNameColumn)
+//   const vulnerabilityVersionRangeColumn = createColumn()
+//   vulnerabilityVersionRangeColumn.addItem(
+//     createTextBlock(alert.vulnerability?.vulnerableVersionRange || ''),
+//   )
+//   row.addColumn(vulnerabilityVersionRangeColumn)
+//   const patchedVersionColumn = createColumn()
+//   patchedVersionColumn.addItem(
+//     createTextBlock(alert.vulnerability?.firstPatchedVersion || ''),
+//   )
+//   row.addColumn(patchedVersionColumn)
+//   const severityColumn = createColumn()
+//   severityColumn.addItem(createTextBlock(alert.advisory?.severity || ''))
+//   row.addColumn(severityColumn)
+//   const summaryColumn = createColumn()
+//   summaryColumn.addItem(createTextBlock(alert.advisory?.summary || ''))
+//   row.addColumn(summaryColumn)
+//   const actionColumn = createColumn()
+//   actionColumn.addItem(
+//     createLinkButton('View Advisory', alert.advisory?.url || ''),
+//   )
+//   row.addColumn(actionColumn)
+//   return row
+// }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -120,9 +138,14 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     adaptiveCard.addItem((0, utils_1.createTextBlock)(constants_1.ACTION_SHORT_SUMMARY));
     adaptiveCard.addItem((0, utils_1.createTextBlock)(`You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
     const container = (0, utils_1.createContainer)(true, true);
-    container.addItem(createTableHeader());
+    // container.addItem(createTableHeader())
     for (const alert of alerts) {
-        container.addItem(createTableAlertRow(alert));
+        container.addItem(createTableRow('Package Name', alert.packageName));
+        container.addItem(createTableRow('Vulnerability Version Range', ((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
+        container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
+        container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
+        container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
+        container.addItem(createTableRow('Advisory URL', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
     }
     adaptiveCard.addItem(container);
     const body = {

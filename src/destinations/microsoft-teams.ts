@@ -5,7 +5,7 @@ import {
   createAdaptiveCard,
   createColumn,
   createContainer,
-  createLinkButton,
+  // createLinkButton,
   createRow,
   createTextBlock,
   request,
@@ -13,59 +13,70 @@ import {
 import { ACTION_SHORT_SUMMARY } from '../constants'
 import { Alert } from '../entities'
 
-const createTableHeader = (): Row => {
+const createTableRow = (key: string, value: string): Row => {
   const row = createRow()
-  const packageNameColumn = createColumn()
-  packageNameColumn.addItem(createTextBlock('Package Name', true))
-  row.addColumn(packageNameColumn)
-  const vulnerabilityVersionRangeColumn = createColumn()
-  vulnerabilityVersionRangeColumn.addItem(
-    createTextBlock('Vulnerability Version Range', true),
-  )
-  row.addColumn(vulnerabilityVersionRangeColumn)
-  const patchedVersionColumn = createColumn()
-  patchedVersionColumn.addItem(createTextBlock('Patched Version', true))
-  row.addColumn(patchedVersionColumn)
-  const severityColumn = createColumn()
-  severityColumn.addItem(createTextBlock('Severity', true))
-  row.addColumn(severityColumn)
-  const summaryColumn = createColumn()
-  summaryColumn.addItem(createTextBlock('Summary', true))
-  row.addColumn(summaryColumn)
-  const actionColumn = createColumn()
-  actionColumn.addItem(createTextBlock('Action', true))
-  row.addColumn(actionColumn)
+  const keyColumn = createColumn()
+  keyColumn.addItem(createTextBlock(key, true))
+  const valueColumn = createColumn()
+  valueColumn.addItem(createTextBlock(value))
+  row.addColumn(keyColumn)
+  row.addColumn(valueColumn)
   return row
 }
 
-const createTableAlertRow = (alert: Alert): Row => {
-  const row = createRow()
-  const packageNameColumn = createColumn()
-  packageNameColumn.addItem(createTextBlock(alert.packageName))
-  row.addColumn(packageNameColumn)
-  const vulnerabilityVersionRangeColumn = createColumn()
-  vulnerabilityVersionRangeColumn.addItem(
-    createTextBlock(alert.vulnerability?.vulnerableVersionRange || ''),
-  )
-  row.addColumn(vulnerabilityVersionRangeColumn)
-  const patchedVersionColumn = createColumn()
-  patchedVersionColumn.addItem(
-    createTextBlock(alert.vulnerability?.firstPatchedVersion || ''),
-  )
-  row.addColumn(patchedVersionColumn)
-  const severityColumn = createColumn()
-  severityColumn.addItem(createTextBlock(alert.advisory?.severity || ''))
-  row.addColumn(severityColumn)
-  const summaryColumn = createColumn()
-  summaryColumn.addItem(createTextBlock(alert.advisory?.summary || ''))
-  row.addColumn(summaryColumn)
-  const actionColumn = createColumn()
-  actionColumn.addItem(
-    createLinkButton('View Advisory', alert.advisory?.url || ''),
-  )
-  row.addColumn(actionColumn)
-  return row
-}
+// const createTableHeader = (): Row => {
+//   const row = createRow()
+//   const packageNameColumn = createColumn()
+//   packageNameColumn.addItem(createTextBlock('Package Name', true))
+//   row.addColumn(packageNameColumn)
+//   const vulnerabilityVersionRangeColumn = createColumn()
+//   vulnerabilityVersionRangeColumn.addItem(
+//     createTextBlock('Vulnerability Version Range', true),
+//   )
+//   row.addColumn(vulnerabilityVersionRangeColumn)
+//   const patchedVersionColumn = createColumn()
+//   patchedVersionColumn.addItem(createTextBlock('Patched Version', true))
+//   row.addColumn(patchedVersionColumn)
+//   const severityColumn = createColumn()
+//   severityColumn.addItem(createTextBlock('Severity', true))
+//   row.addColumn(severityColumn)
+//   const summaryColumn = createColumn()
+//   summaryColumn.addItem(createTextBlock('Summary', true))
+//   row.addColumn(summaryColumn)
+//   const actionColumn = createColumn()
+//   actionColumn.addItem(createTextBlock('Action', true))
+//   row.addColumn(actionColumn)
+//   return row
+// }
+
+// const createTableAlertRow = (alert: Alert): Row => {
+//   const row = createRow()
+//   const packageNameColumn = createColumn()
+//   packageNameColumn.addItem(createTextBlock(alert.packageName))
+//   row.addColumn(packageNameColumn)
+//   const vulnerabilityVersionRangeColumn = createColumn()
+//   vulnerabilityVersionRangeColumn.addItem(
+//     createTextBlock(alert.vulnerability?.vulnerableVersionRange || ''),
+//   )
+//   row.addColumn(vulnerabilityVersionRangeColumn)
+//   const patchedVersionColumn = createColumn()
+//   patchedVersionColumn.addItem(
+//     createTextBlock(alert.vulnerability?.firstPatchedVersion || ''),
+//   )
+//   row.addColumn(patchedVersionColumn)
+//   const severityColumn = createColumn()
+//   severityColumn.addItem(createTextBlock(alert.advisory?.severity || ''))
+//   row.addColumn(severityColumn)
+//   const summaryColumn = createColumn()
+//   summaryColumn.addItem(createTextBlock(alert.advisory?.summary || ''))
+//   row.addColumn(summaryColumn)
+//   const actionColumn = createColumn()
+//   actionColumn.addItem(
+//     createLinkButton('View Advisory', alert.advisory?.url || ''),
+//   )
+//   row.addColumn(actionColumn)
+//   return row
+// }
 
 export const sendAlertsToMicrosoftTeams = async (
   webhookUrl: string,
@@ -86,10 +97,27 @@ export const sendAlertsToMicrosoftTeams = async (
   )
 
   const container = createContainer(true, true)
-  container.addItem(createTableHeader())
+  // container.addItem(createTableHeader())
 
   for (const alert of alerts) {
-    container.addItem(createTableAlertRow(alert))
+    container.addItem(createTableRow('Package Name', alert.packageName))
+    container.addItem(
+      createTableRow(
+        'Vulnerability Version Range',
+        alert.vulnerability?.vulnerableVersionRange || '',
+      ),
+    )
+    container.addItem(
+      createTableRow(
+        'Patched Version',
+        alert.vulnerability?.firstPatchedVersion || '',
+      ),
+    )
+    container.addItem(
+      createTableRow('Severity', alert.advisory?.severity || ''),
+    )
+    container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
+    container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
   }
 
   adaptiveCard.addItem(container)

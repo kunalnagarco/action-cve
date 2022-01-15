@@ -1,5 +1,6 @@
 import { getInput, setFailed } from '@actions/core'
 import {
+  sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
   sendAlertsToZenduty,
@@ -11,6 +12,7 @@ import { fetchAlerts } from './fetch-alerts'
 async function run(): Promise<void> {
   try {
     const token = getInput('token')
+    const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const zenDutyApiKey = getInput('zenduty_api_key')
@@ -21,6 +23,9 @@ async function run(): Promise<void> {
     const repo = context.repo.repo
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
+      if (microsoftTeamsWebhookUrl) {
+        await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)
+      }
       if (slackWebhookUrl) {
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))

@@ -77,17 +77,17 @@ const createTableRow = (key, value) => {
     row.addColumn(valueColumn);
     return row;
 };
-// const createTableButtonRow = (url: string): Row => {
-//   const row = createRow()
-//   const keyColumn = createColumn()
-//   keyColumn.addItem(createTextBlock('Advisory URL', true))
-//   row.addColumn(keyColumn)
-//   const urlColumn = createColumn()
-//   urlColumn.addItem(createLinkButton('View Advisory', url))
-//   row.addColumn(urlColumn)
-//   row.separator = true
-//   return row
-// }
+const createTableButtonRow = (url) => {
+    const row = (0, utils_1.createRow)();
+    const keyColumn = (0, utils_1.createColumn)();
+    keyColumn.addItem((0, utils_1.createTextBlock)('Advisory URL', true));
+    row.addColumn(keyColumn);
+    const urlColumn = (0, utils_1.createColumn)();
+    urlColumn.addItem((0, utils_1.createLinkButton)('View Advisory', url));
+    row.addColumn(urlColumn);
+    row.separator = true;
+    return row;
+};
 // const createTableHeader = (): Row => {
 //   const row = createRow()
 //   const packageNameColumn = createColumn()
@@ -156,8 +156,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
         container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
         container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
         container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
-        container.addItem(createTableRow('Advisory URL', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
-        // container.addItem(createTableButtonRow(alert.advisory?.url || ''))
+        container.addItem(createTableButtonRow(((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
     }
     adaptiveCard.addItem(container);
     const body = {

@@ -148,17 +148,16 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     const adaptiveCard = (0, utils_1.createAdaptiveCard)();
     adaptiveCard.addItem((0, utils_1.createTextBlock)(constants_1.ACTION_SHORT_SUMMARY));
     adaptiveCard.addItem((0, utils_1.createTextBlock)(`You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
-    const container = (0, utils_1.createContainer)(true, true);
-    // container.addItem(createTableHeader())
     for (const alert of alerts) {
+        const container = (0, utils_1.createContainer)(true, true);
         container.addItem(createTableRow('Package Name', alert.packageName));
         container.addItem(createTableRow('Vulnerability Version Range', ((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
         container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
         container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
         container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
         container.addItem(createTableButtonRow(((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
+        adaptiveCard.addItem(container);
     }
-    adaptiveCard.addItem(container);
     const body = {
         type: 'message',
         attachments: [

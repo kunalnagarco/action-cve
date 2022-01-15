@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/kunalnagarco/action-cve/compare/v1.4.3...v1.5.0) (2022-01-15)
+
+
+### Features
+
+* Add destination - Microsoft Teams (channels) ([#49](https://github.com/kunalnagarco/action-cve/issues/49)) ([14ae886](https://github.com/kunalnagarco/action-cve/commit/14ae886804ace008533b26cd4d20398773f92266))
+
 ### [1.4.3](https://github.com/kunalnagarco/action-cve/compare/v1.4.2...v1.4.3) (2022-01-04)
 
 

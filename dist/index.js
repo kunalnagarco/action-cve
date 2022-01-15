@@ -77,17 +77,17 @@ const createTableRow = (key, value) => {
     row.addColumn(valueColumn);
     return row;
 };
-const createTableButtonRow = (url) => {
-    const row = (0, utils_1.createRow)();
-    const keyColumn = (0, utils_1.createColumn)();
-    keyColumn.addItem((0, utils_1.createTextBlock)('Advisory URL', true));
-    row.addColumn(keyColumn);
-    const urlColumn = (0, utils_1.createColumn)();
-    urlColumn.addItem((0, utils_1.createLinkButton)('View Advisory', url));
-    row.addColumn(urlColumn);
-    row.separator = true;
-    return row;
-};
+// const createTableButtonRow = (url: string): Row => {
+//   const row = createRow()
+//   const keyColumn = createColumn()
+//   keyColumn.addItem(createTextBlock('Advisory URL', true))
+//   row.addColumn(keyColumn)
+//   const urlColumn = createColumn()
+//   urlColumn.addItem(createLinkButton('View Advisory', url))
+//   row.addColumn(urlColumn)
+//   row.separator = true
+//   return row
+// }
 // const createTableHeader = (): Row => {
 //   const row = createRow()
 //   const packageNameColumn = createColumn()
@@ -141,7 +141,7 @@ const createTableButtonRow = (url) => {
 //   return row
 // }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -157,7 +157,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
         container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
         container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
         container.addItem(createTableRow('Advisory URL', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
-        container.addItem(createTableButtonRow(((_f = alert.advisory) === null || _f === void 0 ? void 0 : _f.url) || ''));
+        // container.addItem(createTableButtonRow(alert.advisory?.url || ''))
     }
     adaptiveCard.addItem(container);
     const body = {

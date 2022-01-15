@@ -67,16 +67,16 @@ exports.sendAlertsToMicrosoftTeams = void 0;
 /* eslint-disable no-console */
 const utils_1 = __nccwpck_require__(1606);
 const constants_1 = __nccwpck_require__(5105);
-// const createTableRow = (key: string, value: string): Row => {
-//   const row = createRow()
-//   const keyColumn = createColumn()
-//   keyColumn.addItem(createTextBlock(key, true))
-//   row.addColumn(keyColumn)
-//   const valueColumn = createColumn()
-//   valueColumn.addItem(createTextBlock(value))
-//   row.addColumn(valueColumn)
-//   return row
-// }
+const createTableRow = (key, value) => {
+    const row = (0, utils_1.createRow)();
+    const keyColumn = (0, utils_1.createColumn)();
+    keyColumn.addItem((0, utils_1.createTextBlock)(key, true));
+    row.addColumn(keyColumn);
+    const valueColumn = (0, utils_1.createColumn)();
+    valueColumn.addItem((0, utils_1.createTextBlock)(value));
+    row.addColumn(valueColumn);
+    return row;
+};
 const createTableButtonRow = (url) => {
     const row = (0, utils_1.createRow)();
     const keyColumn = (0, utils_1.createColumn)();
@@ -141,7 +141,7 @@ const createTableButtonRow = (url) => {
 //   return row
 // }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -151,24 +151,12 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     const container = (0, utils_1.createContainer)(true, true);
     // container.addItem(createTableHeader())
     for (const alert of alerts) {
-        // container.addItem(createTableRow('Package Name', alert.packageName))
-        // container.addItem(
-        //   createTableRow(
-        //     'Vulnerability Version Range',
-        //     alert.vulnerability?.vulnerableVersionRange || '',
-        //   ),
-        // )
-        // container.addItem(
-        //   createTableRow(
-        //     'Patched Version',
-        //     alert.vulnerability?.firstPatchedVersion || '',
-        //   ),
-        // )
-        // container.addItem(
-        //   createTableRow('Severity', alert.advisory?.severity || ''),
-        // )
-        // container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
-        container.addItem(createTableButtonRow(((_a = alert.advisory) === null || _a === void 0 ? void 0 : _a.url) || ''));
+        container.addItem(createTableRow('Package Name', alert.packageName));
+        container.addItem(createTableRow('Vulnerability Version Range', ((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
+        container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
+        container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
+        container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
+        container.addItem(createTableButtonRow(((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
     }
     adaptiveCard.addItem(container);
     const body = {

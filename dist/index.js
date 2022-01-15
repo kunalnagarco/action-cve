@@ -130,7 +130,7 @@ const createTableRow = (key, value) => {
 //   return row
 // }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -145,7 +145,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
         container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
         container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
         container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
-        // container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
+        container.addItem(createTableRow('Advisory URL', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
     }
     adaptiveCard.addItem(container);
     const body = {

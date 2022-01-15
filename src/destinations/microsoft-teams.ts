@@ -101,12 +101,12 @@ export const sendAlertsToMicrosoftTeams = async (
 
   for (const alert of alerts) {
     container.addItem(createTableRow('Package Name', alert.packageName))
-    // container.addItem(
-    //   createTableRow(
-    //     'Vulnerability Version Range',
-    //     alert.vulnerability?.vulnerableVersionRange || '',
-    //   ),
-    // )
+    container.addItem(
+      createTableRow(
+        'Vulnerability Version Range',
+        alert.vulnerability?.vulnerableVersionRange || '',
+      ),
+    )
     // container.addItem(
     //   createTableRow(
     //     'Patched Version',

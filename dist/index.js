@@ -130,6 +130,7 @@ const createTableRow = (key, value) => {
 //   return row
 // }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -140,12 +141,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     // container.addItem(createTableHeader())
     for (const alert of alerts) {
         container.addItem(createTableRow('Package Name', alert.packageName));
-        // container.addItem(
-        //   createTableRow(
-        //     'Vulnerability Version Range',
-        //     alert.vulnerability?.vulnerableVersionRange || '',
-        //   ),
-        // )
+        container.addItem(createTableRow('Vulnerability Version Range', ((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
         // container.addItem(
         //   createTableRow(
         //     'Patched Version',

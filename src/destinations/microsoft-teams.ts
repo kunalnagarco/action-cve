@@ -77,9 +77,11 @@ export const sendAlertsToMicrosoftTeams = async (
 
   const adaptiveCard = createAdaptiveCard()
 
+  adaptiveCard.addItem(createTextBlock(ACTION_SHORT_SUMMARY))
+
   adaptiveCard.addItem(
     createTextBlock(
-      `${ACTION_SHORT_SUMMARY} - You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`,
+      `You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`,
     ),
   )
 

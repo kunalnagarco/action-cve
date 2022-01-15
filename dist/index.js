@@ -117,7 +117,8 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
     const adaptiveCard = (0, utils_1.createAdaptiveCard)();
-    adaptiveCard.addItem((0, utils_1.createTextBlock)(`${constants_1.ACTION_SHORT_SUMMARY} - You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
+    adaptiveCard.addItem((0, utils_1.createTextBlock)(constants_1.ACTION_SHORT_SUMMARY));
+    adaptiveCard.addItem((0, utils_1.createTextBlock)(`You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
     const container = (0, utils_1.createContainer)(true, true);
     container.addItem(createTableHeader());
     for (const alert of alerts) {

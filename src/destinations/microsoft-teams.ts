@@ -1,5 +1,4 @@
 /* eslint-disable i18n-text/no-en */
-/* eslint-disable no-console */
 import {
   Row,
   createAdaptiveCard,
@@ -86,7 +85,7 @@ export const sendAlertsToMicrosoftTeams = async (
       },
     ],
   }
-  console.log(JSON.stringify(body))
+
   await request(webhookUrl, {
     method: 'POST',
     headers: {

@@ -87,58 +87,6 @@ const createTableButtonRow = (url) => {
     row.addColumn(urlColumn);
     return row;
 };
-// const createTableHeader = (): Row => {
-//   const row = createRow()
-//   const packageNameColumn = createColumn()
-//   packageNameColumn.addItem(createTextBlock('Package Name', true))
-//   row.addColumn(packageNameColumn)
-//   const vulnerabilityVersionRangeColumn = createColumn()
-//   vulnerabilityVersionRangeColumn.addItem(
-//     createTextBlock('Vulnerability Version Range', true),
-//   )
-//   row.addColumn(vulnerabilityVersionRangeColumn)
-//   const patchedVersionColumn = createColumn()
-//   patchedVersionColumn.addItem(createTextBlock('Patched Version', true))
-//   row.addColumn(patchedVersionColumn)
-//   const severityColumn = createColumn()
-//   severityColumn.addItem(createTextBlock('Severity', true))
-//   row.addColumn(severityColumn)
-//   const summaryColumn = createColumn()
-//   summaryColumn.addItem(createTextBlock('Summary', true))
-//   row.addColumn(summaryColumn)
-//   const actionColumn = createColumn()
-//   actionColumn.addItem(createTextBlock('Action', true))
-//   row.addColumn(actionColumn)
-//   return row
-// }
-// const createTableAlertRow = (alert: Alert): Row => {
-//   const row = createRow()
-//   const packageNameColumn = createColumn()
-//   packageNameColumn.addItem(createTextBlock(alert.packageName))
-//   row.addColumn(packageNameColumn)
-//   const vulnerabilityVersionRangeColumn = createColumn()
-//   vulnerabilityVersionRangeColumn.addItem(
-//     createTextBlock(alert.vulnerability?.vulnerableVersionRange || ''),
-//   )
-//   row.addColumn(vulnerabilityVersionRangeColumn)
-//   const patchedVersionColumn = createColumn()
-//   patchedVersionColumn.addItem(
-//     createTextBlock(alert.vulnerability?.firstPatchedVersion || ''),
-//   )
-//   row.addColumn(patchedVersionColumn)
-//   const severityColumn = createColumn()
-//   severityColumn.addItem(createTextBlock(alert.advisory?.severity || ''))
-//   row.addColumn(severityColumn)
-//   const summaryColumn = createColumn()
-//   summaryColumn.addItem(createTextBlock(alert.advisory?.summary || ''))
-//   row.addColumn(summaryColumn)
-//   const actionColumn = createColumn()
-//   actionColumn.addItem(
-//     createLinkButton('View Advisory', alert.advisory?.url || ''),
-//   )
-//   row.addColumn(actionColumn)
-//   return row
-// }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;

@@ -113,9 +113,9 @@ export const sendAlertsToMicrosoftTeams = async (
         alert.vulnerability?.firstPatchedVersion || '',
       ),
     )
-    // container.addItem(
-    //   createTableRow('Severity', alert.advisory?.severity || ''),
-    // )
+    container.addItem(
+      createTableRow('Severity', alert.advisory?.severity || ''),
+    )
     // container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
     // container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
   }

@@ -17,9 +17,9 @@ const createTableRow = (key: string, value: string): Row => {
   const row = createRow()
   const keyColumn = createColumn()
   keyColumn.addItem(createTextBlock(key, true))
+  row.addColumn(keyColumn)
   const valueColumn = createColumn()
   valueColumn.addItem(createTextBlock(value))
-  row.addColumn(keyColumn)
   row.addColumn(valueColumn)
   return row
 }
@@ -101,23 +101,23 @@ export const sendAlertsToMicrosoftTeams = async (
 
   for (const alert of alerts) {
     container.addItem(createTableRow('Package Name', alert.packageName))
-    container.addItem(
-      createTableRow(
-        'Vulnerability Version Range',
-        alert.vulnerability?.vulnerableVersionRange || '',
-      ),
-    )
-    container.addItem(
-      createTableRow(
-        'Patched Version',
-        alert.vulnerability?.firstPatchedVersion || '',
-      ),
-    )
-    container.addItem(
-      createTableRow('Severity', alert.advisory?.severity || ''),
-    )
-    container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
-    container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
+    // container.addItem(
+    //   createTableRow(
+    //     'Vulnerability Version Range',
+    //     alert.vulnerability?.vulnerableVersionRange || '',
+    //   ),
+    // )
+    // container.addItem(
+    //   createTableRow(
+    //     'Patched Version',
+    //     alert.vulnerability?.firstPatchedVersion || '',
+    //   ),
+    // )
+    // container.addItem(
+    //   createTableRow('Severity', alert.advisory?.severity || ''),
+    // )
+    // container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
+    // container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
   }
 
   adaptiveCard.addItem(container)

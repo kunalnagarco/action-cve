@@ -71,9 +71,9 @@ const createTableRow = (key, value) => {
     const row = (0, utils_1.createRow)();
     const keyColumn = (0, utils_1.createColumn)();
     keyColumn.addItem((0, utils_1.createTextBlock)(key, true));
+    row.addColumn(keyColumn);
     const valueColumn = (0, utils_1.createColumn)();
     valueColumn.addItem((0, utils_1.createTextBlock)(value));
-    row.addColumn(keyColumn);
     row.addColumn(valueColumn);
     return row;
 };
@@ -130,7 +130,6 @@ const createTableRow = (key, value) => {
 //   return row
 // }
 const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
     const alertCount = alerts.length;
     const repositoryOwner = alerts[0].repository.owner;
     const repositoryName = alerts[0].repository.name;
@@ -141,11 +140,23 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
     // container.addItem(createTableHeader())
     for (const alert of alerts) {
         container.addItem(createTableRow('Package Name', alert.packageName));
-        container.addItem(createTableRow('Vulnerability Version Range', ((_a = alert.vulnerability) === null || _a === void 0 ? void 0 : _a.vulnerableVersionRange) || ''));
-        container.addItem(createTableRow('Patched Version', ((_b = alert.vulnerability) === null || _b === void 0 ? void 0 : _b.firstPatchedVersion) || ''));
-        container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
-        container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
-        container.addItem(createTableRow('Advisory URL', ((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
+        // container.addItem(
+        //   createTableRow(
+        //     'Vulnerability Version Range',
+        //     alert.vulnerability?.vulnerableVersionRange || '',
+        //   ),
+        // )
+        // container.addItem(
+        //   createTableRow(
+        //     'Patched Version',
+        //     alert.vulnerability?.firstPatchedVersion || '',
+        //   ),
+        // )
+        // container.addItem(
+        //   createTableRow('Severity', alert.advisory?.severity || ''),
+        // )
+        // container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
+        // container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
     }
     adaptiveCard.addItem(container);
     const body = {

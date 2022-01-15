@@ -158,7 +158,7 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
             },
         ],
     };
-    console.log(body);
+    console.log(JSON.stringify(body));
     yield (0, utils_1.request)(webhookUrl, {
         method: 'POST',
         headers: {

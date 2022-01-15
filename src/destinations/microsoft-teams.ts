@@ -132,7 +132,7 @@ export const sendAlertsToMicrosoftTeams = async (
       },
     ],
   }
-  console.log(body)
+  console.log(JSON.stringify(body))
   await request(webhookUrl, {
     method: 'POST',
     headers: {

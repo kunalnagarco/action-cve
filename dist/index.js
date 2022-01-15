@@ -103,7 +103,6 @@ const sendAlertsToMicrosoftTeams = (webhookUrl, alerts) => __awaiter(void 0, voi
         container.addItem(createTableRow('Severity', ((_c = alert.advisory) === null || _c === void 0 ? void 0 : _c.severity) || ''));
         container.addItem(createTableRow('Summary', ((_d = alert.advisory) === null || _d === void 0 ? void 0 : _d.summary) || ''));
         container.addItem(createTableButtonRow(((_e = alert.advisory) === null || _e === void 0 ? void 0 : _e.url) || ''));
-        container.separator = true;
         adaptiveCard.addItem(container);
     }
     const body = {

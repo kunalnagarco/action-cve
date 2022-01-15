@@ -5,7 +5,7 @@ import {
   createAdaptiveCard,
   createColumn,
   createContainer,
-  // createLinkButton,
+  createLinkButton,
   createRow,
   createTextBlock,
   request,
@@ -21,6 +21,18 @@ const createTableRow = (key: string, value: string): Row => {
   const valueColumn = createColumn()
   valueColumn.addItem(createTextBlock(value))
   row.addColumn(valueColumn)
+  return row
+}
+
+const createTableButtonRow = (url: string): Row => {
+  const row = createRow()
+  const keyColumn = createColumn()
+  keyColumn.addItem(createTextBlock('Advisory URL', true))
+  row.addColumn(keyColumn)
+  const urlColumn = createColumn()
+  urlColumn.addItem(createLinkButton('View Advisory', url))
+  row.addColumn(urlColumn)
+  row.separator = true
   return row
 }
 
@@ -118,6 +130,7 @@ export const sendAlertsToMicrosoftTeams = async (
     )
     container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
     container.addItem(createTableRow('Advisory URL', alert.advisory?.url || ''))
+    container.addItem(createTableButtonRow(alert.advisory?.url || ''))
   }
 
   adaptiveCard.addItem(container)

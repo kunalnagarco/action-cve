@@ -33,11 +33,16 @@ export const createRow = (): ColumnSet => {
   return new ColumnSet()
 }
 
-export const createTextBlock = (text: string, isBold = false): TextBlock => {
+export const createTextBlock = (
+  text: string,
+  isBold = false,
+  isWrap = true,
+): TextBlock => {
   const textBlock = new TextBlock(text)
   if (isBold) {
     textBlock.weight = TextWeight.Bolder
   }
+  textBlock.wrap = isWrap
   return textBlock
 }
 

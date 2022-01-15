@@ -32,7 +32,6 @@ const createTableButtonRow = (url: string): Row => {
   const urlColumn = createColumn()
   urlColumn.addItem(createLinkButton('View Advisory', url))
   row.addColumn(urlColumn)
-  row.separator = true
   return row
 }
 
@@ -128,6 +127,7 @@ export const sendAlertsToMicrosoftTeams = async (
     )
     container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
     container.addItem(createTableButtonRow(alert.advisory?.url || ''))
+    container.separator = true
     adaptiveCard.addItem(container)
   }
 

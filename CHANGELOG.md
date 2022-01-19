@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/kunalnagarco/action-cve/compare/v1.5.2...v1.6.0) (2022-01-19)
+
+
+### Features
+
+* Update dependency marked to 4.0.10 [SECURITY] ([#56](https://github.com/kunalnagarco/action-cve/issues/56)) ([4a4419c](https://github.com/kunalnagarco/action-cve/commit/4a4419c5cb166a76c38ddada51a7f83969171518))
+
 ### [1.5.2](https://github.com/kunalnagarco/action-cve/compare/v1.5.1...v1.5.2) (2022-01-19)
 
 

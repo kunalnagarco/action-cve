@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.5.2](https://github.com/kunalnagarco/action-cve/compare/v1.5.1...v1.5.2) (2022-01-19)
+
+
+### Chores
+
+* Update node version to 16.x ([#57](https://github.com/kunalnagarco/action-cve/issues/57)) ([984b6e1](https://github.com/kunalnagarco/action-cve/commit/984b6e188d75b939333fc6f1d25c6c76fec01d83))
+
 ### [1.5.1](https://github.com/kunalnagarco/action-cve/compare/v1.5.0...v1.5.1) (2022-01-15)
 
 

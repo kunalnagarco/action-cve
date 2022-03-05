@@ -229,7 +229,8 @@ exports.validateSlackWebhookUrl = validateSlackWebhookUrl;
 const sendAlertsToSlack = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     const webhook = new webhook_1.IncomingWebhook(webhookUrl);
     const alertBlocks = [];
-    for (const alert of alerts) {
+    const sortedAlerts = alerts.sort(alert => alert.advisory?.severity)
+    for (const alert of sortedAlerts) {
         alertBlocks.push(createAlertBlock(alert));
     }
     yield webhook.send({

@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.6.4](https://github.com/kunalnagarco/action-cve/compare/v1.6.3...v1.6.4) (2022-03-20)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#69](https://github.com/kunalnagarco/action-cve/issues/69)) ([4784468](https://github.com/kunalnagarco/action-cve/commit/47844687f0ca2b35c4e6a95504d566dfaca5ec5e))
+
 ### [1.6.3](https://github.com/kunalnagarco/action-cve/compare/v1.6.2...v1.6.3) (2022-03-07)
 
 

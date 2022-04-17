@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.6.6](https://github.com/kunalnagarco/action-cve/compare/v1.6.5...v1.6.6) (2022-04-17)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#73](https://github.com/kunalnagarco/action-cve/issues/73)) ([0967866](https://github.com/kunalnagarco/action-cve/commit/096786649c6ae40f2a66552178083d05c87f171b))
+* **deps:** update dependency @semantic-release/github to v8.0.4 ([#71](https://github.com/kunalnagarco/action-cve/issues/71)) ([335d9dc](https://github.com/kunalnagarco/action-cve/commit/335d9dc0ec2cd3a54d1695cab75c3f1a6657fd60))
+* **deps:** update dependency eslint-plugin-github to v4.3.6 ([#72](https://github.com/kunalnagarco/action-cve/issues/72)) ([48eefb4](https://github.com/kunalnagarco/action-cve/commit/48eefb49d5f4554af44180474b5aac30ead2011c))
+
 ### [1.6.5](https://github.com/kunalnagarco/action-cve/compare/v1.6.4...v1.6.5) (2022-03-31)
 
 

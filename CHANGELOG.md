@@ -1,5 +1,20 @@
 # Changelog
 
+### [1.6.7](https://github.com/kunalnagarco/action-cve/compare/v1.6.6...v1.6.7) (2022-05-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @actions/github to v5.0.1 ([#78](https://github.com/kunalnagarco/action-cve/issues/78)) ([b755049](https://github.com/kunalnagarco/action-cve/commit/b755049ced1c4fd1f6e4c4335acc619dcc1b6b3c))
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#75](https://github.com/kunalnagarco/action-cve/issues/75)) ([0fed017](https://github.com/kunalnagarco/action-cve/commit/0fed017bdd90a3325847213a500a1ce4a2cc0330))
+* **deps:** update dependency @types/node-fetch to v2.6.1 ([#79](https://github.com/kunalnagarco/action-cve/issues/79)) ([c3059b8](https://github.com/kunalnagarco/action-cve/commit/c3059b8ba985e0b2e52ece0bd4c63287a0ae649d))
+* **deps:** update dependency @vercel/ncc to v0.33.4 ([#76](https://github.com/kunalnagarco/action-cve/issues/76)) ([349488f](https://github.com/kunalnagarco/action-cve/commit/349488f292538389a298de8702bf4898cfda3fca))
+* **deps:** update dependency ts-jest to v27.1.4 ([#77](https://github.com/kunalnagarco/action-cve/issues/77)) ([8acaa69](https://github.com/kunalnagarco/action-cve/commit/8acaa699c4e9d4f8ec49b200f55515c5a3c8e030))
+
 ### [1.6.6](https://github.com/kunalnagarco/action-cve/compare/v1.6.5...v1.6.6) (2022-04-17)
 
 

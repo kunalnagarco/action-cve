@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.6.11](https://github.com/kunalnagarco/action-cve/compare/v1.6.10...v1.6.11) (2022-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @actions/github to v5.0.3 ([#84](https://github.com/kunalnagarco/action-cve/issues/84)) ([474d4a1](https://github.com/kunalnagarco/action-cve/commit/474d4a1b1af102687861c045ae4ba093f67f34d1))
+
+
+### Chores
+
+* **deps:** update dependency ts-jest to v27.1.5 ([#83](https://github.com/kunalnagarco/action-cve/issues/83)) ([4fa64d9](https://github.com/kunalnagarco/action-cve/commit/4fa64d929c3db0b5413fb53d00c011df0acf2dcb))
+
 ### [1.6.10](https://github.com/kunalnagarco/action-cve/compare/v1.6.9...v1.6.10) (2022-05-30)
 
 

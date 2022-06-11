@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.6.12](https://github.com/kunalnagarco/action-cve/compare/v1.6.11...v1.6.12) (2022-06-11)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#85](https://github.com/kunalnagarco/action-cve/issues/85)) ([532426c](https://github.com/kunalnagarco/action-cve/commit/532426c102e02cbe1ad08e49b8aea07c569bfc52))
+* **deps:** update dependency semantic-release to 19.0.3 [security] ([#86](https://github.com/kunalnagarco/action-cve/issues/86)) ([1726dca](https://github.com/kunalnagarco/action-cve/commit/1726dca57e4bcc6e88193830f16cea3144c0233c))
+
 ### [1.6.11](https://github.com/kunalnagarco/action-cve/compare/v1.6.10...v1.6.11) (2022-06-04)
 
 

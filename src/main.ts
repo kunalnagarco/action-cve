@@ -23,9 +23,8 @@ async function run(): Promise<void> {
     const emailFrom = getInput('email_from')
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
-    const emailTransportSmtpConfig = JSON.parse(
-      getInput('email_transport_smtp_config'),
-    )
+    const emailTransportSmtpConfig = getInput('email_transport_smtp_config')
+
     console.log(emailTransportSmtpConfig, typeof emailTransportSmtpConfig)
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable i18n-text/no-en */
 // import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert } from '../entities'
@@ -11,6 +12,7 @@ export const sendAlertsToEmailSmtp = async (
   emailFrom: string,
   subject?: string,
 ): Promise<void> => {
+  console.log(typeof config, config.from)
   const transporter = createTransport(config)
   await transporter.sendMail({
     from: emailFrom,

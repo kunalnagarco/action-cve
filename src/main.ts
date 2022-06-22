@@ -62,21 +62,22 @@ async function run(): Promise<void> {
         }
       }
       if (emailFrom && emailList) {
-        if (typeof emailTransportSmtpConfig === 'object') {
-          sendAlertsToEmailSmtp(
-            emailTransportSmtpConfig,
-            alerts,
-            emailList,
-            emailFrom,
-            emailSubject,
-          )
-        } else {
-          setFailed(
-            new Error(
-              'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
-            ),
-          )
-        }
+        sendAlertsToEmailSmtp(
+          JSON.parse(emailTransportSmtpConfig),
+          alerts,
+          emailList,
+          emailFrom,
+          emailSubject,
+        )
+        // if (typeof emailTransportSmtpConfig === 'object') {
+
+        // } else {
+        //   setFailed(
+        //     new Error(
+        //       'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
+        //     ),
+        //   )
+        // }
       }
     }
   } catch (err) {

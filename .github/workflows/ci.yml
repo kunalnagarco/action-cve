@@ -22,6 +22,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run all
       - name: Run action
         uses: ./
         with:
@@ -34,10 +38,6 @@ jobs:
           # zenduty_escalation_policy_id: ${{ secrets.ZENDUTY_ESCALATION_POLICY_ID }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run all
       - name: Release (dry-run)
         run: npm run release -- --dry-run
         env:

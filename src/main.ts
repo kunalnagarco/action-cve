@@ -21,7 +21,7 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner
     // const repo = context.repo.repo
-    const owner = 'kunalnagar'
+    const owner = 'kunalnagarco'
     const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {

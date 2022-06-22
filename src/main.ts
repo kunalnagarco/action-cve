@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
 import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
   sendAlertsToZenduty,
+  sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
 // import { context } from '@actions/github'
@@ -18,10 +20,21 @@ async function run(): Promise<void> {
     const zenDutyApiKey = getInput('zenduty_api_key')
     const zenDutyServiceId = getInput('zenduty_service_id')
     const zenDutyEscalationPolicyId = getInput('zenduty_escalation_policy_id')
+    const emailFrom = getInput('email_from')
+    const emailList = getInput('email_list')
+    const emailSubject = getInput('email_subject')
+    const emailTransportSmtpConfig = getInput('email_transport_smtp_config')
+    console.log(
+      emailFrom,
+      emailList,
+      emailSubject,
+      emailTransportSmtpConfig,
+      typeof emailTransportSmtpConfig,
+    )
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner
     // const repo = context.repo.repo
-    const owner = 'kunalnagarco'
+    const owner = 'kunalnagar'
     const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
@@ -49,6 +62,23 @@ async function run(): Promise<void> {
         } else {
           setFailed(
             new Error('Check your Zenduty Service ID and Escalation Policy ID'),
+          )
+        }
+      }
+      if (emailFrom && emailList) {
+        if (typeof emailTransportSmtpConfig === 'object') {
+          sendAlertsToEmailSmtp(
+            emailTransportSmtpConfig,
+            alerts,
+            emailList,
+            emailFrom,
+            emailSubject,
+          )
+        } else {
+          setFailed(
+            new Error(
+              'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
+            ),
           )
         }
       }

@@ -16,6 +16,13 @@ inputs:
     description: 'Zenduty Service ID: https://docs.zenduty.com/docs/services'
   zenduty_escalation_policy_id:
     description: 'Zenduty Escalation Policy ID: https://docs.zenduty.com/docs/escalationpolicies'
+  email_list:
+    description: 'Comma-separated list of emails'
+  email_subject:
+    description: 'Custom subject line for email filtering'
+    default: 'Blah'
+  email_transport_smtp_config:
+    description: 'SMTP email config object in the nodemailer format: https://nodemailer.com/smtp/#1-single-connection'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

@@ -24,7 +24,7 @@ async function run(): Promise<void> {
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
     const emailTransportSmtpConfig = JSON.parse(
-      JSON.stringify(getInput('email_transport_smtp_config')),
+      getInput('email_transport_smtp_config'),
     )
     console.log(typeof emailTransportSmtpConfig)
     const count = parseInt(getInput('count'))
@@ -63,7 +63,7 @@ async function run(): Promise<void> {
       }
       if (emailFrom && emailList) {
         sendAlertsToEmailSmtp(
-          JSON.parse(emailTransportSmtpConfig),
+          emailTransportSmtpConfig,
           alerts,
           emailList,
           emailFrom,

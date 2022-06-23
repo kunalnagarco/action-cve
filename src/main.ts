@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { getInput, setFailed } from '@actions/core'
+import { getInput, getMultilineInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -24,9 +24,12 @@ async function run(): Promise<void> {
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
     const emailTransportSmtpConfig = JSON.parse(
-      getInput('email_transport_smtp_config'),
+      JSON.stringify(getMultilineInput('email_transport_smtp_config')),
     )
-    console.log(typeof emailTransportSmtpConfig, emailTransportSmtpConfig)
+    console.log(
+      typeof emailTransportSmtpConfig,
+      JSON.parse(emailTransportSmtpConfig[0]),
+    )
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner
     // const repo = context.repo.repo

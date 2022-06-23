@@ -28,15 +28,6 @@ async function run(): Promise<void> {
     )
     const emailTransportSmtpUser = getInput('email_transport_smtp_user')
     const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
-    const emailTransportSmtpConfig = {
-      host: emailTransportSmtpHost,
-      port: emailTransportSmtpPort,
-      secure: emailTransportSmtpPort === 465 && true,
-      auth: {
-        user: emailTransportSmtpUser,
-        pass: emailTransportSmtpPassword,
-      },
-    }
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner
     // const repo = context.repo.repo
@@ -72,22 +63,30 @@ async function run(): Promise<void> {
         }
       }
       if (emailFrom && emailList) {
-        sendAlertsToEmailSmtp(
-          emailTransportSmtpConfig,
-          alerts,
-          emailList,
-          emailFrom,
-          emailSubject,
-        )
-        // if (typeof emailTransportSmtpConfig === 'object') {
-
-        // } else {
-        //   setFailed(
-        //     new Error(
-        //       'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
-        //     ),
-        //   )
-        // }
+        if (emailTransportSmtpUser && emailTransportSmtpPassword) {
+          const emailTransportSmtpConfig = {
+            host: emailTransportSmtpHost,
+            port: emailTransportSmtpPort,
+            secure: emailTransportSmtpPort === 465 && true,
+            auth: {
+              user: emailTransportSmtpUser,
+              pass: emailTransportSmtpPassword,
+            },
+          }
+          sendAlertsToEmailSmtp(
+            emailTransportSmtpConfig,
+            alerts,
+            emailList,
+            emailFrom,
+            emailSubject,
+          )
+        } else {
+          setFailed(
+            new Error(
+              'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
+            ),
+          )
+        }
       }
     }
   } catch (err) {

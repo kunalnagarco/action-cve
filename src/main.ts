@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { getInput, getMultilineInput, setFailed } from '@actions/core'
+import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -23,13 +22,21 @@ async function run(): Promise<void> {
     const emailFrom = getInput('email_from')
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
-    const emailTransportSmtpConfig = JSON.parse(
-      JSON.stringify(getMultilineInput('email_transport_smtp_config')),
+    const emailTransportSmtpHost = getInput('email_transport_smtp_host')
+    const emailTransportSmtpPort = parseInt(
+      getInput('email_transport_smtp_port'),
     )
-    console.log(
-      typeof emailTransportSmtpConfig,
-      JSON.parse(emailTransportSmtpConfig[0]),
-    )
+    const emailTransportSmtpUser = getInput('email_transport_smtp_user')
+    const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
+    const emailTransportSmtpConfig = {
+      host: emailTransportSmtpHost,
+      port: emailTransportSmtpPort,
+      secure: true,
+      auth: {
+        user: emailTransportSmtpUser,
+        pass: emailTransportSmtpPassword,
+      },
+    }
     const count = parseInt(getInput('count'))
     // const owner = context.repo.owner
     // const repo = context.repo.repo

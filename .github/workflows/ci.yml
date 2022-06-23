@@ -38,7 +38,8 @@ jobs:
           # zenduty_escalation_policy_id: ${{ secrets.ZENDUTY_ESCALATION_POLICY_ID }}
           email_from: ${{ secrets.EMAIL_FROM }}
           email_list: 'knlnagar@gmail.com,kunal.nagar@icloud.com'
-          email_transport_smtp_config: ${{ toJson(secrets.EMAIL_TRANSPORT_SMTP_CONFIG) }}
+          email_transport_smtp_user: ${{ secrets.EMAIL_TRANSPORT_SMTP_USER }}
+          email_transport_smtp_password: ${{ secrets.EMAIL_TRANSPORT_SMTP_PASSWORD }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release (dry-run)

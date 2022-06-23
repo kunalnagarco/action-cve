@@ -23,8 +23,16 @@ inputs:
   email_subject:
     description: 'Custom subject line for email filtering'
     default: 'Blah'
-  email_transport_smtp_config:
-    description: 'SMTP email config object in the nodemailer format: https://nodemailer.com/smtp/#1-single-connection'
+  email_transport_smtp_host:
+    description: 'SMTP host e.g. smtp.gmail.com'
+    default: 'smtp.gmail.com'
+  email_transport_smtp_port:
+    description: 'SMTP port'
+    default: 587
+  email_transport_smtp_user:
+    description: 'SMTP user'
+  email_transport_smtp_password:
+    description: 'SMTP password'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

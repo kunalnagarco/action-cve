@@ -22,7 +22,6 @@ inputs:
     description: 'Comma-separated list of emails'
   email_subject:
     description: 'Custom subject line for email filtering'
-    default: 'Blah'
   email_transport_smtp_host:
     description: 'SMTP host e.g. smtp.gmail.com'
     default: 'smtp.gmail.com'

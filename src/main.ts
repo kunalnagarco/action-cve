@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     const emailTransportSmtpConfig = {
       host: emailTransportSmtpHost,
       port: emailTransportSmtpPort,
-      secure: true,
+      secure: emailTransportSmtpPort === 465 && true,
       auth: {
         user: emailTransportSmtpUser,
         pass: emailTransportSmtpPassword,

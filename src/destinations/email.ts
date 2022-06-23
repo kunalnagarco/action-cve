@@ -52,6 +52,6 @@ export const sendAlertsToEmailSmtp = async (
     subject:
       subject ||
       `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
-    text: createTable(alerts),
+    html: createTable(alerts),
   })
 }

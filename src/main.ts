@@ -24,7 +24,7 @@ async function run(): Promise<void> {
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
     const emailTransportSmtpConfig = JSON.parse(
-      getInput('email_transport_smtp_config'),
+      JSON.stringify(getInput('email_transport_smtp_config')),
     )
     console.log(typeof emailTransportSmtpConfig)
     const count = parseInt(getInput('count'))

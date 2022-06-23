@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { getInput, setFailed } from '@actions/core'
+import { getInput, getMultilineInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -24,7 +24,7 @@ async function run(): Promise<void> {
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
     const emailTransportSmtpConfig = JSON.parse(
-      JSON.stringify(getInput('email_transport_smtp_config')),
+      JSON.stringify(getMultilineInput('email_transport_smtp_config')),
     )
     console.log(typeof emailTransportSmtpConfig)
     const count = parseInt(getInput('count'))

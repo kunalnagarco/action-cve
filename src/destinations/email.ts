@@ -10,7 +10,7 @@ const createTable = (alerts: Alert[]): string => {
     rowData += createTableRow(alert)
   }
   return `
-    <table border="1" cellpadding="20" width="100%" height="100%">
+    <table border="1" cellpadding="10" width="100%">
       <thead>
         <th>Package name</th>
         <th>Vulnerability Version Range</th>

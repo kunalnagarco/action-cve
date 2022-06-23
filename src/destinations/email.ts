@@ -5,8 +5,12 @@ import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 const createTable = (alerts: Alert[]): string => {
+  let rowData = ''
+  for (const alert of alerts) {
+    rowData += createTableRow(alert)
+  }
   return `
-    <table>
+    <table border="1" cellpadding="20" width="100%" height="100%">
       <thead>
         <th>Package name</th>
         <th>Vulnerability Version Range</th>
@@ -16,12 +20,9 @@ const createTable = (alerts: Alert[]): string => {
         <th></th>
       </thead>
       <tbody>
-        ${alerts.map((alert) => {
-          createTableRow(alert)
-        })}
+        ${rowData}
       </tbody>
     </table>
-
   `
 }
 

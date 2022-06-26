@@ -1,5 +1,4 @@
-/* eslint-disable i18n-text/no-en */
-// import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
+import { ACTION_ICON, ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert } from '../entities'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
@@ -39,6 +38,16 @@ const createTableRow = (alert: Alert): string => {
   `
 }
 
+const createEmailBody = (alerts: Alert[]): string => {
+  return `
+    <h2>
+      <img src="${ACTION_ICON}" alt="${ACTION_SHORT_SUMMARY}" width="20" height="20" />
+      <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>
+    </h2>
+    ${createTable(alerts)}
+  `
+}
+
 export const sendAlertsToEmailSmtp = async (
   config: SMTPTransport.Options,
   alerts: Alert[],
@@ -52,7 +61,7 @@ export const sendAlertsToEmailSmtp = async (
     to: emailList,
     subject:
       subject ||
-      `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
-    html: createTable(alerts),
+      `${ACTION_SHORT_SUMMARY} - ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
+    html: createEmailBody(alerts),
   })
 }

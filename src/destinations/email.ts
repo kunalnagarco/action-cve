@@ -1,4 +1,4 @@
-import { ACTION_ICON, ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
+import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert } from '../entities'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
@@ -40,10 +40,10 @@ const createTableRow = (alert: Alert): string => {
 
 const createEmailBody = (alerts: Alert[]): string => {
   return `
-    <h2>
-      <img src="${ACTION_ICON}" alt="${ACTION_SHORT_SUMMARY}" width="20" height="20" />
-      <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>
-    </h2>
+    Hello,
+
+    You are receiving this as you have set up email notifications for vulnerabilities via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.
+
     ${createTable(alerts)}
   `
 }

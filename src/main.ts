@@ -63,6 +63,8 @@ async function run(): Promise<void> {
         }
       }
       if (emailFrom && emailList) {
+        const emailWikiLink =
+          'https://github.com/kunalnagarco/action-cve/wiki/Send-alerts-to-email'
         if (emailTransportSmtpUser && emailTransportSmtpPassword) {
           const emailTransportSmtpConfig = {
             host: emailTransportSmtpHost,
@@ -83,7 +85,7 @@ async function run(): Promise<void> {
         } else {
           setFailed(
             new Error(
-              'Invalid SMTP config. Please check the wiki for more info: <<wiki_link_here>>',
+              `Invalid SMTP config. Please check the wiki for more info: ${emailWikiLink}`,
             ),
           )
         }

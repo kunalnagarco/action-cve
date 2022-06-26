@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/kunalnagarco/action-cve/compare/v1.6.14...v1.7.0) (2022-06-26)
+
+
+### Features
+
+* Add new destination - Email ([#91](https://github.com/kunalnagarco/action-cve/issues/91)) ([2f0b324](https://github.com/kunalnagarco/action-cve/commit/2f0b324b2974c46b61c5643beb67fb2179cda835))
+
 ### [1.6.14](https://github.com/kunalnagarco/action-cve/compare/v1.6.13...v1.6.14) (2022-06-21)
 
 

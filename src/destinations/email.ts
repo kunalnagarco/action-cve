@@ -1,5 +1,5 @@
 import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
-import { Alert } from '../entities'
+import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
@@ -41,11 +41,9 @@ const createTableRow = (alert: Alert): string => {
 const createEmailBody = (alerts: Alert[]): string => {
   return `
     <p>Hello,</p>
-    <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${
-      alerts[0].repository.owner
-    }/${
-    alerts[0].repository.name
-  }</b> via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
+    <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${getFullRepositoryNameFromAlert(
+      alerts[0],
+    )}</b> via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `
 }
@@ -63,7 +61,9 @@ export const sendAlertsToEmailSmtp = async (
     to: emailList,
     subject:
       subject ||
-      `${ACTION_SHORT_SUMMARY} - ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
+      `${ACTION_SHORT_SUMMARY} - ${
+        alerts.length
+      } vulnerabilities in ${getFullRepositoryNameFromAlert(alerts[0])}`,
     html: createEmailBody(alerts),
   })
 }

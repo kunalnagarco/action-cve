@@ -58,7 +58,7 @@ export const sendAlertsToEmailSmtp = async (
   const transporter = createTransport(config)
   await transporter.sendMail({
     from: emailFrom,
-    to: emailList,
+    bcc: emailList,
     subject:
       subject ||
       `${ACTION_SHORT_SUMMARY} - ${

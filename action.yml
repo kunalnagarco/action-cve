@@ -19,7 +19,7 @@ inputs:
   email_from:
     description: 'Sender email'
   email_list:
-    description: 'Comma-separated list of emails'
+    description: 'Comma-separated list of emails sent as bcc'
   email_subject:
     description: 'Custom subject line for email filtering'
   email_transport_smtp_host:

@@ -40,10 +40,12 @@ const createTableRow = (alert: Alert): string => {
 
 const createEmailBody = (alerts: Alert[]): string => {
   return `
-    Hello,
-
-    You are receiving this as you have set up email notifications for vulnerabilities via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.
-
+    <p>Hello,</p>
+    <p>You are receiving this message as you have set up email notifications for vulnerabilities in ${
+      alerts[0].repository.owner
+    }/${
+    alerts[0].repository.name
+  } via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a></p>.
     ${createTable(alerts)}
   `
 }

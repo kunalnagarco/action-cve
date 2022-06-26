@@ -4,6 +4,7 @@ import {
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
   sendAlertsToZenduty,
+  sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
 import { context } from '@actions/github'
@@ -18,6 +19,15 @@ async function run(): Promise<void> {
     const zenDutyApiKey = getInput('zenduty_api_key')
     const zenDutyServiceId = getInput('zenduty_service_id')
     const zenDutyEscalationPolicyId = getInput('zenduty_escalation_policy_id')
+    const emailFrom = getInput('email_from')
+    const emailList = getInput('email_list')
+    const emailSubject = getInput('email_subject')
+    const emailTransportSmtpHost = getInput('email_transport_smtp_host')
+    const emailTransportSmtpPort = parseInt(
+      getInput('email_transport_smtp_port'),
+    )
+    const emailTransportSmtpUser = getInput('email_transport_smtp_user')
+    const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
     const count = parseInt(getInput('count'))
     const owner = context.repo.owner
     const repo = context.repo.repo
@@ -47,6 +57,34 @@ async function run(): Promise<void> {
         } else {
           setFailed(
             new Error('Check your Zenduty Service ID and Escalation Policy ID'),
+          )
+        }
+      }
+      if (emailFrom && emailList) {
+        const emailWikiLink =
+          'https://github.com/kunalnagarco/action-cve/wiki/Send-alerts-to-email'
+        if (emailTransportSmtpUser && emailTransportSmtpPassword) {
+          const emailTransportSmtpConfig = {
+            host: emailTransportSmtpHost,
+            port: emailTransportSmtpPort,
+            secure: emailTransportSmtpPort === 465 && true,
+            auth: {
+              user: emailTransportSmtpUser,
+              pass: emailTransportSmtpPassword,
+            },
+          }
+          sendAlertsToEmailSmtp(
+            emailTransportSmtpConfig,
+            alerts,
+            emailList,
+            emailFrom,
+            emailSubject,
+          )
+        } else {
+          setFailed(
+            new Error(
+              `Invalid SMTP config. Please check the wiki for more info: ${emailWikiLink}`,
+            ),
           )
         }
       }

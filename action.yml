@@ -16,6 +16,22 @@ inputs:
     description: 'Zenduty Service ID: https://docs.zenduty.com/docs/services'
   zenduty_escalation_policy_id:
     description: 'Zenduty Escalation Policy ID: https://docs.zenduty.com/docs/escalationpolicies'
+  email_from:
+    description: 'Sender email'
+  email_list:
+    description: 'Comma-separated list of emails sent as bcc'
+  email_subject:
+    description: 'Custom subject line for email filtering'
+  email_transport_smtp_host:
+    description: 'SMTP host e.g. smtp.gmail.com'
+    default: 'smtp.gmail.com'
+  email_transport_smtp_port:
+    description: 'SMTP port'
+    default: 587
+  email_transport_smtp_user:
+    description: 'SMTP user'
+  email_transport_smtp_password:
+    description: 'SMTP password'
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

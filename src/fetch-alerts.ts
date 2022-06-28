@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Alert, toAlert } from './entities'
 import {
   Repository,
@@ -6,14 +5,13 @@ import {
 } from '@octokit/graphql-schema'
 import { getOctokit } from '@actions/github'
 
-const isValidAlert = (
+const isActiveAlert = (
   gitHubAlert: RepositoryVulnerabilityAlertEdge,
 ): boolean => {
   if (
-    gitHubAlert?.node?.dismissedAt === null ||
+    gitHubAlert?.node?.dismissedAt === null &&
     gitHubAlert?.node?.fixedAt === null
   ) {
-    console.log('dismissedAt, fixedAt is null', gitHubAlert?.node)
     return true
   }
   return false
@@ -81,7 +79,7 @@ export const fetchAlerts = async (
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node && isValidAlert(gitHubAlert)) {
+      if (gitHubAlert && gitHubAlert.node && isActiveAlert(gitHubAlert)) {
         alerts.push(toAlert(gitHubAlert.node))
       }
     }

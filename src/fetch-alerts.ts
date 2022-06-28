@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Alert, toAlert } from './entities'
 import {
   Repository,
@@ -8,6 +9,12 @@ import { getOctokit } from '@actions/github'
 const isValidAlert = (
   gitHubAlert: RepositoryVulnerabilityAlertEdge,
 ): boolean => {
+  console.log(
+    typeof gitHubAlert?.node?.dismissedAt,
+    gitHubAlert?.node?.dismissedAt,
+    typeof gitHubAlert?.node?.fixedAt,
+    gitHubAlert?.node?.fixedAt,
+  )
   if (
     typeof gitHubAlert?.node?.dismissedAt === null ||
     typeof gitHubAlert?.node?.fixedAt === null

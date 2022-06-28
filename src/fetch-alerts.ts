@@ -10,7 +10,7 @@ const isValidAlert = (
 ): boolean => {
   if (
     typeof gitHubAlert?.node?.dismissedAt === null ||
-    typeof gitHubAlert?.node?.fixedAt
+    typeof gitHubAlert?.node?.fixedAt === null
   ) {
     return true
   }

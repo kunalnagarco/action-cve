@@ -1,6 +1,21 @@
 import { Alert, toAlert } from './entities'
-import { Repository } from '@octokit/graphql-schema'
+import {
+  Repository,
+  RepositoryVulnerabilityAlertEdge,
+} from '@octokit/graphql-schema'
 import { getOctokit } from '@actions/github'
+
+const isValidAlert = (
+  gitHubAlert: RepositoryVulnerabilityAlertEdge,
+): boolean => {
+  if (
+    typeof gitHubAlert?.node?.dismissedAt === null ||
+    typeof gitHubAlert?.node?.fixedAt
+  ) {
+    return true
+  }
+  return false
+}
 
 export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
@@ -62,7 +77,7 @@ export const fetchAlerts = async (
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node) {
+      if (gitHubAlert && gitHubAlert.node && isValidAlert(gitHubAlert)) {
         alerts.push(toAlert(gitHubAlert.node))
       }
     }

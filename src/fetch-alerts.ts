@@ -16,8 +16,8 @@ const isValidAlert = (
     gitHubAlert?.node?.fixedAt,
   )
   if (
-    typeof gitHubAlert?.node?.dismissedAt === null ||
-    typeof gitHubAlert?.node?.fixedAt === null
+    gitHubAlert?.node?.dismissedAt === null ||
+    gitHubAlert?.node?.fixedAt === null
   ) {
     return true
   }

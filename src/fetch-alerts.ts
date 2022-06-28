@@ -9,16 +9,11 @@ import { getOctokit } from '@actions/github'
 const isValidAlert = (
   gitHubAlert: RepositoryVulnerabilityAlertEdge,
 ): boolean => {
-  console.log(
-    typeof gitHubAlert?.node?.dismissedAt,
-    gitHubAlert?.node?.dismissedAt,
-    typeof gitHubAlert?.node?.fixedAt,
-    gitHubAlert?.node?.fixedAt,
-  )
   if (
     gitHubAlert?.node?.dismissedAt === null ||
     gitHubAlert?.node?.fixedAt === null
   ) {
+    console.log('dismissedAt, fixedAt is null', gitHubAlert?.node)
     return true
   }
   return false

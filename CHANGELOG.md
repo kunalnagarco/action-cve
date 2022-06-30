@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.7.1](https://github.com/kunalnagarco/action-cve/compare/v1.7.0...v1.7.1) (2022-06-30)
+
+
+### Bug Fixes
+
+* Dismissed or Fixed alerts should not be included in the list ([#94](https://github.com/kunalnagarco/action-cve/issues/94)) ([2d3d468](https://github.com/kunalnagarco/action-cve/commit/2d3d4683d373c70f190a945ee4c4e647cd50ab67))
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#93](https://github.com/kunalnagarco/action-cve/issues/93)) ([02b0c26](https://github.com/kunalnagarco/action-cve/commit/02b0c26ca556c2098521a1f88443e6232b786ded))
+
 ## [1.7.0](https://github.com/kunalnagarco/action-cve/compare/v1.6.14...v1.7.0) (2022-06-26)
 
 

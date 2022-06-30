@@ -413,7 +413,7 @@ exports.toAdvisory = toAdvisory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toAlert = void 0;
+exports.isActiveAlert = exports.toAlert = void 0;
 const advisory_1 = __nccwpck_require__(9750);
 const repository_1 = __nccwpck_require__(7359);
 const vulnerability_1 = __nccwpck_require__(3005);
@@ -433,6 +433,14 @@ const toAlert = (repositoryVulnerabilityAlert) => {
     });
 };
 exports.toAlert = toAlert;
+const isActiveAlert = (repositoryVulnerabilityAlert) => {
+    if (repositoryVulnerabilityAlert.dismissedAt === null &&
+        repositoryVulnerabilityAlert.fixedAt === null) {
+        return true;
+    }
+    return false;
+};
+exports.isActiveAlert = isActiveAlert;
 
 
 /***/ }),
@@ -527,6 +535,8 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
           edges {
             node {
               id
+              dismissedAt
+              fixedAt
               repository {
                 name
                 owner {
@@ -571,7 +581,7 @@ const fetchAlerts = (gitHubPersonalAccessToken, repositoryName, repositoryOwner,
     if (gitHubAlerts) {
         const alerts = [];
         for (const gitHubAlert of gitHubAlerts) {
-            if (gitHubAlert && gitHubAlert.node) {
+            if (gitHubAlert && gitHubAlert.node && (0, entities_1.isActiveAlert)(gitHubAlert.node)) {
                 alerts.push((0, entities_1.toAlert)(gitHubAlert.node));
             }
         }
@@ -3732,7 +3742,7 @@ exports.withCustomRequest = withCustomRequest;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 
-const VERSION = "2.18.0";
+const VERSION = "2.19.0";
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -4936,7 +4946,7 @@ const Endpoints = {
   }
 };
 
-const VERSION = "5.14.0";
+const VERSION = "5.15.0";
 
 function endpointsToMethods(octokit, endpointsMap) {
   const newMethods = {};

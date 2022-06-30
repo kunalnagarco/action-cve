@@ -1,4 +1,4 @@
-import { Alert, toAlert } from './entities'
+import { Alert, toAlert, isActiveAlert } from './entities'
 import { Repository } from '@octokit/graphql-schema'
 import { getOctokit } from '@actions/github'
 
@@ -18,6 +18,8 @@ export const fetchAlerts = async (
           edges {
             node {
               id
+              dismissedAt
+              fixedAt
               repository {
                 name
                 owner {
@@ -62,7 +64,7 @@ export const fetchAlerts = async (
   if (gitHubAlerts) {
     const alerts: Alert[] = []
     for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node) {
+      if (gitHubAlert && gitHubAlert.node && isActiveAlert(gitHubAlert.node)) {
         alerts.push(toAlert(gitHubAlert.node))
       }
     }

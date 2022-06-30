@@ -27,3 +27,15 @@ export const toAlert = (
   manifest: repositoryVulnerabilityAlert.vulnerableManifestFilename,
   createdAt: repositoryVulnerabilityAlert.createdAt,
 })
+
+export const isActiveAlert = (
+  repositoryVulnerabilityAlert: RepositoryVulnerabilityAlert,
+): boolean => {
+  if (
+    repositoryVulnerabilityAlert.dismissedAt === null &&
+    repositoryVulnerabilityAlert.fixedAt === null
+  ) {
+    return true
+  }
+  return false
+}

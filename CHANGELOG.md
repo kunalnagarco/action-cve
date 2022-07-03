@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.2](https://github.com/kunalnagarco/action-cve/compare/v1.7.1...v1.7.2) (2022-07-03)
+
+
+### Chores
+
+* **deps:** update dependency @types/node-fetch to v2.6.2 ([#96](https://github.com/kunalnagarco/action-cve/issues/96)) ([edb3534](https://github.com/kunalnagarco/action-cve/commit/edb353481be89162aed61543fa2fbb0e0f3be0ea))
+
 ### [1.7.1](https://github.com/kunalnagarco/action-cve/compare/v1.7.0...v1.7.1) (2022-06-30)
 
 

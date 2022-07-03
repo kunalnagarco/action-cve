@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.3](https://github.com/kunalnagarco/action-cve/compare/v1.7.2...v1.7.3) (2022-07-03)
+
+
+### Chores
+
+* **deps:** pin dependencies ([#95](https://github.com/kunalnagarco/action-cve/issues/95)) ([8186816](https://github.com/kunalnagarco/action-cve/commit/81868166347cbe3b5ff20b977b011b43bb7b143d))
+
 ### [1.7.2](https://github.com/kunalnagarco/action-cve/compare/v1.7.1...v1.7.2) (2022-07-03)
 
 

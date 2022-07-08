@@ -3,6 +3,7 @@ import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
+  MAX_COUNT_SLACK,
   sendAlertsToSlack,
   sendAlertsToZenduty,
   sendAlertsToEmailSmtp,
@@ -42,6 +43,12 @@ async function run(): Promise<void> {
       if (slackWebhookUrl) {
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))
+        } else if (count > MAX_COUNT_SLACK) {
+          setFailed(
+            new Error(
+              `Max count for Slack is ${MAX_COUNT_SLACK} due to message length restrictions.`,
+            ),
+          )
         } else {
           await sendAlertsToSlack(slackWebhookUrl, alerts)
         }

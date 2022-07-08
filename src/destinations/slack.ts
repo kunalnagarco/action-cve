@@ -56,15 +56,16 @@ export const validateSlackWebhookUrl = (url: string): boolean => {
   return regexPattern.test(url)
 }
 
+export const MAX_COUNT_SLACK = 45
+
 export const sendAlertsToSlack = async (
   webhookUrl: string,
   alerts: Alert[],
 ): Promise<void> => {
   const webhook = new IncomingWebhook(webhookUrl)
   const alertBlocks: KnownBlock[] = []
-  // for (const alert of alerts) {
-  for (let i = 0; i < 45; i++) {
-    alertBlocks.push(createAlertBlock(alerts[0]))
+  for (const alert of alerts) {
+    alertBlocks.push(createAlertBlock(alert))
   }
   await webhook.send({
     blocks: [

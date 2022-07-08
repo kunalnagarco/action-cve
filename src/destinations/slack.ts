@@ -49,12 +49,12 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
   }
 }
 
-const createMaxAlertsNoticeBlock = (count: number): KnownBlock => {
+const createMaxAlertsNoticeBlock = (): KnownBlock => {
   return {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `*Note:* There are a total of ${count} alerts, however only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
+      text: `*Note:* Only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
     },
   }
 }
@@ -75,7 +75,7 @@ export const sendAlertsToSlack = async (
   const webhook = new IncomingWebhook(webhookUrl)
   const alertBlocks: KnownBlock[] = []
   if (alerts.length > MAX_COUNT_SLACK) {
-    alertBlocks.push(createMaxAlertsNoticeBlock(alerts.length))
+    alertBlocks.push(createMaxAlertsNoticeBlock())
   }
   for (const alert of alerts) {
     alertBlocks.push(createAlertBlock(alert))

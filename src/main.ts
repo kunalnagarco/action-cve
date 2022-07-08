@@ -94,7 +94,7 @@ async function run(): Promise<void> {
     }
   } catch (err) {
     if (err instanceof Error) {
-      console.log(err)
+      console.log(err.message, err.name, err.stack)
       setFailed(err)
     }
   }

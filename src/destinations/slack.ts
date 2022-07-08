@@ -13,9 +13,8 @@ const createSummaryBlock = (
     text: {
       type: 'mrkdwn',
       text: `
-        You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*. ${
-        alertCount > MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''
-      }
+        You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*.
+        ${alertCount > MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''}
       `,
     },
   }

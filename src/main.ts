@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
@@ -93,6 +94,7 @@ async function run(): Promise<void> {
     }
   } catch (err) {
     if (err instanceof Error) {
+      console.log(err)
       setFailed(err)
     }
   }

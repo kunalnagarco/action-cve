@@ -14,7 +14,7 @@ const createSummaryBlock = (
       type: 'mrkdwn',
       text: `
         You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*. ${
-        alertCount > MAX_COUNT_SLACK ? createMaxAlertsNoticeBlock() : ''
+        alertCount > MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''
       }
       `,
     },
@@ -53,14 +53,8 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
   }
 }
 
-const createMaxAlertsNoticeBlock = (): KnownBlock => {
-  return {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `*Note:* Only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
-    },
-  }
+const createMaxAlertsMarkdownNotice = (): string => {
+  return `*Note:* Only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`
 }
 
 export const validateSlackWebhookUrl = (url: string): boolean => {

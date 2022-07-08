@@ -32,7 +32,7 @@ async function run(): Promise<void> {
     // const owner = context.repo.owner
     // const repo = context.repo.repo
     const owner = 'kunalnagar'
-    const repo = 'action-cve'
+    const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {

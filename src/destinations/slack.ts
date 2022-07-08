@@ -30,6 +30,8 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
       type: 'mrkdwn',
       text: `
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sollicitudin, augue ac finibus tincidunt, diam quam tincidunt quam, id ultrices ligula lectus eget lectus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Curabitur ac tortor at orci ultrices molestie. Ut suscipit urna quis quam tristique, quis eleifend est semper. Morbi ut urna egestas ipsum efficitur sagittis eu at sapien. Duis convallis euismod ligula vel laoreet. Proin sed hendrerit justo. Curabitur fringilla porttitor diam id porttitor. Nunc ex magna, fringilla in nunc in, aliquet faucibus dolor. Etiam vitae ipsum malesuada, scelerisque enim quis, egestas risus. Suspendisse eget nunc vitae urna elementum feugiat. Vivamus scelerisque metus nec dui maximus, eu sagittis nunc consectetur. Aliquam a felis sit amet leo hendrerit gravida et imperdiet nulla. Cras facilisis eleifend metus, ac pellentesque tortor pulvinar nec. Mauris id gravida ante, eu bibendum nisi. Nunc gravida diam a lacus elementum mattis.
+
+      Nullam ornare lobortis augue, quis fringilla tellus aliquet vel. Donec ac tellus eros. Donec efficitur libero ut ipsum consectetur iaculis. Suspendisse potenti. Donec mollis vehicula mattis. Vivamus malesuada euismod turpis ac efficitur. Quisque commodo orci turpis, id blandit urna sodales eu. Maecenas accumsan posuere augue, ac pulvinar sem semper efficitur. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque viverra hendrerit tellus quis luctus.
             `,
     },
     accessory: {

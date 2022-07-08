@@ -56,9 +56,9 @@ export const sendAlertsToSlack = async (
 ): Promise<void> => {
   const webhook = new IncomingWebhook(webhookUrl)
   const alertBlocks: KnownBlock[] = []
-  for (const alert of alerts) {
-    // for (let i = 0; i < 4; i++) {
-    alertBlocks.push(createAlertBlock(alert))
+  // for (const alert of alerts) {
+  for (let i = 0; i < 4; i++) {
+    alertBlocks.push(createAlertBlock(alerts[i]))
   }
   await webhook.send({
     blocks: [

@@ -54,7 +54,7 @@ const createMaxAlertsNoticeBlock = (count: number): KnownBlock => {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `**Note:** There are a total of ${count} alerts, however only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
+      text: `*Note:* There are a total of ${count} alerts, however only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
     },
   }
 }

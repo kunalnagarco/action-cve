@@ -33,7 +33,7 @@ inputs:
   email_transport_smtp_password:
     description: 'SMTP password'
   count:
-    description: 'Number of vulnerability alerts to send. Max 45 for Slack as it may result in 400 errors (max length of the message)'
+    description: 'Number of vulnerability alerts to send.'
     default: 20
 branding:
   icon: 'alert-octagon'

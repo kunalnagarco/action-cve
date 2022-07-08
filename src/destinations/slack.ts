@@ -49,6 +49,16 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
   }
 }
 
+const createMaxAlertsNoticeBlock = (count: number): KnownBlock => {
+  return {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `**Note:** There are a total of ${count} alerts, however only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`,
+    },
+  }
+}
+
 export const validateSlackWebhookUrl = (url: string): boolean => {
   const regexPattern = new RegExp(
     /^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/,
@@ -56,7 +66,7 @@ export const validateSlackWebhookUrl = (url: string): boolean => {
   return regexPattern.test(url)
 }
 
-export const MAX_COUNT_SLACK = 45
+export const MAX_COUNT_SLACK = 30
 
 export const sendAlertsToSlack = async (
   webhookUrl: string,
@@ -64,6 +74,9 @@ export const sendAlertsToSlack = async (
 ): Promise<void> => {
   const webhook = new IncomingWebhook(webhookUrl)
   const alertBlocks: KnownBlock[] = []
+  if (alerts.length > MAX_COUNT_SLACK) {
+    alertBlocks.push(createMaxAlertsNoticeBlock(alerts.length))
+  }
   for (const alert of alerts) {
     alertBlocks.push(createAlertBlock(alert))
   }

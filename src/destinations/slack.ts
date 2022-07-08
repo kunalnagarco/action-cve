@@ -12,7 +12,11 @@ const createSummaryBlock = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*`,
+      text: `
+        You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*. ${
+        alertCount > MAX_COUNT_SLACK ? createMaxAlertsNoticeBlock() : ''
+      }
+      `,
     },
   }
 }
@@ -74,9 +78,6 @@ export const sendAlertsToSlack = async (
 ): Promise<void> => {
   const webhook = new IncomingWebhook(webhookUrl)
   const alertBlocks: KnownBlock[] = []
-  if (alerts.length > MAX_COUNT_SLACK) {
-    alertBlocks.push(createMaxAlertsNoticeBlock())
-  }
   for (const alert of alerts) {
     alertBlocks.push(createAlertBlock(alert))
   }

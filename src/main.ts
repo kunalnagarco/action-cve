@@ -1,4 +1,6 @@
-import { getInput, setFailed, error } from '@actions/core'
+/* eslint-disable no-console */
+import { getInput, setFailed } from '@actions/core'
+import { AxiosError } from 'axios'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -92,8 +94,13 @@ async function run(): Promise<void> {
       }
     }
   } catch (err) {
-    if (err instanceof Error) {
-      // eslint-disable-next-line no-console
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (err?.isAxiosError) {
+      const axiosErr = err as AxiosError
+      console.error(axiosErr.toJSON())
+      setFailed(axiosErr)
+    } else if (err instanceof Error) {
       console.error(err.name, err.message, err.stack)
       setFailed(err)
     }

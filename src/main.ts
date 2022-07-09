@@ -93,7 +93,8 @@ async function run(): Promise<void> {
     }
   } catch (err) {
     if (err instanceof Error) {
-      error(err)
+      // eslint-disable-next-line no-console
+      console.error(err)
       setFailed(err)
     }
   }

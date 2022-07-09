@@ -96,9 +96,9 @@ async function run(): Promise<void> {
   } catch (err) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (err?.isAxiosError) {
+    if (isAxiosError(err)) {
       const axiosErr = err as AxiosError
-      console.error(axiosErr.toJSON())
+      console.error(JSON.stringify(axiosErr.response))
       setFailed(axiosErr)
     } else if (err instanceof Error) {
       console.error(err.name, err.message, err.stack)

@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { getInput, setFailed } from '@actions/core'
+import { getInput, setFailed, error } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -94,7 +93,7 @@ async function run(): Promise<void> {
     }
   } catch (err) {
     if (err instanceof Error) {
-      console.log(err.message, err.name, err.stack)
+      error(err)
       setFailed(err)
     }
   }

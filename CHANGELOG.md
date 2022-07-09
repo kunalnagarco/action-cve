@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.6](https://github.com/kunalnagarco/action-cve/compare/v1.7.5...v1.7.6) (2022-07-09)
+
+
+### Bug Fixes
+
+* Enforce a max count when sending alerts to Slack ([#99](https://github.com/kunalnagarco/action-cve/issues/99)) ([d801242](https://github.com/kunalnagarco/action-cve/commit/d8012429b988057c580822cac81175245e80ca58))
+
 ### [1.7.5](https://github.com/kunalnagarco/action-cve/compare/v1.7.4...v1.7.5) (2022-07-04)
 
 

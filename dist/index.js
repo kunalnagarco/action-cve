@@ -254,7 +254,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sendAlertsToSlack = exports.validateSlackWebhookUrl = void 0;
+exports.sendAlertsToSlack = exports.MAX_COUNT_SLACK = exports.validateSlackWebhookUrl = void 0;
 const constants_1 = __nccwpck_require__(5105);
 const webhook_1 = __nccwpck_require__(1095);
 const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => {
@@ -262,7 +262,10 @@ const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*`,
+            text: `
+        You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*.
+${alertCount > exports.MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''}
+      `,
         },
     };
 };
@@ -297,11 +300,15 @@ const createAlertBlock = (alert) => {
         },
     };
 };
+const createMaxAlertsMarkdownNotice = () => {
+    return `*Note:* Only ${exports.MAX_COUNT_SLACK} have been sent due to message length restrictions.`;
+};
 const validateSlackWebhookUrl = (url) => {
     const regexPattern = new RegExp(/^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/);
     return regexPattern.test(url);
 };
 exports.validateSlackWebhookUrl = validateSlackWebhookUrl;
+exports.MAX_COUNT_SLACK = 30;
 const sendAlertsToSlack = (webhookUrl, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     const webhook = new webhook_1.IncomingWebhook(webhookUrl);
     const alertBlocks = [];

@@ -12,7 +12,10 @@ const createSummaryBlock = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*`,
+      text: `
+        You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*.
+${alertCount > MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''}
+      `,
     },
   }
 }
@@ -49,12 +52,18 @@ const createAlertBlock = (alert: Alert): KnownBlock => {
   }
 }
 
+const createMaxAlertsMarkdownNotice = (): string => {
+  return `*Note:* Only ${MAX_COUNT_SLACK} have been sent due to message length restrictions.`
+}
+
 export const validateSlackWebhookUrl = (url: string): boolean => {
   const regexPattern = new RegExp(
     /^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/,
   )
   return regexPattern.test(url)
 }
+
+export const MAX_COUNT_SLACK = 30
 
 export const sendAlertsToSlack = async (
   webhookUrl: string,

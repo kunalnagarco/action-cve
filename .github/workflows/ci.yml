@@ -32,6 +32,7 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           # microsoft_teams_webhook: ${{ secrets.MICROSOFT_TEAMS_WEBHOOK }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+          # count: 20
           # pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
           # zenduty_api_key: ${{ secrets.ZENDUTY_API_KEY }}
           # zenduty_service_id: ${{ secrets.ZENDUTY_SERVICE_ID }}

@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.7.10](https://github.com/kunalnagarco/action-cve/compare/v1.7.9...v1.7.10) (2022-08-01)
+
+
+### Chores
+
+* **deps:** update dependency @octokit/graphql-schema to v10.74.2 ([#104](https://github.com/kunalnagarco/action-cve/issues/104)) ([2cbd487](https://github.com/kunalnagarco/action-cve/commit/2cbd487d9b4d236dd2512ab430f29ebbc84c3add))
+* **deps:** update dependency @semantic-release/github to v8.0.5 ([#105](https://github.com/kunalnagarco/action-cve/issues/105)) ([399d8c5](https://github.com/kunalnagarco/action-cve/commit/399d8c5262d36a072adf5efe22563d116a663676))
+
 ### [1.7.9](https://github.com/kunalnagarco/action-cve/compare/v1.7.8...v1.7.9) (2022-07-25)
 
 

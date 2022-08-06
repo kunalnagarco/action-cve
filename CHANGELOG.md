@@ -1,5 +1,18 @@
 # Changelog
 
+### [1.7.11](https://github.com/kunalnagarco/action-cve/compare/v1.7.10...v1.7.11) (2022-08-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v6.7.7 ([#107](https://github.com/kunalnagarco/action-cve/issues/107)) ([ee1e6a2](https://github.com/kunalnagarco/action-cve/commit/ee1e6a2a67739ce9fcd4b6c7c79ebde66de85977))
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#108](https://github.com/kunalnagarco/action-cve/issues/108)) ([6d060b2](https://github.com/kunalnagarco/action-cve/commit/6d060b24be1d6ba530821dd78caddf2fcb6f9167))
+* **deps:** update dependency eslint-plugin-github to v4.3.7 ([#106](https://github.com/kunalnagarco/action-cve/issues/106)) ([5a6ab37](https://github.com/kunalnagarco/action-cve/commit/5a6ab37cd3b8826e4dbc50650699fc24cc7a87ea))
+
 ### [1.7.10](https://github.com/kunalnagarco/action-cve/compare/v1.7.9...v1.7.10) (2022-08-01)
 
 

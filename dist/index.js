@@ -25618,7 +25618,7 @@ function wrap(str, lineLength) {
  *
  * @constructor
  * @param {Object} options Stream options
- * @param {Number} [options.lineLength=76] Maximum lenght for lines, set to false to disable wrapping
+ * @param {Number} [options.lineLength=76] Maximum length for lines, set to false to disable wrapping
  */
 class Encoder extends Transform {
     constructor(options) {
@@ -29565,7 +29565,7 @@ const mimeTypes = new Map([
     ['application/x-bittorrent', 'torrent'],
     ['application/x-bsh', ['bsh', 'sh', 'shar']],
     ['application/x-bytecode.elisp', 'elc'],
-    ['applicaiton/x-bytecode.python', 'pyc'],
+    ['application/x-bytecode.python', 'pyc'],
     ['application/x-bzip', 'bz'],
     ['application/x-bzip2', ['boz', 'bz2']],
     ['application/x-cdf', 'cdf'],
@@ -30721,7 +30721,7 @@ const extensions = new Map([
     ['pwz', 'application/vnd.ms-powerpoint'],
     ['py', 'text/x-script.phyton'],
     ['pya', 'audio/vnd.ms-playready.media.pya'],
-    ['pyc', 'applicaiton/x-bytecode.python'],
+    ['pyc', 'application/x-bytecode.python'],
     ['pyv', 'video/vnd.ms-playready.media.pyv'],
     ['qam', 'application/vnd.epson.quickanime'],
     ['qbo', 'application/vnd.intu.qbo'],
@@ -31146,7 +31146,6 @@ module.exports = {
 
 
 const crypto = __nccwpck_require__(6113);
-const os = __nccwpck_require__(2037);
 const fs = __nccwpck_require__(7147);
 const punycode = __nccwpck_require__(5477);
 const PassThrough = (__nccwpck_require__(2781).PassThrough);
@@ -32425,7 +32424,7 @@ class MimeNode {
             ) +
             '@' +
             // try to use the domain of the FROM address or fallback to server hostname
-            (this.getEnvelope().from || this.hostname || os.hostname() || 'localhost').split('@').pop() +
+            (this.getEnvelope().from || this.hostname || 'localhost').split('@').pop() +
             '>'
         );
     }
@@ -33559,23 +33558,37 @@ const os = __nccwpck_require__(2037);
 
 const DNS_TTL = 5 * 60 * 1000;
 
-const networkInterfaces = (module.exports.networkInterfaces = os.networkInterfaces());
+let networkInterfaces;
+try {
+    networkInterfaces = os.networkInterfaces();
+} catch (err) {
+    // fails on some systems
+}
 
-const isFamilySupported = family => {
+module.exports.networkInterfaces = networkInterfaces;
+
+const isFamilySupported = (family, allowInternal) => {
+    let networkInterfaces = module.exports.networkInterfaces;
+    if (!networkInterfaces) {
+        // hope for the best
+        return true;
+    }
+
     const familySupported =
         // crux that replaces Object.values(networkInterfaces) as Object.values is not supported in nodejs v6
         Object.keys(networkInterfaces)
             .map(key => networkInterfaces[key])
             // crux that replaces .flat() as it is not supported in older Node versions (v10 and older)
             .reduce((acc, val) => acc.concat(val), [])
-            .filter(i => !i.internal)
+            .filter(i => !i.internal || allowInternal)
             .filter(i => i.family === 'IPv' + family || i.family === family).length > 0;
 
     return familySupported;
 };
 
-const resolver = (family, hostname, callback) => {
-    const familySupported = isFamilySupported(family);
+const resolver = (family, hostname, options, callback) => {
+    options = options || {};
+    const familySupported = isFamilySupported(family, options.allowInternalNetworkInterfaces);
 
     if (!familySupported) {
         return callback(null, []);
@@ -33654,7 +33667,7 @@ module.exports.resolveHostname = (options, callback) => {
         }
     }
 
-    resolver(4, options.host, (err, addresses) => {
+    resolver(4, options.host, options, (err, addresses) => {
         if (err) {
             if (cached) {
                 // ignore error, use expired value
@@ -33688,7 +33701,7 @@ module.exports.resolveHostname = (options, callback) => {
             );
         }
 
-        resolver(6, options.host, (err, addresses) => {
+        resolver(6, options.host, options, (err, addresses) => {
             if (err) {
                 if (cached) {
                     // ignore error, use expired value
@@ -34338,7 +34351,7 @@ function httpProxyClient(proxyUrl, destinationPort, destinationHost, callback) {
     // Error harness for initial connection. Once connection is established, the responsibility
     // to handle errors is passed to whoever uses this socket
     let finished = false;
-    let tempSocketErr = function (err) {
+    let tempSocketErr = err => {
         if (finished) {
             return;
         }
@@ -34349,6 +34362,12 @@ function httpProxyClient(proxyUrl, destinationPort, destinationHost, callback) {
             // ignore
         }
         callback(err);
+    };
+
+    let timeoutErr = () => {
+        let err = new Error('Proxy socket timed out');
+        err.code = 'ETIMEDOUT';
+        tempSocketErr(err);
     };
 
     socket = connect(options, () => {
@@ -34413,11 +34432,17 @@ function httpProxyClient(proxyUrl, destinationPort, destinationHost, callback) {
                 }
 
                 socket.removeListener('error', tempSocketErr);
+                socket.removeListener('timeout', timeoutErr);
+                socket.setTimeout(0);
+
                 return callback(null, socket);
             }
         };
         socket.on('data', onSocketData);
     });
+
+    socket.setTimeout(httpProxyClient.timeout || 30 * 1000);
+    socket.on('timeout', timeoutErr);
 
     socket.once('error', tempSocketErr);
 }
@@ -34488,6 +34513,8 @@ class SMTPConnection extends EventEmitter {
 
         this.port = Number(this.options.port) || (this.secureConnection ? 465 : 587);
         this.host = this.options.host || 'localhost';
+
+        this.allowInternalNetworkInterfaces = this.options.allowInternalNetworkInterfaces || false;
 
         if (typeof this.options.secure === 'undefined' && this.port === 465) {
             // if secure option is not set but port is 465, then default to secure
@@ -34650,7 +34677,8 @@ class SMTPConnection extends EventEmitter {
 
         let opts = {
             port: this.port,
-            host: this.host
+            host: this.host,
+            allowInternalNetworkInterfaces: this.allowInternalNetworkInterfaces
         };
 
         if (this.options.localAddress) {
@@ -36188,10 +36216,16 @@ class SMTPConnection extends EventEmitter {
 
     _getHostname() {
         // defaul hostname is machine hostname or [IP]
-        let defaultHostname = os.hostname() || '';
+        let defaultHostname;
+        try {
+            defaultHostname = os.hostname() || '';
+        } catch (err) {
+            // fails on windows 7
+            defaultHostname = 'localhost';
+        }
 
         // ignore if not FQDN
-        if (defaultHostname.indexOf('.') < 0) {
+        if (!defaultHostname || defaultHostname.indexOf('.') < 0) {
             defaultHostname = '[127.0.0.1]';
         }
 
@@ -36842,6 +36876,13 @@ class SMTPPool extends EventEmitter {
 
                         finalize();
                     });
+                } else if (!auth && connection.allowsAuth && options.forceAuth) {
+                    let err = new Error('Authentication info was not provided');
+                    err.code = 'NoAuth';
+
+                    returned = true;
+                    connection.close();
+                    return callback(err);
                 } else {
                     finalize();
                 }
@@ -37143,6 +37184,7 @@ class SMTPTransport extends EventEmitter {
         super();
 
         options = options || {};
+
         if (typeof options === 'string') {
             options = {
                 url: options
@@ -37509,6 +37551,13 @@ class SMTPTransport extends EventEmitter {
 
                         finalize();
                     });
+                } else if (!authData && connection.allowsAuth && options.forceAuth) {
+                    let err = new Error('Authentication info was not provided');
+                    err.code = 'NoAuth';
+
+                    returned = true;
+                    connection.close();
+                    return callback(err);
                 } else {
                     finalize();
                 }
@@ -38835,7 +38884,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":true},"163":{"host":"smtp.163.com","port":465,"secure":true},"1und1":{"host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"AOL":{"domains":["aol.com"],"host":"smtp.aol.com","port":587},"DebugMail":{"host":"debugmail.io","port":25},"DynectEmail":{"aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"Ethereal":{"aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"GandiMail":{"aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"Godaddy":{"host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"host":"mail.hot.ee"},"Hotmail":{"aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"mail.ee":{"host":"smtp.mail.ee"},"Mail.ru":{"host":"smtp.mail.ru","port":465,"secure":true},"Maildev":{"port":1025,"ignoreTLS":true},"Mailgun":{"host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"host":"in.mailjet.com","port":587},"Mailosaur":{"host":"mailosaur.io","port":25},"Mailtrap":{"host":"smtp.mailtrap.io","port":2525},"Mandrill":{"host":"smtp.mandrillapp.com","port":587},"Naver":{"host":"smtp.naver.com","port":587},"One":{"host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"host":"smtp.office365.com","port":587,"secure":false},"OhMySMTP":{"host":"smtp.ohmysmtp.com","port":587,"secure":false},"Postmark":{"aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"qiye.aliyun":{"host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"SendCloud":{"host":"smtpcloud.sohu.com","port":25},"SendGrid":{"host":"smtp.sendgrid.net","port":587},"SendinBlue":{"host":"smtp-relay.sendinblue.com","port":587},"SendPulse":{"host":"smtp-pulse.com","port":465,"secure":true},"SES":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"Sparkpost":{"aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"host":"smtp.tipimail.com","port":587},"Yahoo":{"domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zoho":{"host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
+module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":true},"163":{"host":"smtp.163.com","port":465,"secure":true},"1und1":{"host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"AOL":{"domains":["aol.com"],"host":"smtp.aol.com","port":587},"Bluewin":{"host":"smtpauths.bluewin.ch","domains":["bluewin.ch"],"port":465},"DebugMail":{"host":"debugmail.io","port":25},"DynectEmail":{"aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"Ethereal":{"aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"GandiMail":{"aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"Godaddy":{"host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"host":"mail.hot.ee"},"Hotmail":{"aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"mail.ee":{"host":"smtp.mail.ee"},"Mail.ru":{"host":"smtp.mail.ru","port":465,"secure":true},"Maildev":{"port":1025,"ignoreTLS":true},"Mailgun":{"host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"host":"in.mailjet.com","port":587},"Mailosaur":{"host":"mailosaur.io","port":25},"Mailtrap":{"host":"smtp.mailtrap.io","port":2525},"Mandrill":{"host":"smtp.mandrillapp.com","port":587},"Naver":{"host":"smtp.naver.com","port":587},"One":{"host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"host":"smtp.office365.com","port":587,"secure":false},"OhMySMTP":{"host":"smtp.ohmysmtp.com","port":587,"secure":false},"Postmark":{"aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"qiye.aliyun":{"host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"SendCloud":{"host":"smtp.sendcloud.net","port":2525},"SendGrid":{"host":"smtp.sendgrid.net","port":587},"SendinBlue":{"host":"smtp-relay.sendinblue.com","port":587},"SendPulse":{"host":"smtp-pulse.com","port":465,"secure":true},"SES":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"Sparkpost":{"aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"host":"smtp.tipimail.com","port":587},"Yahoo":{"domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zoho":{"host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
 
 /***/ }),
 
@@ -38843,7 +38892,7 @@ module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":t
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"nodemailer","version":"6.7.5","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"grunt --trace-warnings"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.79.0","aws-sdk":"2.1124.0","bunyan":"1.8.15","chai":"4.3.6","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"8.5.0","grunt":"1.5.2","grunt-cli":"1.4.3","grunt-eslint":"24.0.0","grunt-mocha-test":"0.13.3","libbase64":"1.2.1","libmime":"5.1.0","libqp":"1.1.0","mocha":"9.2.2","nodemailer-ntlm-auth":"1.0.1","proxy":"1.0.2","proxy-test-server":"1.0.0","sinon":"13.0.2","smtp-server":"3.11.0"},"engines":{"node":">=6.0.0"}}');
+module.exports = JSON.parse('{"name":"nodemailer","version":"6.7.7","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"grunt --trace-warnings"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.121.0","aws-sdk":"2.1168.0","bunyan":"1.8.15","chai":"4.3.6","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"8.5.0","grunt":"1.5.3","grunt-cli":"1.4.3","grunt-eslint":"24.0.0","grunt-mocha-test":"0.13.3","libbase64":"1.2.1","libmime":"5.1.0","libqp":"1.1.0","mocha":"10.0.0","nodemailer-ntlm-auth":"1.0.1","proxy":"1.0.2","proxy-test-server":"1.0.0","sinon":"14.0.0","smtp-server":"3.11.0"},"engines":{"node":">=6.0.0"}}');
 
 /***/ })
 

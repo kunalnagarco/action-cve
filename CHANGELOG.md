@@ -1,5 +1,17 @@
 # Changelog
 
+### [1.7.12](https://github.com/kunalnagarco/action-cve/compare/v1.7.11...v1.7.12) (2022-09-05)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v6.7.8 ([#112](https://github.com/kunalnagarco/action-cve/issues/112)) ([a0418b8](https://github.com/kunalnagarco/action-cve/commit/a0418b8bcdf8779e31cb08082cd0c819596ead15))
+
+
+### Chores
+
+* **deps:** update semantic-release monorepo ([#111](https://github.com/kunalnagarco/action-cve/issues/111)) ([726badf](https://github.com/kunalnagarco/action-cve/commit/726badf86d571cbba308512a9beb5555bfd3e6b5))
+
 ### [1.7.11](https://github.com/kunalnagarco/action-cve/compare/v1.7.10...v1.7.11) (2022-08-06)
 
 

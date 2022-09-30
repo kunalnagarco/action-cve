@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.7.13](https://github.com/kunalnagarco/action-cve/compare/v1.7.12...v1.7.13) (2022-09-30)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#109](https://github.com/kunalnagarco/action-cve/issues/109)) ([d6667a1](https://github.com/kunalnagarco/action-cve/commit/d6667a1e927c252b6615ff063199d0f2a7e0b112))
+* **deps:** update dependency @actions/core to 1.9.1 [security] ([#110](https://github.com/kunalnagarco/action-cve/issues/110)) ([98cc16f](https://github.com/kunalnagarco/action-cve/commit/98cc16f73564c93a022cc8b6040f226a62cb1321))
+
 ### [1.7.12](https://github.com/kunalnagarco/action-cve/compare/v1.7.11...v1.7.12) (2022-09-05)
 
 

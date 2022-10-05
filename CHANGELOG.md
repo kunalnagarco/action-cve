@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.7.14](https://github.com/kunalnagarco/action-cve/compare/v1.7.13...v1.7.14) (2022-10-05)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#117](https://github.com/kunalnagarco/action-cve/issues/117)) ([7e96e3f](https://github.com/kunalnagarco/action-cve/commit/7e96e3fcae435de3de1fcc10d35b4b6d037009fd))
+* **deps:** update dependency @slack/types to v2.7.0 ([#115](https://github.com/kunalnagarco/action-cve/issues/115)) ([0463c8d](https://github.com/kunalnagarco/action-cve/commit/0463c8d3112c1d02535d74e2c95acfc61221cdac))
+
 ### [1.7.13](https://github.com/kunalnagarco/action-cve/compare/v1.7.12...v1.7.13) (2022-09-30)
 
 

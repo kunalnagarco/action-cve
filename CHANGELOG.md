@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.7.15](https://github.com/kunalnagarco/action-cve/compare/v1.7.14...v1.7.15) (2022-10-10)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#118](https://github.com/kunalnagarco/action-cve/issues/118)) ([6f57e17](https://github.com/kunalnagarco/action-cve/commit/6f57e17b88ac6284dc3581d6d3bca923ec908fec))
+* **deps:** update dependency @types/jest to v27.5.2 ([#116](https://github.com/kunalnagarco/action-cve/issues/116)) ([301d4d3](https://github.com/kunalnagarco/action-cve/commit/301d4d348b0f8952e3d51d49c2da9ce37d11e1ff))
+
 ### [1.7.14](https://github.com/kunalnagarco/action-cve/compare/v1.7.13...v1.7.14) (2022-10-05)
 
 

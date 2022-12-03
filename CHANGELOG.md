@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.7.19](https://github.com/kunalnagarco/action-cve/compare/v1.7.18...v1.7.19) (2022-12-03)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#123](https://github.com/kunalnagarco/action-cve/issues/123)) ([f6ecbe8](https://github.com/kunalnagarco/action-cve/commit/f6ecbe8fe573e4647bfa8be8f00f572cfe0981c5))
+* **deps:** update dependency @slack/types to v2.8.0 ([#125](https://github.com/kunalnagarco/action-cve/issues/125)) ([2aeac4a](https://github.com/kunalnagarco/action-cve/commit/2aeac4ae6efc9d120c33196594e53bbf00296b3a))
+* **deps:** update semantic-release monorepo ([#124](https://github.com/kunalnagarco/action-cve/issues/124)) ([4804f6c](https://github.com/kunalnagarco/action-cve/commit/4804f6cf18bc162e361890e3cc2b191096e127a6))
+
 ### [1.7.18](https://github.com/kunalnagarco/action-cve/compare/v1.7.17...v1.7.18) (2022-11-27)
 
 

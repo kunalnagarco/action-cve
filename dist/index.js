@@ -19400,7 +19400,7 @@ var isWebWorker = (typeof self === "undefined" ? "undefined" : _typeof(self)) ==
  */
 var isJsDom = typeof window !== "undefined" && window.name === "nodejs" || typeof navigator !== "undefined" && (navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom"));
 
-var isDeno = typeof Deno !== "undefined" && typeof Deno.core !== "undefined";
+var isDeno = typeof Deno !== "undefined" && typeof Deno.version !== "undefined" && typeof Deno.version.deno !== "undefined";
 
 exports.isBrowser = isBrowser;
 exports.isWebWorker = isWebWorker;

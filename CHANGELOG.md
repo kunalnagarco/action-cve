@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.7.21](https://github.com/kunalnagarco/action-cve/compare/v1.7.20...v1.7.21) (2023-01-02)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#127](https://github.com/kunalnagarco/action-cve/issues/127)) ([e7cdc1c](https://github.com/kunalnagarco/action-cve/commit/e7cdc1cac7bb1261e1dc7733656dc4a5ce49ea82))
+* **deps:** update dependency @vercel/ncc to v0.36.0 ([#128](https://github.com/kunalnagarco/action-cve/issues/128)) ([81caab9](https://github.com/kunalnagarco/action-cve/commit/81caab91d0ed1013f3385404cbf95dad87593f1b))
+* **deps:** update dependency eslint to v8.31.0 ([#129](https://github.com/kunalnagarco/action-cve/issues/129)) ([0fda4f9](https://github.com/kunalnagarco/action-cve/commit/0fda4f9a405a633fa9285738478629c1198eb2d8))
+
 ### [1.7.20](https://github.com/kunalnagarco/action-cve/compare/v1.7.19...v1.7.20) (2022-12-05)
 
 

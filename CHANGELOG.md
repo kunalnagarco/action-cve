@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.35](https://github.com/kunalnagarco/action-cve/compare/v1.7.34...v1.7.35) (2023-05-03)
+
+
+### Chores
+
+* Update ESLint config ([#133](https://github.com/kunalnagarco/action-cve/issues/133)) ([cb6bcca](https://github.com/kunalnagarco/action-cve/commit/cb6bcca4ec9b2ff0f85325786ebb2f2dfe4f5ddf))
+
 ### [1.7.34](https://github.com/kunalnagarco/action-cve/compare/v1.7.33...v1.7.34) (2023-04-24)
 
 

@@ -31,9 +31,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToEmailSmtp = void 0;
+const nodemailer_1 = __nccwpck_require__(4289);
 const constants_1 = __nccwpck_require__(5105);
 const entities_1 = __nccwpck_require__(7604);
-const nodemailer_1 = __nccwpck_require__(4289);
 const createTable = (alerts) => {
     let rowData = '';
     for (const alert of alerts) {
@@ -131,7 +131,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToMicrosoftTeams = void 0;
-/* eslint-disable i18n-text/no-en */
 const utils_1 = __nccwpck_require__(1606);
 const constants_1 = __nccwpck_require__(5105);
 const createTableRow = (key, value) => {
@@ -211,8 +210,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToPagerDuty = void 0;
-const constants_1 = __nccwpck_require__(5105);
 const pdjs_1 = __nccwpck_require__(8512);
+const constants_1 = __nccwpck_require__(5105);
 const sendAlertsToPagerDuty = (integrationKey, alerts) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, pdjs_1.event)({
         data: {
@@ -255,8 +254,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToSlack = exports.MAX_COUNT_SLACK = exports.validateSlackWebhookUrl = void 0;
-const constants_1 = __nccwpck_require__(5105);
 const webhook_1 = __nccwpck_require__(1095);
+const constants_1 = __nccwpck_require__(5105);
 const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => {
     return {
         type: 'section',
@@ -376,7 +375,6 @@ const sendAlertsToZenduty = (apiKey, serviceId, escalationPolicyId, alerts) => _
         urgency: 0,
         summary,
     };
-    // eslint-disable-next-line i18n-text/no-en
     const bearer = `Token ${apiKey}`;
     yield (0, utils_1.request)('https://www.zenduty.com/api/incidents/', {
         method: 'POST',

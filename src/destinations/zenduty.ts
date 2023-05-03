@@ -35,7 +35,6 @@ export const sendAlertsToZenduty = async (
     urgency: 0,
     summary,
   }
-  // eslint-disable-next-line i18n-text/no-en
   const bearer = `Token ${apiKey}`
   await request('https://www.zenduty.com/api/incidents/', {
     method: 'POST',

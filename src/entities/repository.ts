@@ -1,4 +1,5 @@
 import { Repository as GitHubRepository } from '@octokit/graphql-schema'
+
 import { Alert } from '.'
 
 export interface Repository {

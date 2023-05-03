@@ -1,7 +1,8 @@
-import { ACTION_ICON, ACTION_SHORT_SUMMARY } from '../constants'
-import { Alert } from '../entities'
 import { IncomingWebhook } from '@slack/webhook'
 import { KnownBlock } from '@slack/types'
+
+import { ACTION_ICON, ACTION_SHORT_SUMMARY } from '../constants'
+import { Alert } from '../entities'
 
 const createSummaryBlock = (
   alertCount: number,

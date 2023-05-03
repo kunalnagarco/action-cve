@@ -1,6 +1,7 @@
+import { event } from '@pagerduty/pdjs'
+
 import { ACTION_ICON, ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert } from '../entities'
-import { event } from '@pagerduty/pdjs'
 
 export const sendAlertsToPagerDuty = async (
   integrationKey: string,

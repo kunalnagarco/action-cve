@@ -1,7 +1,8 @@
-import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
-import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
+
+import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
+import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 
 const createTable = (alerts: Alert[]): string => {
   let rowData = ''

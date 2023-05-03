@@ -1,4 +1,3 @@
-/* eslint-disable i18n-text/no-en */
 import {
   Row,
   createAdaptiveCard,

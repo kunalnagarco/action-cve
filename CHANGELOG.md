@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.36](https://github.com/kunalnagarco/action-cve/compare/v1.7.35...v1.7.36) (2023-05-08)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([2f62575](https://github.com/kunalnagarco/action-cve/commit/2f6257532194f15ab097e424c0141b60cbc7417d))
+
 ### [1.7.35](https://github.com/kunalnagarco/action-cve/compare/v1.7.34...v1.7.35) (2023-05-03)
 
 

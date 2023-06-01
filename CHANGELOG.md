@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.40](https://github.com/kunalnagarco/action-cve/compare/v1.7.39...v1.7.40) (2023-06-01)
+
+
+### Chores
+
+* **deps:** update dependency @vercel/ncc to v0.36.1 ([9540919](https://github.com/kunalnagarco/action-cve/commit/95409193934a7192b73dfe20230b9dddd14900c2))
+
 ### [1.7.39](https://github.com/kunalnagarco/action-cve/compare/v1.7.38...v1.7.39) (2023-05-29)
 
 

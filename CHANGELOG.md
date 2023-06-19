@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.42](https://github.com/kunalnagarco/action-cve/compare/v1.7.41...v1.7.42) (2023-06-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node-fetch to v2.6.11 ([#134](https://github.com/kunalnagarco/action-cve/issues/134)) ([d60c248](https://github.com/kunalnagarco/action-cve/commit/d60c248241c0ddcc020ead73d283e30b4b1527c0))
+
 ### [1.7.41](https://github.com/kunalnagarco/action-cve/compare/v1.7.40...v1.7.41) (2023-06-12)
 
 

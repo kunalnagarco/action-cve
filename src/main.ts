@@ -16,9 +16,7 @@ async function run(): Promise<void> {
     const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
-    const zenDutyApiKey = getInput('zenduty_api_key')
-    const zenDutyServiceId = getInput('zenduty_service_id')
-    const zenDutyEscalationPolicyId = getInput('zenduty_escalation_policy_id')
+    const zenDutyIntegrationKey= getInput('zenduty_integration_key')
     const emailFrom = getInput('email_from')
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
@@ -46,19 +44,8 @@ async function run(): Promise<void> {
       if (pagerDutyIntegrationKey) {
         await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
       }
-      if (zenDutyApiKey) {
-        if (zenDutyServiceId && zenDutyEscalationPolicyId) {
-          await sendAlertsToZenduty(
-            zenDutyApiKey,
-            zenDutyServiceId,
-            zenDutyEscalationPolicyId,
-            alerts,
-          )
-        } else {
-          setFailed(
-            new Error('Check your Zenduty Service ID and Escalation Policy ID'),
-          )
-        }
+      if (zenDutyIntegrationKey) {
+        await sendAlertsToZenduty(zenDutyIntegrationKey, alerts)
       }
       if (emailFrom && emailList) {
         const emailWikiLink =

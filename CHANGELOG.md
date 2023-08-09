@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.49](https://github.com/kunalnagarco/action-cve/compare/v1.7.48...v1.7.49) (2023-08-09)
+
+
+### Chores
+
+* **deps:** update semantic-release monorepo ([35854e1](https://github.com/kunalnagarco/action-cve/commit/35854e12f1174615c2aa27e015b9080571716a2b))
+
 ### [1.7.48](https://github.com/kunalnagarco/action-cve/compare/v1.7.47...v1.7.48) (2023-08-07)
 
 

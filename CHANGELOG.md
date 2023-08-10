@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.51](https://github.com/kunalnagarco/action-cve/compare/v1.7.50...v1.7.51) (2023-08-10)
+
+
+### Chores
+
+* **deps:** update dependency lint-staged to v12.5.0 ([d81f689](https://github.com/kunalnagarco/action-cve/commit/d81f6895eeed7f190ed8d5b0a7da998ed16610e5))
+
 ### [1.7.50](https://github.com/kunalnagarco/action-cve/compare/v1.7.49...v1.7.50) (2023-08-09)
 
 

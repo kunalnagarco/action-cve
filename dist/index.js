@@ -21261,6 +21261,7 @@ exports.Headers = Headers;
 exports.Request = Request;
 exports.Response = Response;
 exports.FetchError = FetchError;
+exports.AbortError = AbortError;
 
 
 /***/ }),

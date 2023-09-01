@@ -62,7 +62,7 @@
     "@semantic-release/release-notes-generator": "10.0.3",
     "@slack/types": "2.8.0",
     "@types/jest": "27.5.2",
-    "@types/node": "17.0.10",
+    "@types/node": "17.0.45",
     "@types/node-fetch": "2.6.4",
     "@types/nodemailer": "6.4.5",
     "@vercel/ncc": "0.36.1",

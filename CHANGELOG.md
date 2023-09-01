@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.55](https://github.com/kunalnagarco/action-cve/compare/v1.7.54...v1.7.55) (2023-09-01)
+
+
+### Chores
+
+* **deps:** update dependency @types/node to v17.0.45 ([d617f7d](https://github.com/kunalnagarco/action-cve/commit/d617f7d0ac88cb56b8d4d803f4357026c0ff789f))
+
 ### [1.7.54](https://github.com/kunalnagarco/action-cve/compare/v1.7.53...v1.7.54) (2023-08-28)
 
 

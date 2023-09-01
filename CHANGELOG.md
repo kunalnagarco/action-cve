@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.56](https://github.com/kunalnagarco/action-cve/compare/v1.7.55...v1.7.56) (2023-09-01)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-github to v4.10.0 ([222eeab](https://github.com/kunalnagarco/action-cve/commit/222eeabb5430ff03acb56891f7890fb9b8dbd25a))
+
 ### [1.7.55](https://github.com/kunalnagarco/action-cve/compare/v1.7.54...v1.7.55) (2023-09-01)
 
 

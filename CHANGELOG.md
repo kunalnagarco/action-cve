@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.68](https://github.com/kunalnagarco/action-cve/compare/v1.7.67...v1.7.68) (2023-11-01)
+
+
+### Chores
+
+* **deps:** update dependency sort-package-json to v1.57.0 ([009ca5c](https://github.com/kunalnagarco/action-cve/commit/009ca5ce2343c381abcef420890693507a425332))
+
 ### [1.7.67](https://github.com/kunalnagarco/action-cve/compare/v1.7.66...v1.7.67) (2023-11-01)
 
 

@@ -7641,10 +7641,10 @@ var ErrorResponse = /** @class */ (function (_super) {
 exports.ErrorResponse = ErrorResponse;
 var LoginRequestResponse = /** @class */ (function (_super) {
     __extends(LoginRequestResponse, _super);
-    function LoginRequestResponse(request, _auth) {
+    function LoginRequestResponse(request, auth) {
         var _this = _super.call(this, request) || this;
         _this.request = request;
-        _this._auth = _auth;
+        _this._auth = auth;
         for (var _i = 0, _a = _this._auth.buttons; _i < _a.length; _i++) {
             var button = _a[_i];
             if (button.type === "signin" && button.value !== undefined) {
@@ -7717,6 +7717,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AdaptiveApplet = void 0;
+// Copyright (C) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 var Enums = __nccwpck_require__(4926);
 var Utils = __nccwpck_require__(909);
 var shared_1 = __nccwpck_require__(5181);
@@ -7734,6 +7736,7 @@ function logEvent(level, message) {
             shared_1.GlobalSettings.applets.onLogEvent(level, message, optionalParams);
         }
         else {
+            /* eslint-disable no-console */
             switch (level) {
                 case Enums.LogLevel.Warning:
                     console.warn(message, optionalParams);
@@ -7745,16 +7748,18 @@ function logEvent(level, message) {
                     console.log(message, optionalParams);
                     break;
             }
+            /* eslint-enable no-console */
         }
     }
 }
 var ActivityRequest = /** @class */ (function () {
-    function ActivityRequest(action, trigger, consecutiveRefreshes) {
+    function ActivityRequest(action, trigger, consecutiveActions) {
         this.action = action;
         this.trigger = trigger;
-        this.consecutiveRefreshes = consecutiveRefreshes;
+        this.consecutiveActions = consecutiveActions;
         this.attemptNumber = 0;
     }
+    // eslint-disable-next-line @typescript-eslint/require-await
     ActivityRequest.prototype.retryAsync = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -7794,7 +7799,9 @@ var AdaptiveApplet = /** @class */ (function () {
     };
     AdaptiveApplet.prototype.showManualRefreshButton = function (refreshAction) {
         var _this = this;
-        var displayBuiltInManualRefreshButton = this.onShowManualRefreshButton ? this.onShowManualRefreshButton(this) : true;
+        var displayBuiltInManualRefreshButton = this.onShowManualRefreshButton
+            ? this.onShowManualRefreshButton(this)
+            : true;
         if (displayBuiltInManualRefreshButton) {
             this._refreshButtonHostElement.style.display = "none";
             var renderedRefreshButton = undefined;
@@ -7847,15 +7854,17 @@ var AdaptiveApplet = /** @class */ (function () {
             }
         }
     };
-    AdaptiveApplet.prototype.createActivityRequest = function (action, trigger, consecutiveRefreshes) {
+    AdaptiveApplet.prototype.createActivityRequest = function (action, trigger, consecutiveActions) {
         var _this = this;
         if (this.card) {
-            var request_1 = new ActivityRequest(action, trigger, consecutiveRefreshes);
+            var request_1 = new ActivityRequest(action, trigger, consecutiveActions);
             request_1.onSend = function (sender) {
                 sender.attemptNumber++;
-                _this.internalSendActivityRequestAsync(request_1);
+                void _this.internalSendActivityRequestAsync(request_1);
             };
-            var cancel = this.onPrepareActivityRequest ? !this.onPrepareActivityRequest(this, request_1, action) : false;
+            var cancel = this.onPrepareActivityRequest
+                ? !this.onPrepareActivityRequest(this, request_1, action)
+                : false;
             return cancel ? undefined : request_1;
         }
         else {
@@ -7876,7 +7885,7 @@ var AdaptiveApplet = /** @class */ (function () {
                 },
                 {
                     type: "TextBlock",
-                    text: "Please login in the popup. You will obtain a magic code. Paste that code below and select \"Submit\"",
+                    text: 'Please login in the popup. You will obtain a magic code. Paste that code below and select "Submit"',
                     wrap: true,
                     horizontalAlignment: "center"
                 },
@@ -7891,12 +7900,12 @@ var AdaptiveApplet = /** @class */ (function () {
                     actions: [
                         {
                             type: "Action.Submit",
-                            id: AdaptiveApplet.submitMagicCodeActionId,
+                            id: AdaptiveApplet._submitMagicCodeActionId,
                             title: "Submit"
                         },
                         {
                             type: "Action.Submit",
-                            id: AdaptiveApplet.cancelMagicCodeAuthActionId,
+                            id: AdaptiveApplet._cancelMagicCodeAuthActionId,
                             title: "Cancel"
                         }
                     ]
@@ -7914,9 +7923,11 @@ var AdaptiveApplet = /** @class */ (function () {
         this._allowAutomaticCardUpdate = false;
     };
     AdaptiveApplet.prototype.createSerializationContext = function () {
-        return this.onCreateSerializationContext ? this.onCreateSerializationContext(this) : new card_elements_1.SerializationContext();
+        return this.onCreateSerializationContext
+            ? this.onCreateSerializationContext(this)
+            : new card_elements_1.SerializationContext();
     };
-    AdaptiveApplet.prototype.internalSetCard = function (payload, consecutiveRefreshes) {
+    AdaptiveApplet.prototype.internalSetCard = function (payload, consecutiveActions) {
         var _this = this;
         if (typeof payload === "object" && payload["type"] === "AdaptiveCard") {
             this._cardPayload = payload;
@@ -7929,10 +7940,14 @@ var AdaptiveApplet = /** @class */ (function () {
                 }
                 var serializationContext = this.createSerializationContext();
                 card.parse(this._cardPayload, serializationContext);
-                var doChangeCard = this.onCardChanging ? this.onCardChanging(this, this._cardPayload) : true;
+                var doChangeCard = this.onCardChanging
+                    ? this.onCardChanging(this, this._cardPayload)
+                    : true;
                 if (doChangeCard) {
                     this._card = card;
-                    if (this._card.authentication && this._card.authentication.tokenExchangeResource && this.onPrefetchSSOToken) {
+                    if (this._card.authentication &&
+                        this._card.authentication.tokenExchangeResource &&
+                        this.onPrefetchSSOToken) {
                         this.onPrefetchSSOToken(this, this._card.authentication.tokenExchangeResource);
                     }
                     this._card.onExecuteAction = function (action) {
@@ -7941,8 +7956,22 @@ var AdaptiveApplet = /** @class */ (function () {
                         _this.internalExecuteAction(action, activity_request_1.ActivityRequestTrigger.Manual, 0);
                     };
                     this._card.onInputValueChanged = function (input) {
+                        var _a, _b, _c;
                         // If the user modifies an input, cancel any pending automatic refresh
                         _this.cancelAutomaticRefresh();
+                        if (input instanceof card_elements_1.ChoiceSetInput && input.isDynamicTypeahead()) {
+                            var filter = input.getFilterForDynamicSearch();
+                            if (filter) {
+                                var dataQueryAction = new card_elements_1.DataQuery();
+                                dataQueryAction.filter = filter;
+                                dataQueryAction.dataset = ((_a = input.choicesData) === null || _a === void 0 ? void 0 : _a.dataset) || "";
+                                dataQueryAction.count = (_b = input.choicesData) === null || _b === void 0 ? void 0 : _b.count;
+                                dataQueryAction.skip = (_c = input.choicesData) === null || _c === void 0 ? void 0 : _c.skip;
+                                _this._choiceSet = input;
+                                _this.internalExecuteAction(dataQueryAction, activity_request_1.ActivityRequestTrigger.Manual, 0 // consecutiveActions
+                                );
+                            }
+                        }
                     };
                     this._card.render();
                     if (this._card.renderedElement) {
@@ -7951,30 +7980,45 @@ var AdaptiveApplet = /** @class */ (function () {
                             this.onCardChanged(this);
                         }
                         if (this._card.refresh) {
-                            if (shared_1.GlobalSettings.applets.refresh.mode === Enums.RefreshMode.Automatic && consecutiveRefreshes < shared_1.GlobalSettings.applets.refresh.maximumConsecutiveAutomaticRefreshes) {
-                                if (shared_1.GlobalSettings.applets.refresh.timeBetweenAutomaticRefreshes <= 0) {
-                                    logEvent(Enums.LogLevel.Info, "Triggering automatic card refresh number " + (consecutiveRefreshes + 1));
-                                    this.internalExecuteAction(this._card.refresh.action, activity_request_1.ActivityRequestTrigger.Automatic, consecutiveRefreshes + 1);
+                            if (shared_1.GlobalSettings.applets.refresh.mode ===
+                                Enums.RefreshMode.Automatic &&
+                                consecutiveActions <
+                                    shared_1.GlobalSettings.applets.refresh
+                                        .maximumConsecutiveAutomaticRefreshes) {
+                                if (shared_1.GlobalSettings.applets.refresh.timeBetweenAutomaticRefreshes <=
+                                    0) {
+                                    logEvent(Enums.LogLevel.Info, "Triggering automatic card refresh number " +
+                                        (consecutiveActions + 1));
+                                    this.internalExecuteAction(this._card.refresh.action, activity_request_1.ActivityRequestTrigger.Automatic, consecutiveActions + 1);
                                 }
                                 else {
-                                    logEvent(Enums.LogLevel.Info, "Scheduling automatic card refresh number " + (consecutiveRefreshes + 1) + " in " + shared_1.GlobalSettings.applets.refresh.timeBetweenAutomaticRefreshes + "ms");
+                                    logEvent(Enums.LogLevel.Info, "Scheduling automatic card refresh number " +
+                                        (consecutiveActions + 1) +
+                                        " in " +
+                                        shared_1.GlobalSettings.applets.refresh
+                                            .timeBetweenAutomaticRefreshes +
+                                        "ms");
                                     var action_1 = this._card.refresh.action;
                                     this._allowAutomaticCardUpdate = true;
                                     window.setTimeout(function () {
                                         if (_this._allowAutomaticCardUpdate) {
-                                            _this.internalExecuteAction(action_1, activity_request_1.ActivityRequestTrigger.Automatic, consecutiveRefreshes + 1);
+                                            _this.internalExecuteAction(action_1, activity_request_1.ActivityRequestTrigger.Automatic, consecutiveActions + 1);
                                         }
                                     }, shared_1.GlobalSettings.applets.refresh.timeBetweenAutomaticRefreshes);
                                 }
                             }
                             else if (shared_1.GlobalSettings.applets.refresh.mode !== Enums.RefreshMode.Disabled) {
-                                if (consecutiveRefreshes > 0) {
-                                    logEvent(Enums.LogLevel.Warning, "Stopping automatic refreshes after " + consecutiveRefreshes + " consecutive refreshes.");
+                                if (consecutiveActions > 0) {
+                                    logEvent(Enums.LogLevel.Warning, "Stopping automatic refreshes after " +
+                                        consecutiveActions +
+                                        " consecutive refreshes.");
                                 }
                                 else {
                                     logEvent(Enums.LogLevel.Warning, "The card has a refresh section, but automatic refreshes are disabled.");
                                 }
-                                if (shared_1.GlobalSettings.applets.refresh.allowManualRefreshesAfterAutomaticRefreshes || shared_1.GlobalSettings.applets.refresh.mode === Enums.RefreshMode.Manual) {
+                                if (shared_1.GlobalSettings.applets.refresh
+                                    .allowManualRefreshesAfterAutomaticRefreshes ||
+                                    shared_1.GlobalSettings.applets.refresh.mode === Enums.RefreshMode.Manual) {
                                     logEvent(Enums.LogLevel.Info, "Showing manual refresh button.");
                                     this.showManualRefreshButton(this._card.refresh.action);
                                 }
@@ -7989,12 +8033,12 @@ var AdaptiveApplet = /** @class */ (function () {
             }
         }
     };
-    AdaptiveApplet.prototype.internalExecuteAction = function (action, trigger, consecutiveRefreshes) {
-        if (action instanceof card_elements_1.ExecuteAction) {
+    AdaptiveApplet.prototype.internalExecuteAction = function (action, trigger, consecutiveActions) {
+        if (action instanceof card_elements_1.UniversalAction) {
             if (this.channelAdapter) {
-                var request = this.createActivityRequest(action, trigger, consecutiveRefreshes);
+                var request = this.createActivityRequest(action, trigger, consecutiveActions);
                 if (request) {
-                    request.retryAsync();
+                    void request.retryAsync();
                 }
             }
             else {
@@ -8037,37 +8081,44 @@ var AdaptiveApplet = /** @class */ (function () {
         }
     };
     AdaptiveApplet.prototype.activityRequestFailed = function (response) {
-        return this.onActivityRequestFailed ? this.onActivityRequestFailed(this, response) : shared_1.GlobalSettings.applets.defaultTimeBetweenRetryAttempts;
+        return this.onActivityRequestFailed
+            ? this.onActivityRequestFailed(this, response)
+            : shared_1.GlobalSettings.applets.defaultTimeBetweenRetryAttempts;
     };
     AdaptiveApplet.prototype.showAuthCodeInputDialog = function (request) {
         var _this = this;
-        var showBuiltInAuthCodeInputCard = this.onShowAuthCodeInputDialog ? this.onShowAuthCodeInputDialog(this, request) : true;
+        var showBuiltInAuthCodeInputCard = this.onShowAuthCodeInputDialog
+            ? this.onShowAuthCodeInputDialog(this, request)
+            : true;
         if (showBuiltInAuthCodeInputCard) {
             var authCodeInputCard = this.createMagicCodeInputCard(request.attemptNumber);
             authCodeInputCard.render();
             authCodeInputCard.onExecuteAction = function (submitMagicCodeAction) {
                 if (_this.card && submitMagicCodeAction instanceof card_elements_1.SubmitAction) {
                     switch (submitMagicCodeAction.id) {
-                        case AdaptiveApplet.submitMagicCodeActionId:
+                        case AdaptiveApplet._submitMagicCodeActionId:
                             var authCode = undefined;
-                            if (submitMagicCodeAction.data && typeof submitMagicCodeAction.data["magicCode"] === "string") {
+                            if (submitMagicCodeAction.data &&
+                                typeof submitMagicCodeAction.data["magicCode"] === "string") {
                                 authCode = submitMagicCodeAction.data["magicCode"];
                             }
                             if (authCode) {
                                 _this.displayCard(_this.card);
                                 request.authCode = authCode;
-                                request.retryAsync();
+                                void request.retryAsync();
                             }
                             else {
                                 alert("Please enter the magic code you received.");
                             }
                             break;
-                        case AdaptiveApplet.cancelMagicCodeAuthActionId:
+                        case AdaptiveApplet._cancelMagicCodeAuthActionId:
                             logEvent(Enums.LogLevel.Warning, "Authentication cancelled by user.");
                             _this.displayCard(_this.card);
                             break;
                         default:
-                            logEvent(Enums.LogLevel.Error, "Unespected action taken from magic code input card (id = " + submitMagicCodeAction.id + ")");
+                            logEvent(Enums.LogLevel.Error, "Unexpected action taken from magic code input card (id = " +
+                                submitMagicCodeAction.id +
+                                ")");
                             alert(strings_1.Strings.magicCodeInputCard.somethingWentWrong());
                             break;
                     }
@@ -8078,12 +8129,39 @@ var AdaptiveApplet = /** @class */ (function () {
     };
     AdaptiveApplet.prototype.internalSendActivityRequestAsync = function (request) {
         return __awaiter(this, void 0, void 0, function () {
-            var overlay, done, _loop_1, this_1, state_1;
+            var action;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!this.channelAdapter) {
                             throw new Error("internalSendActivityRequestAsync: channelAdapter is not set.");
+                        }
+                        action = request.action;
+                        if (!(action instanceof card_elements_1.ExecuteAction)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.internalSendExecuteRequestAsync(request)];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 2:
+                        if (!(action instanceof card_elements_1.DataQuery)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.internalSendDataQueryRequestAsync(request)];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 4: throw new Error("internalSendActivityRequestAsync: Unhandled Action Type");
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AdaptiveApplet.prototype.internalSendExecuteRequestAsync = function (request) {
+        return __awaiter(this, void 0, void 0, function () {
+            var overlay, done, _loop_1, this_1, state_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.channelAdapter) {
+                            throw new Error("internalSendExecuteRequestAsync: channelAdapter is not set.");
                         }
                         overlay = this.createProgressOverlay(request);
                         if (overlay !== undefined) {
@@ -8130,40 +8208,52 @@ var AdaptiveApplet = /** @class */ (function () {
                                             // Leave parseContent as is
                                         }
                                         if (typeof parsedContent === "string") {
-                                            logEvent(Enums.LogLevel.Info, "The activity request returned a string after " + request.attemptNumber + " attempt(s).");
+                                            logEvent(Enums.LogLevel.Info, "The activity request returned a string after " +
+                                                request.attemptNumber +
+                                                " attempt(s).");
                                             this_1.activityRequestSucceeded(response, parsedContent);
                                         }
-                                        else if (typeof parsedContent === "object" && parsedContent["type"] === "AdaptiveCard") {
-                                            logEvent(Enums.LogLevel.Info, "The activity request returned an Adaptive Card after " + request.attemptNumber + " attempt(s).");
-                                            this_1.internalSetCard(parsedContent, request.consecutiveRefreshes);
+                                        else if (typeof parsedContent === "object" &&
+                                            parsedContent["type"] === "AdaptiveCard") {
+                                            logEvent(Enums.LogLevel.Info, "The activity request returned an Adaptive Card after " +
+                                                request.attemptNumber +
+                                                " attempt(s).");
+                                            this_1.internalSetCard(parsedContent, request.consecutiveActions);
                                             this_1.activityRequestSucceeded(response, this_1.card);
                                         }
                                         else {
-                                            throw new Error("internalSendActivityRequestAsync: Action.Execute result is of unsupported type (" + typeof response.rawContent + ")");
+                                            throw new Error("internalSendActivityRequestAsync: Action.Execute result is of unsupported type (" +
+                                                typeof response.rawContent +
+                                                ")");
                                         }
                                         done = true;
                                         return [3 /*break*/, 10];
                                     case 5:
                                         if (!(response instanceof activity_request_1.ErrorResponse)) return [3 /*break*/, 9];
                                         retryIn_1 = this_1.activityRequestFailed(response);
-                                        if (!(retryIn_1 >= 0 && request.attemptNumber < shared_1.GlobalSettings.applets.maximumRetryAttempts)) return [3 /*break*/, 7];
-                                        logEvent(Enums.LogLevel.Warning, "Activity request failed: " + response.error.message + ". Retrying in " + retryIn_1 + "ms");
+                                        if (!(retryIn_1 >= 0 &&
+                                            request.attemptNumber < shared_1.GlobalSettings.applets.maximumRetryAttempts)) return [3 /*break*/, 7];
+                                        logEvent(Enums.LogLevel.Warning, "Activity request failed: ".concat(response.error.message, ". Retrying in ").concat(retryIn_1, "ms"));
                                         request.attemptNumber++;
-                                        return [4 /*yield*/, new Promise(function (resolve, reject) {
-                                                window.setTimeout(function () { resolve(); }, retryIn_1);
+                                        return [4 /*yield*/, new Promise(function (resolve, _reject) {
+                                                window.setTimeout(function () {
+                                                    resolve();
+                                                }, retryIn_1);
                                             })];
                                     case 6:
                                         _b.sent();
                                         return [3 /*break*/, 8];
                                     case 7:
-                                        logEvent(Enums.LogLevel.Error, "Activity request failed: " + response.error.message + ". Giving up after " + request.attemptNumber + " attempt(s)");
+                                        logEvent(Enums.LogLevel.Error, "Activity request failed: ".concat(response.error.message, ". Giving up after ").concat(request.attemptNumber, " attempt(s)"));
                                         this_1.removeProgressOverlay(request);
                                         done = true;
                                         _b.label = 8;
                                     case 8: return [3 /*break*/, 10];
                                     case 9:
                                         if (response instanceof activity_request_1.LoginRequestResponse) {
-                                            logEvent(Enums.LogLevel.Info, "The activity request returned a LoginRequestResponse after " + request.attemptNumber + " attempt(s).");
+                                            logEvent(Enums.LogLevel.Info, "The activity request returned a LoginRequestResponse after " +
+                                                request.attemptNumber +
+                                                " attempt(s).");
                                             if (request.attemptNumber <= shared_1.GlobalSettings.applets.maximumRetryAttempts) {
                                                 attemptOAuth = true;
                                                 if (response.tokenExchangeResource && this_1.onSSOTokenNeeded) {
@@ -8184,20 +8274,28 @@ var AdaptiveApplet = /** @class */ (function () {
                                                     }
                                                     else {
                                                         this_1.showAuthCodeInputDialog(request);
-                                                        left = window.screenX + (window.outerWidth - shared_1.GlobalSettings.applets.authPromptWidth) / 2;
-                                                        top_1 = window.screenY + (window.outerHeight - shared_1.GlobalSettings.applets.authPromptHeight) / 2;
-                                                        window.open(response.signinButton.value, response.signinButton.title ? response.signinButton.title : "Sign in", "width=" + shared_1.GlobalSettings.applets.authPromptWidth + ",height=" + shared_1.GlobalSettings.applets.authPromptHeight + ",left=" + left + ",top=" + top_1);
+                                                        left = window.screenX +
+                                                            (window.outerWidth - shared_1.GlobalSettings.applets.authPromptWidth) /
+                                                                2;
+                                                        top_1 = window.screenY +
+                                                            (window.outerHeight - shared_1.GlobalSettings.applets.authPromptHeight) /
+                                                                2;
+                                                        window.open(response.signinButton.value, response.signinButton.title
+                                                            ? response.signinButton.title
+                                                            : "Sign in", "width=".concat(shared_1.GlobalSettings.applets.authPromptWidth, ",height=").concat(shared_1.GlobalSettings.applets.authPromptHeight, ",left=").concat(left, ",top=").concat(top_1));
                                                     }
                                                 }
                                             }
                                             else {
-                                                logEvent(Enums.LogLevel.Error, "Authentication failed. Giving up after " + request.attemptNumber + " attempt(s)");
+                                                logEvent(Enums.LogLevel.Error, "Authentication failed. Giving up after " +
+                                                    request.attemptNumber +
+                                                    " attempt(s)");
                                                 alert(strings_1.Strings.magicCodeInputCard.authenticationFailed());
                                             }
                                             return [2 /*return*/, "break"];
                                         }
                                         else {
-                                            throw new Error("Unhandled response type: " + response.toString());
+                                            throw new Error("Unhandled response type: " + JSON.stringify(response));
                                         }
                                         _b.label = 10;
                                     case 10: return [2 /*return*/];
@@ -8219,6 +8317,70 @@ var AdaptiveApplet = /** @class */ (function () {
             });
         });
     };
+    AdaptiveApplet.prototype.internalSendDataQueryRequestAsync = function (request) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, error_2, rawResponse, parsedResponse;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.channelAdapter) {
+                            throw new Error("internalSendDataQueryRequestAsync: channel adapter not set");
+                        }
+                        if (!this._choiceSet) return [3 /*break*/, 5];
+                        this._choiceSet.showLoadingIndicator();
+                        response = undefined;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this.channelAdapter.sendRequestAsync(request)];
+                    case 2:
+                        response = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_2 = _a.sent();
+                        logEvent(Enums.LogLevel.Error, "Activity request failed: " + error_2);
+                        this._choiceSet.showErrorIndicator("Unable to load");
+                        return [3 /*break*/, 4];
+                    case 4:
+                        this._choiceSet.removeLoadingIndicator();
+                        if (response) {
+                            if (response instanceof activity_request_1.SuccessResponse) {
+                                rawResponse = response.rawContent;
+                                if (rawResponse) {
+                                    parsedResponse = rawResponse;
+                                    try {
+                                        parsedResponse = JSON.parse(parsedResponse);
+                                    }
+                                    catch (error) {
+                                        throw new Error("Cannot parse response object: " + rawResponse);
+                                    }
+                                    if (typeof parsedResponse === "object") {
+                                        this._choiceSet.renderChoices(parsedResponse);
+                                        this.activityRequestSucceeded(response, parsedResponse);
+                                    }
+                                    else {
+                                        throw new Error("internalSendDataQueryRequestAsync: Data.Query result is of unsupported type (" +
+                                            typeof rawResponse +
+                                            ")");
+                                    }
+                                }
+                            }
+                            else if (response instanceof activity_request_1.ErrorResponse) {
+                                this._choiceSet.showErrorIndicator("Error loading results.");
+                                logEvent(Enums.LogLevel.Error, "Activity request failed: ".concat(response.error.message, "."));
+                                this.activityRequestFailed(response);
+                            }
+                            else {
+                                this._choiceSet.showErrorIndicator("Unable to load");
+                                throw new Error("Unhandled response type: " + JSON.stringify(response));
+                            }
+                        }
+                        _a.label = 5;
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
     AdaptiveApplet.prototype.refreshCard = function () {
         if (this._card && this._card.refresh) {
             this.internalExecuteAction(this._card.refresh.action, activity_request_1.ActivityRequestTrigger.Manual, 0);
@@ -8234,8 +8396,8 @@ var AdaptiveApplet = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    AdaptiveApplet.submitMagicCodeActionId = "submitMagicCode";
-    AdaptiveApplet.cancelMagicCodeAuthActionId = "cancelMagicCodeAuth";
+    AdaptiveApplet._submitMagicCodeActionId = "submitMagicCode";
+    AdaptiveApplet._cancelMagicCodeAuthActionId = "cancelMagicCodeAuth";
     return AdaptiveApplet;
 }());
 exports.AdaptiveApplet = AdaptiveApplet;
@@ -8250,7 +8412,11 @@ exports.AdaptiveApplet = AdaptiveApplet;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -8271,6 +8437,7 @@ __exportStar(__nccwpck_require__(7785), exports);
 __exportStar(__nccwpck_require__(4553), exports);
 __exportStar(__nccwpck_require__(9936), exports);
 __exportStar(__nccwpck_require__(8064), exports);
+__exportStar(__nccwpck_require__(2606), exports);
 __exportStar(__nccwpck_require__(2162), exports);
 __exportStar(__nccwpck_require__(1473), exports);
 __exportStar(__nccwpck_require__(6617), exports);
@@ -8305,8 +8472,45 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SerializationContext = exports.AdaptiveCard = exports.Authentication = exports.TokenExchangeResource = exports.AuthCardButton = exports.RefreshDefinition = exports.RefreshActionProperty = exports.ContainerWithActions = exports.ColumnSet = exports.Column = exports.Container = exports.BackgroundImage = exports.ContainerBase = exports.StylableCardElementContainer = exports.ContainerStyleProperty = exports.ActionSet = exports.ShowCardAction = exports.HttpAction = exports.HttpHeader = exports.ToggleVisibilityAction = exports.OpenUrlAction = exports.ExecuteAction = exports.SubmitAction = exports.SubmitActionBase = exports.Action = exports.TimeInput = exports.TimeProperty = exports.DateInput = exports.NumberInput = exports.ChoiceSetInput = exports.Choice = exports.ToggleInput = exports.TextInput = exports.Input = exports.Media = exports.MediaSource = exports.ImageSet = exports.CardElementContainer = exports.Image = exports.FactSet = exports.Fact = exports.RichTextBlock = exports.TextRun = exports.TextBlock = exports.BaseTextBlock = exports.ActionProperty = exports.CardElement = exports.renderSeparation = void 0;
+exports.BackgroundImage = exports.ContainerBase = exports.StylableCardElementContainer = exports.ContainerStyleProperty = exports.ActionSet = exports.ShowCardAction = exports.HttpAction = exports.HttpHeader = exports.ToggleVisibilityAction = exports.OpenUrlAction = exports.DataQuery = exports.ExecuteAction = exports.UniversalAction = exports.SubmitAction = exports.SubmitActionBase = exports.Action = exports.TimeInput = exports.TimeProperty = exports.DateInput = exports.NumberInput = exports.FilteredChoiceSet = exports.ChoiceSetInput = exports.ChoiceSetInputDataQuery = exports.Choice = exports.ToggleInput = exports.TextInput = exports.Input = exports.Media = exports.YouTubePlayer = exports.DailymotionPlayer = exports.VimeoPlayer = exports.IFrameMediaMediaPlayer = exports.CustomMediaPlayer = exports.HTML5MediaPlayer = exports.MediaPlayer = exports.MediaSource = exports.CaptionSource = exports.ContentSource = exports.ImageSet = exports.CardElementContainer = exports.Image = exports.FactSet = exports.Fact = exports.RichTextBlock = exports.TextRun = exports.TextBlock = exports.BaseTextBlock = exports.ActionProperty = exports.CardElement = exports.renderSeparation = void 0;
+exports.SerializationContext = exports.AdaptiveCard = exports.Authentication = exports.TokenExchangeResource = exports.AuthCardButton = exports.RefreshDefinition = exports.RefreshActionProperty = exports.ContainerWithActions = exports.ColumnSet = exports.Column = exports.Container = void 0;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 var Enums = __nccwpck_require__(4926);
@@ -8319,17 +8523,28 @@ var serialization_1 = __nccwpck_require__(5457);
 var registry_1 = __nccwpck_require__(4553);
 var strings_1 = __nccwpck_require__(1920);
 var controls_1 = __nccwpck_require__(9976);
+function clearElement(element) {
+    var _a, _b;
+    var trustedHtml = (typeof window === 'undefined') ? "" : ((_b = (_a = window.trustedTypes) === null || _a === void 0 ? void 0 : _a.emptyHTML) !== null && _b !== void 0 ? _b : "");
+    element.innerHTML = trustedHtml;
+}
 function renderSeparation(hostConfig, separationDefinition, orientation) {
-    if (separationDefinition.spacing > 0 || (separationDefinition.lineThickness && separationDefinition.lineThickness > 0)) {
+    if (separationDefinition.spacing > 0 ||
+        (separationDefinition.lineThickness && separationDefinition.lineThickness > 0)) {
         var separator = document.createElement("div");
-        separator.className = hostConfig.makeCssClassName("ac-" + (orientation == Enums.Orientation.Horizontal ? "horizontal" : "vertical") + "-separator");
+        separator.className = hostConfig.makeCssClassName("ac-" +
+            (orientation === Enums.Orientation.Horizontal ? "horizontal" : "vertical") +
+            "-separator");
         separator.setAttribute("aria-hidden", "true");
-        var color = separationDefinition.lineColor ? Utils.stringToCssColor(separationDefinition.lineColor) : "";
-        if (orientation == Enums.Orientation.Horizontal) {
+        var color = separationDefinition.lineColor
+            ? Utils.stringToCssColor(separationDefinition.lineColor)
+            : "";
+        if (orientation === Enums.Orientation.Horizontal) {
             if (separationDefinition.lineThickness) {
-                separator.style.paddingTop = (separationDefinition.spacing / 2) + "px";
-                separator.style.marginBottom = (separationDefinition.spacing / 2) + "px";
-                separator.style.borderBottom = separationDefinition.lineThickness + "px solid " + color;
+                separator.style.paddingTop = separationDefinition.spacing / 2 + "px";
+                separator.style.marginBottom = separationDefinition.spacing / 2 + "px";
+                separator.style.borderBottom =
+                    separationDefinition.lineThickness + "px solid " + color;
             }
             else {
                 separator.style.height = separationDefinition.spacing + "px";
@@ -8337,9 +8552,10 @@ function renderSeparation(hostConfig, separationDefinition, orientation) {
         }
         else {
             if (separationDefinition.lineThickness) {
-                separator.style.paddingLeft = (separationDefinition.spacing / 2) + "px";
-                separator.style.marginRight = (separationDefinition.spacing / 2) + "px";
-                separator.style.borderRight = separationDefinition.lineThickness + "px solid " + color;
+                separator.style.paddingLeft = separationDefinition.spacing / 2 + "px";
+                separator.style.marginRight = separationDefinition.spacing / 2 + "px";
+                separator.style.borderRight =
+                    separationDefinition.lineThickness + "px solid " + color;
             }
             else {
                 separator.style.width = separationDefinition.spacing + "px";
@@ -8414,7 +8630,9 @@ var CardElement = /** @class */ (function (_super) {
             lineThickness: this.separator ? this.hostConfig.separator.lineThickness : undefined,
             lineColor: this.separator ? this.hostConfig.separator.lineColor : undefined
         }, this.separatorOrientation);
-        if (shared_1.GlobalSettings.alwaysBleedSeparators && renderedSeparator && this.separatorOrientation == Enums.Orientation.Horizontal) {
+        if (shared_1.GlobalSettings.alwaysBleedSeparators &&
+            renderedSeparator &&
+            this.separatorOrientation === Enums.Orientation.Horizontal) {
             // Adjust separator's margins if the option to always bleed separators is turned on
             var parentContainer = this.getParentContainer();
             if (parentContainer && parentContainer.getEffectivePadding()) {
@@ -8426,7 +8644,9 @@ var CardElement = /** @class */ (function (_super) {
         return renderedSeparator;
     };
     CardElement.prototype.updateRenderedElementVisibility = function () {
-        var displayMode = this.isDesignMode() || this.isVisible ? this._defaultRenderedElementDisplayMode : "none";
+        var displayMode = this.isDesignMode() || this.isVisible
+            ? this._defaultRenderedElementDisplayMode
+            : "none";
         if (this._renderedElement) {
             if (displayMode) {
                 this._renderedElement.style.display = displayMode;
@@ -8502,8 +8722,10 @@ var CardElement = /** @class */ (function (_super) {
         element.style.padding = "4px";
         element.style.minHeight = "32px";
         element.style.fontSize = "10px";
-        element.style.color = foregroundCssColor;
-        element.innerText = "Empty " + this.getJsonTypeName();
+        if (foregroundCssColor) {
+            element.style.color = foregroundCssColor;
+        }
+        element.innerText = strings_1.Strings.defaults.emptyElementText(this.getJsonTypeName());
         return element;
     };
     CardElement.prototype.adjustRenderedElementSize = function (renderedElement) {
@@ -8514,8 +8736,21 @@ var CardElement = /** @class */ (function (_super) {
             renderedElement.style.flex = "1 1 auto";
         }
     };
+    /*
+     * Called when mouse enters or leaves the card.
+     * Inputs elements need to update their visual state in such events like showing or hiding borders etc.
+     * It calls Input.updateVisualState(eventType) for all inputs.
+     * This method on input (updateVisualState) is supposed to be called from card level on mouse events.
+     */
+    CardElement.prototype.updateInputsVisualState = function (hover) {
+        var allInputs = this.getAllInputs();
+        var inputEventType = !!hover ? InputEventType.MouseEnterOnCard : InputEventType.MouseLeaveOnCard;
+        allInputs.forEach(function (input) { return input.updateVisualState(inputEventType); });
+    };
     CardElement.prototype.isDisplayed = function () {
-        return this._renderedElement !== undefined && this.isVisible && this._renderedElement.offsetHeight > 0;
+        return (this._renderedElement !== undefined &&
+            this.isVisible &&
+            this._renderedElement.offsetHeight > 0);
     };
     CardElement.prototype.overrideInternalRender = function () {
         return this.internalRender();
@@ -8540,7 +8775,7 @@ var CardElement = /** @class */ (function (_super) {
      * maxHeight will be the amount of space still available on the card (0 if
      * the element is fully off the card).
      */
-    CardElement.prototype.truncateOverflow = function (maxHeight) {
+    CardElement.prototype.truncateOverflow = function (_maxHeight) {
         // Child implementations should return true if the element handled
         // the truncation request such that its content fits within maxHeight,
         // false if the element should fall back to being hidden
@@ -8549,11 +8784,14 @@ var CardElement = /** @class */ (function (_super) {
     /*
      * This should reverse any changes performed in truncateOverflow().
      */
-    CardElement.prototype.undoOverflowTruncation = function () { };
+    CardElement.prototype.undoOverflowTruncation = function () {
+        return;
+    };
     CardElement.prototype.getDefaultPadding = function () {
         return new shared_1.PaddingDefinition();
     };
-    CardElement.prototype.getHasBackground = function () {
+    CardElement.prototype.getHasBackground = function (ignoreBackgroundImages) {
+        if (ignoreBackgroundImages === void 0) { ignoreBackgroundImages = false; }
         return false;
     };
     CardElement.prototype.getHasBorder = function () {
@@ -8628,19 +8866,19 @@ var CardElement = /** @class */ (function (_super) {
             var doProcessLeft = processLeft && this.parent.isLeftMostElement(this);
             var effectivePadding = this.parent.getEffectivePadding();
             if (effectivePadding) {
-                if (doProcessTop && effectivePadding.top != Enums.Spacing.None) {
+                if (doProcessTop && effectivePadding.top !== Enums.Spacing.None) {
                     result.top = effectivePadding.top;
                     doProcessTop = false;
                 }
-                if (doProcessRight && effectivePadding.right != Enums.Spacing.None) {
+                if (doProcessRight && effectivePadding.right !== Enums.Spacing.None) {
                     result.right = effectivePadding.right;
                     doProcessRight = false;
                 }
-                if (doProcessBottom && effectivePadding.bottom != Enums.Spacing.None) {
+                if (doProcessBottom && effectivePadding.bottom !== Enums.Spacing.None) {
                     result.bottom = effectivePadding.bottom;
                     doProcessBottom = false;
                 }
-                if (doProcessLeft && effectivePadding.left != Enums.Spacing.None) {
+                if (doProcessLeft && effectivePadding.left !== Enums.Spacing.None) {
                     result.left = effectivePadding.left;
                     doProcessLeft = false;
                 }
@@ -8681,7 +8919,9 @@ var CardElement = /** @class */ (function (_super) {
                 this._renderedElement.classList.add(this.customCssSelector);
             }
             this._renderedElement.style.boxSizing = "border-box";
-            this._defaultRenderedElementDisplayMode = this._renderedElement.style.display ? this._renderedElement.style.display : undefined;
+            this._defaultRenderedElementDisplayMode = this._renderedElement.style.display
+                ? this._renderedElement.style.display
+                : undefined;
             this.adjustRenderedElementSize(this._renderedElement);
             this.updateLayout(false);
         }
@@ -8690,35 +8930,50 @@ var CardElement = /** @class */ (function (_super) {
         }
         return this._renderedElement;
     };
-    CardElement.prototype.updateLayout = function (processChildren) {
-        if (processChildren === void 0) { processChildren = true; }
+    CardElement.prototype.updateLayout = function (_processChildren) {
+        if (_processChildren === void 0) { _processChildren = true; }
         this.updateRenderedElementVisibility();
         this.applyPadding();
     };
-    CardElement.prototype.indexOf = function (cardElement) {
+    CardElement.prototype.updateActionsEnabledState = function () {
+        var allActions = this.getRootElement().getAllActions();
+        for (var _i = 0, allActions_1 = allActions; _i < allActions_1.length; _i++) {
+            var action = allActions_1[_i];
+            action.updateEnabledState();
+        }
+    };
+    CardElement.prototype.indexOf = function (_cardElement) {
         return -1;
     };
     CardElement.prototype.isDesignMode = function () {
         var rootElement = this.getRootElement();
         return rootElement instanceof AdaptiveCard && rootElement.designMode;
     };
-    CardElement.prototype.isFirstElement = function (element) {
+    CardElement.prototype.isFirstElement = function (_element) {
         return true;
     };
-    CardElement.prototype.isLastElement = function (element) {
+    CardElement.prototype.isLastElement = function (_element) {
         return true;
     };
     CardElement.prototype.isAtTheVeryLeft = function () {
-        return this.parent ? this.parent.isLeftMostElement(this) && this.parent.isAtTheVeryLeft() : true;
+        return this.parent
+            ? this.parent.isLeftMostElement(this) && this.parent.isAtTheVeryLeft()
+            : true;
     };
     CardElement.prototype.isAtTheVeryRight = function () {
-        return this.parent ? this.parent.isRightMostElement(this) && this.parent.isAtTheVeryRight() : true;
+        return this.parent
+            ? this.parent.isRightMostElement(this) && this.parent.isAtTheVeryRight()
+            : true;
     };
     CardElement.prototype.isAtTheVeryTop = function () {
-        return this.parent ? this.parent.isFirstElement(this) && this.parent.isAtTheVeryTop() : true;
+        return this.parent
+            ? this.parent.isFirstElement(this) && this.parent.isAtTheVeryTop()
+            : true;
     };
     CardElement.prototype.isAtTheVeryBottom = function () {
-        return this.parent ? this.parent.isLastElement(this) && this.parent.isAtTheVeryBottom() : true;
+        return this.parent
+            ? this.parent.isLastElement(this) && this.parent.isAtTheVeryBottom()
+            : true;
     };
     CardElement.prototype.isBleedingAtTop = function () {
         return false;
@@ -8726,10 +8981,10 @@ var CardElement = /** @class */ (function (_super) {
     CardElement.prototype.isBleedingAtBottom = function () {
         return false;
     };
-    CardElement.prototype.isLeftMostElement = function (element) {
+    CardElement.prototype.isLeftMostElement = function (_element) {
         return true;
     };
-    CardElement.prototype.isRightMostElement = function (element) {
+    CardElement.prototype.isRightMostElement = function (_element) {
         return true;
     };
     CardElement.prototype.isTopElement = function (element) {
@@ -8739,7 +8994,8 @@ var CardElement = /** @class */ (function (_super) {
         return this.isLastElement(element);
     };
     CardElement.prototype.isHiddenDueToOverflow = function () {
-        return this._renderedElement !== undefined && this._renderedElement.style.visibility == 'hidden';
+        return (this._renderedElement !== undefined &&
+            this._renderedElement.style.visibility === "hidden");
     };
     CardElement.prototype.getRootElement = function () {
         return this.getRootObject();
@@ -8758,14 +9014,37 @@ var CardElement = /** @class */ (function (_super) {
         if (processActions === void 0) { processActions = true; }
         return [];
     };
+    CardElement.prototype.getAllActions = function () {
+        var result = [];
+        for (var i = 0; i < this.getActionCount(); i++) {
+            var action = this.getActionAt(i);
+            if (action) {
+                result.push(action);
+            }
+        }
+        return result;
+    };
     CardElement.prototype.getResourceInformation = function () {
         return [];
     };
     CardElement.prototype.getElementById = function (id) {
         return this.id === id ? this : undefined;
     };
-    CardElement.prototype.getActionById = function (id) {
+    CardElement.prototype.getActionById = function (_id) {
         return undefined;
+    };
+    CardElement.prototype.getElementByIdFromAction = function (id) {
+        var result = undefined;
+        for (var i = 0; i < this.getActionCount(); i++) {
+            var action = this.getActionAt(i);
+            if (action instanceof ShowCardAction) {
+                result = action.card.getElementById(id);
+                if (result) {
+                    break;
+                }
+            }
+        }
+        return result;
     };
     CardElement.prototype.getEffectivePadding = function () {
         var padding = this.getPadding();
@@ -8859,32 +9138,29 @@ var CardElement = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    CardElement.langProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "lang", true, /^[a-z]{2,3}$/ig);
+    CardElement.langProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "lang", true, /^[a-z]{2,3}$/gi);
     CardElement.isVisibleProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_2, "isVisible", true);
     CardElement.separatorProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_0, "separator", false);
-    CardElement.heightProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_1, "height", [
-        { value: "auto" },
-        { value: "stretch" }
-    ], "auto");
+    CardElement.heightProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_1, "height", [{ value: "auto" }, { value: "stretch" }], "auto");
     CardElement.horizontalAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_0, "horizontalAlignment", Enums.HorizontalAlignment);
     CardElement.spacingProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_0, "spacing", Enums.Spacing, Enums.Spacing.Default);
     __decorate([
-        serialization_1.property(CardElement.horizontalAlignmentProperty)
+        (0, serialization_1.property)(CardElement.horizontalAlignmentProperty)
     ], CardElement.prototype, "horizontalAlignment", void 0);
     __decorate([
-        serialization_1.property(CardElement.spacingProperty)
+        (0, serialization_1.property)(CardElement.spacingProperty)
     ], CardElement.prototype, "spacing", void 0);
     __decorate([
-        serialization_1.property(CardElement.separatorProperty)
+        (0, serialization_1.property)(CardElement.separatorProperty)
     ], CardElement.prototype, "separator", void 0);
     __decorate([
-        serialization_1.property(CardElement.heightProperty)
+        (0, serialization_1.property)(CardElement.heightProperty)
     ], CardElement.prototype, "height", void 0);
     __decorate([
-        serialization_1.property(CardElement.langProperty)
+        (0, serialization_1.property)(CardElement.langProperty)
     ], CardElement.prototype, "lang", null);
     __decorate([
-        serialization_1.property(CardElement.isVisibleProperty)
+        (0, serialization_1.property)(CardElement.isVisibleProperty)
     ], CardElement.prototype, "isVisible", null);
     return CardElement;
 }(card_object_1.CardObject));
@@ -9005,7 +9281,10 @@ var BaseTextBlock = /** @class */ (function (_super) {
         }
         targetElement.style.fontSize = fontSize + "px";
         var colorDefinition = this.getColorDefinition(this.getEffectiveStyleDefinition().foregroundColors, this.effectiveColor);
-        targetElement.style.color = Utils.stringToCssColor(this.effectiveIsSubtle ? colorDefinition.subtle : colorDefinition.default);
+        var targetColor = Utils.stringToCssColor(this.effectiveIsSubtle ? colorDefinition.subtle : colorDefinition.default);
+        if (targetColor) {
+            targetElement.style.color = targetColor;
+        }
         var fontWeight;
         switch (this.effectiveWeight) {
             case Enums.TextWeight.Lighter:
@@ -9023,6 +9302,13 @@ var BaseTextBlock = /** @class */ (function (_super) {
             targetElement.setAttribute("aria-hidden", "true");
         }
     };
+    BaseTextBlock.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        if (this.selectAction) {
+            result.push(this.selectAction);
+        }
+        return result;
+    };
     Object.defineProperty(BaseTextBlock.prototype, "effectiveColor", {
         get: function () {
             return this.color !== undefined ? this.color : this.getEffectiveTextStyleDefinition().color;
@@ -9032,14 +9318,18 @@ var BaseTextBlock = /** @class */ (function (_super) {
     });
     Object.defineProperty(BaseTextBlock.prototype, "effectiveFontType", {
         get: function () {
-            return this.fontType !== undefined ? this.fontType : this.getEffectiveTextStyleDefinition().fontType;
+            return this.fontType !== undefined
+                ? this.fontType
+                : this.getEffectiveTextStyleDefinition().fontType;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BaseTextBlock.prototype, "effectiveIsSubtle", {
         get: function () {
-            return this.isSubtle !== undefined ? this.isSubtle : this.getEffectiveTextStyleDefinition().isSubtle;
+            return this.isSubtle !== undefined
+                ? this.isSubtle
+                : this.getEffectiveTextStyleDefinition().isSubtle;
         },
         enumerable: false,
         configurable: true
@@ -9053,7 +9343,9 @@ var BaseTextBlock = /** @class */ (function (_super) {
     });
     Object.defineProperty(BaseTextBlock.prototype, "effectiveWeight", {
         get: function () {
-            return this.weight !== undefined ? this.weight : this.getEffectiveTextStyleDefinition().weight;
+            return this.weight !== undefined
+                ? this.weight
+                : this.getEffectiveTextStyleDefinition().weight;
         },
         enumerable: false,
         configurable: true
@@ -9065,27 +9357,29 @@ var BaseTextBlock = /** @class */ (function (_super) {
     BaseTextBlock.colorProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_0, "color", Enums.TextColor);
     BaseTextBlock.isSubtleProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_0, "isSubtle");
     BaseTextBlock.fontTypeProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_2, "fontType", Enums.FontType);
-    BaseTextBlock.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", ["Action.ShowCard"]);
+    BaseTextBlock.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", [
+        "Action.ShowCard"
+    ]);
     __decorate([
-        serialization_1.property(BaseTextBlock.sizeProperty)
+        (0, serialization_1.property)(BaseTextBlock.sizeProperty)
     ], BaseTextBlock.prototype, "size", void 0);
     __decorate([
-        serialization_1.property(BaseTextBlock.weightProperty)
+        (0, serialization_1.property)(BaseTextBlock.weightProperty)
     ], BaseTextBlock.prototype, "weight", void 0);
     __decorate([
-        serialization_1.property(BaseTextBlock.colorProperty)
+        (0, serialization_1.property)(BaseTextBlock.colorProperty)
     ], BaseTextBlock.prototype, "color", void 0);
     __decorate([
-        serialization_1.property(BaseTextBlock.fontTypeProperty)
+        (0, serialization_1.property)(BaseTextBlock.fontTypeProperty)
     ], BaseTextBlock.prototype, "fontType", void 0);
     __decorate([
-        serialization_1.property(BaseTextBlock.isSubtleProperty)
+        (0, serialization_1.property)(BaseTextBlock.isSubtleProperty)
     ], BaseTextBlock.prototype, "isSubtle", void 0);
     __decorate([
-        serialization_1.property(BaseTextBlock.textProperty)
+        (0, serialization_1.property)(BaseTextBlock.textProperty)
     ], BaseTextBlock.prototype, "text", null);
     __decorate([
-        serialization_1.property(BaseTextBlock.selectActionProperty)
+        (0, serialization_1.property)(BaseTextBlock.selectActionProperty)
     ], BaseTextBlock.prototype, "selectAction", void 0);
     return BaseTextBlock;
 }(CardElement));
@@ -9101,11 +9395,14 @@ var TextBlock = /** @class */ (function (_super) {
         return _this;
     }
     TextBlock.prototype.restoreOriginalContent = function () {
+        var _a, _b;
         if (this.renderedElement !== undefined) {
             if (this.maxLines && this.maxLines > 0) {
-                this.renderedElement.style.maxHeight = this._computedLineHeight * this.maxLines + "px";
+                this.renderedElement.style.maxHeight =
+                    this._computedLineHeight * this.maxLines + "px";
             }
-            this.renderedElement.innerHTML = this._originalInnerHtml;
+            var originalHtml = (_b = (_a = TextBlock._ttRoundtripPolicy) === null || _a === void 0 ? void 0 : _a.createHTML(this._originalInnerHtml)) !== null && _b !== void 0 ? _b : this._originalInnerHtml;
+            this.renderedElement.innerHTML = originalHtml;
         }
     };
     TextBlock.prototype.truncateIfSupported = function (maxHeight) {
@@ -9115,10 +9412,11 @@ var TextBlock = /** @class */ (function (_super) {
             // account Markdown lists
             var children = this.renderedElement.children;
             var isTextOnly = !children.length;
-            var truncationSupported = isTextOnly || children.length == 1 && children[0].tagName.toLowerCase() == 'p';
+            var truncationSupported = isTextOnly ||
+                (children.length === 1 && children[0].tagName.toLowerCase() === "p" && !children[0].children.length);
             if (truncationSupported) {
                 var element = isTextOnly ? this.renderedElement : children[0];
-                Utils.truncate(element, maxHeight, this._computedLineHeight);
+                Utils.truncateText(element, maxHeight, this._computedLineHeight);
                 return true;
             }
         }
@@ -9130,6 +9428,7 @@ var TextBlock = /** @class */ (function (_super) {
     };
     TextBlock.prototype.internalRender = function () {
         var _this = this;
+        var _a, _b;
         this._processedText = undefined;
         if (this.text) {
             var preProcessedText = this.preProcessPropertyValue(BaseTextBlock.textProperty);
@@ -9155,14 +9454,14 @@ var TextBlock = /** @class */ (function (_super) {
             }
             if (this.selectAction && hostConfig.supportsInteractivity) {
                 element.onclick = function (e) {
-                    if (_this.selectAction && _this.selectAction.isEnabled) {
+                    if (_this.selectAction && _this.selectAction.isEffectivelyEnabled()) {
                         e.preventDefault();
                         e.cancelBubble = true;
                         _this.selectAction.execute();
                     }
                 };
                 this.selectAction.setupElementForAccessibility(element);
-                if (this.selectAction.isEnabled) {
+                if (this.selectAction.isEffectivelyEnabled()) {
                     element.classList.add(hostConfig.makeCssClassName("ac-selectable"));
                 }
             }
@@ -9171,10 +9470,13 @@ var TextBlock = /** @class */ (function (_super) {
                 var formattedText = TextFormatters.formatText(this.lang, preProcessedText);
                 if (this.useMarkdown && formattedText) {
                     if (shared_1.GlobalSettings.allowMarkForTextHighlighting) {
-                        formattedText = formattedText.replace(/<mark>/g, "===").replace(/<\/mark>/g, "/==/");
+                        formattedText = formattedText
+                            .replace(/<mark>/g, "===")
+                            .replace(/<\/mark>/g, "/==/");
                     }
                     var markdownProcessingResult = AdaptiveCard.applyMarkdown(formattedText);
-                    if (markdownProcessingResult.didProcess && markdownProcessingResult.outputHtml) {
+                    if (markdownProcessingResult.didProcess &&
+                        markdownProcessingResult.outputHtml) {
                         this._processedText = markdownProcessingResult.outputHtml;
                         this._treatAsPlainText = false;
                         // Only process <mark> tag if markdown processing was applied because
@@ -9183,15 +9485,21 @@ var TextBlock = /** @class */ (function (_super) {
                             var markStyle = "";
                             var effectiveStyle = this.getEffectiveStyleDefinition();
                             if (effectiveStyle.highlightBackgroundColor) {
-                                markStyle += "background-color: " + effectiveStyle.highlightBackgroundColor + ";";
+                                markStyle +=
+                                    "background-color: " +
+                                        effectiveStyle.highlightBackgroundColor +
+                                        ";";
                             }
                             if (effectiveStyle.highlightForegroundColor) {
-                                markStyle += "color: " + effectiveStyle.highlightForegroundColor + ";";
+                                markStyle +=
+                                    "color: " + effectiveStyle.highlightForegroundColor + ";";
                             }
                             if (markStyle) {
                                 markStyle = 'style="' + markStyle + '"';
                             }
-                            this._processedText = this._processedText.replace(/===/g, "<mark " + markStyle + ">").replace(/\/==\//g, "</mark>");
+                            this._processedText = this._processedText
+                                .replace(/===/g, "<mark " + markStyle + ">")
+                                .replace(/\/==\//g, "</mark>");
                         }
                     }
                     else {
@@ -9211,7 +9519,8 @@ var TextBlock = /** @class */ (function (_super) {
                 element.innerText = this._processedText;
             }
             else {
-                element.innerHTML = this._processedText;
+                var processedHtml = (_b = (_a = TextBlock._ttMarkdownPolicy) === null || _a === void 0 ? void 0 : _a.createHTML(this._processedText)) !== null && _b !== void 0 ? _b : this._processedText;
+                element.innerHTML = processedHtml;
             }
             if (element.firstElementChild instanceof HTMLElement) {
                 var firstElementChild = element.firstElementChild;
@@ -9226,31 +9535,34 @@ var TextBlock = /** @class */ (function (_super) {
                 element.lastElementChild.style.marginBottom = "0px";
             }
             var anchors = element.getElementsByTagName("a");
-            for (var i = 0; i < anchors.length; i++) {
-                var anchor = anchors[i];
+            var _loop_1 = function (anchor) {
                 anchor.classList.add(hostConfig.makeCssClassName("ac-anchor"));
                 anchor.target = "_blank";
                 anchor.onclick = function (e) {
-                    if (raiseAnchorClickedEvent(_this, e.target, e)) {
+                    if (raiseAnchorClickedEvent(_this, anchor, e)) {
                         e.preventDefault();
                         e.cancelBubble = true;
                     }
                 };
                 anchor.oncontextmenu = function (e) {
-                    if (raiseAnchorClickedEvent(_this, e.target, e)) {
+                    if (raiseAnchorClickedEvent(_this, anchor, e)) {
                         e.preventDefault();
                         e.cancelBubble = true;
                         return false;
                     }
                     return true;
                 };
+            };
+            for (var _i = 0, _c = Array.from(anchors); _i < _c.length; _i++) {
+                var anchor = _c[_i];
+                _loop_1(anchor);
             }
             if (this.wrap) {
                 element.style.wordWrap = "break-word";
                 if (this.maxLines && this.maxLines > 0) {
                     element.style.overflow = "hidden";
                     if (Utils.isInternetExplorer() || !shared_1.GlobalSettings.useWebkitLineClamp) {
-                        element.style.maxHeight = (this._computedLineHeight * this.maxLines) + "px";
+                        element.style.maxHeight = this._computedLineHeight * this.maxLines + "px";
                     }
                     else {
                         // While non standard, --webkit-line-clamp works in every browser (except IE)
@@ -9267,7 +9579,8 @@ var TextBlock = /** @class */ (function (_super) {
                 element.style.whiteSpace = "nowrap";
                 element.style.textOverflow = "ellipsis";
             }
-            if (shared_1.GlobalSettings.useAdvancedTextBlockTruncation || shared_1.GlobalSettings.useAdvancedCardBottomTruncation) {
+            if (shared_1.GlobalSettings.useAdvancedTextBlockTruncation ||
+                shared_1.GlobalSettings.useAdvancedCardBottomTruncation) {
                 this._originalInnerHtml = element.innerHTML;
             }
             return element;
@@ -9325,7 +9638,9 @@ var TextBlock = /** @class */ (function (_super) {
         else {
             // Looks like 1.33 is the magic number to compute line-height
             // from font size.
-            this._computedLineHeight = this.getFontSize(this.hostConfig.getFontTypeDefinition(this.effectiveFontType)) * 1.33;
+            this._computedLineHeight =
+                this.getFontSize(this.hostConfig.getFontTypeDefinition(this.effectiveFontType)) *
+                    1.33;
         }
         targetElement.style.lineHeight = this._computedLineHeight + "px";
     };
@@ -9348,6 +9663,7 @@ var TextBlock = /** @class */ (function (_super) {
             this.truncateIfSupported(this._computedLineHeight * this.maxLines);
         }
     };
+    var _a, _b;
     TextBlock.wrapProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_0, "wrap", false);
     TextBlock.maxLinesProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_0, "maxLines");
     TextBlock.styleProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_5, "style", [
@@ -9355,14 +9671,22 @@ var TextBlock = /** @class */ (function (_super) {
         { value: "columnHeader" },
         { value: "heading" }
     ]);
+    // Markdown processing is handled outside of Adaptive Cards. It's up to the host to ensure that markdown is safely
+    // processed.
+    TextBlock._ttMarkdownPolicy = (typeof window === 'undefined') ? undefined : (_a = window.trustedTypes) === null || _a === void 0 ? void 0 : _a.createPolicy("adaptivecards#markdownPassthroughPolicy", { createHTML: function (value) { return value; } });
+    // When "advanced" truncation is enabled (see GlobalSettings.useAdvancedCardBottomTruncation and
+    // GlobalSettings.useAdvancedTextBlockTruncation), we store the original pre-truncation content in
+    // _originalInnerHtml so that we can restore/recalculate truncation later if space availability has changed (see
+    // TextBlock.restoreOriginalContent())
+    TextBlock._ttRoundtripPolicy = (typeof window === 'undefined') ? undefined : (_b = window.trustedTypes) === null || _b === void 0 ? void 0 : _b.createPolicy("adaptivecards#restoreContentsPolicy", { createHTML: function (value) { return value; } });
     __decorate([
-        serialization_1.property(TextBlock.wrapProperty)
+        (0, serialization_1.property)(TextBlock.wrapProperty)
     ], TextBlock.prototype, "wrap", void 0);
     __decorate([
-        serialization_1.property(TextBlock.maxLinesProperty)
+        (0, serialization_1.property)(TextBlock.maxLinesProperty)
     ], TextBlock.prototype, "maxLines", void 0);
     __decorate([
-        serialization_1.property(TextBlock.styleProperty)
+        (0, serialization_1.property)(TextBlock.styleProperty)
     ], TextBlock.prototype, "style", void 0);
     return TextBlock;
 }(BaseTextBlock));
@@ -9402,7 +9726,7 @@ var TextRun = /** @class */ (function (_super) {
                 anchor.href = href ? href : "";
                 anchor.target = "_blank";
                 anchor.onclick = function (e) {
-                    if (_this.selectAction && _this.selectAction.isEnabled) {
+                    if (_this.selectAction && _this.selectAction.isEffectivelyEnabled()) {
                         e.preventDefault();
                         e.cancelBubble = true;
                         _this.selectAction.execute();
@@ -9431,7 +9755,12 @@ var TextRun = /** @class */ (function (_super) {
         }
         if (this.highlight) {
             var colorDefinition = this.getColorDefinition(this.getEffectiveStyleDefinition().foregroundColors, this.effectiveColor);
-            targetElement.style.backgroundColor = Utils.stringToCssColor(this.effectiveIsSubtle ? colorDefinition.highlightColors.subtle : colorDefinition.highlightColors.default);
+            var backgroundColor = Utils.stringToCssColor(this.effectiveIsSubtle
+                ? colorDefinition.highlightColors.subtle
+                : colorDefinition.highlightColors.default);
+            if (backgroundColor) {
+                targetElement.style.backgroundColor = backgroundColor;
+            }
         }
         if (this.underline) {
             targetElement.style.textDecoration = "underline";
@@ -9459,16 +9788,16 @@ var TextRun = /** @class */ (function (_super) {
     TextRun.highlightProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_2, "highlight", false);
     TextRun.underlineProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_3, "underline", false);
     __decorate([
-        serialization_1.property(TextRun.italicProperty)
+        (0, serialization_1.property)(TextRun.italicProperty)
     ], TextRun.prototype, "italic", void 0);
     __decorate([
-        serialization_1.property(TextRun.strikethroughProperty)
+        (0, serialization_1.property)(TextRun.strikethroughProperty)
     ], TextRun.prototype, "strikethrough", void 0);
     __decorate([
-        serialization_1.property(TextRun.highlightProperty)
+        (0, serialization_1.property)(TextRun.highlightProperty)
     ], TextRun.prototype, "highlight", void 0);
     __decorate([
-        serialization_1.property(TextRun.underlineProperty)
+        (0, serialization_1.property)(TextRun.underlineProperty)
     ], TextRun.prototype, "underline", void 0);
     return TextRun;
 }(BaseTextBlock));
@@ -9486,7 +9815,7 @@ var RichTextBlock = /** @class */ (function (_super) {
             throw new Error(strings_1.Strings.errors.elementCannotBeUsedAsInline());
         }
         var doAdd = inline.parent === undefined || forceAdd;
-        if (!doAdd && inline.parent != this) {
+        if (!doAdd && inline.parent !== this) {
             throw new Error(strings_1.Strings.errors.inlineAlreadyParented());
         }
         else {
@@ -9508,7 +9837,7 @@ var RichTextBlock = /** @class */ (function (_super) {
                 }
                 else {
                     // No fallback for inlines in 1.2
-                    inline = context.parseElement(this, jsonInline, false);
+                    inline = context.parseElement(this, jsonInline, [], false);
                 }
                 if (inline) {
                     this.internalAddInline(inline, true);
@@ -9623,10 +9952,10 @@ var Fact = /** @class */ (function (_super) {
     Fact.titleProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "title");
     Fact.valueProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "value");
     __decorate([
-        serialization_1.property(Fact.titleProperty)
+        (0, serialization_1.property)(Fact.titleProperty)
     ], Fact.prototype, "name", void 0);
     __decorate([
-        serialization_1.property(Fact.valueProperty)
+        (0, serialization_1.property)(Fact.valueProperty)
     ], Fact.prototype, "value", void 0);
     return Fact;
 }(serialization_1.SerializableObject));
@@ -9672,7 +10001,8 @@ var FactSet = /** @class */ (function (_super) {
                 tdElement.style.verticalAlign = "top";
                 var textBlock = new TextBlock();
                 textBlock.setParent(this);
-                textBlock.text = (!this.facts[i].name && this.isDesignMode()) ? "Title" : this.facts[i].name;
+                textBlock.text =
+                    !this.facts[i].name && this.isDesignMode() ? "Title" : this.facts[i].name;
                 textBlock.size = hostConfig.factSet.title.size;
                 textBlock.color = hostConfig.factSet.title.color;
                 textBlock.isSubtle = hostConfig.factSet.title.isSubtle;
@@ -9712,7 +10042,7 @@ var FactSet = /** @class */ (function (_super) {
     //#region Schema
     FactSet.factsProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_0, "facts", Fact);
     __decorate([
-        serialization_1.property(FactSet.factsProperty)
+        (0, serialization_1.property)(FactSet.factsProperty)
     ], FactSet.prototype, "facts", void 0);
     return FactSet;
 }(CardElement));
@@ -9740,7 +10070,7 @@ var ImageDimensionProperty = /** @class */ (function (_super) {
         if (typeof sourceValue === "string") {
             try {
                 var size = shared_1.SizeAndUnit.parse(sourceValue, true);
-                if (size.unit == Enums.SizeUnit.Pixel) {
+                if (size.unit === Enums.SizeUnit.Pixel) {
                     result = size.physicalSize;
                     isValid = true;
                 }
@@ -9856,13 +10186,14 @@ var Image = /** @class */ (function (_super) {
                     break;
             }
             var imageElement = document.createElement("img");
-            imageElement.onload = function (e) {
+            this.renderedImageElement = imageElement;
+            imageElement.onload = function (_e) {
                 raiseImageLoadedEvent(_this);
             };
-            imageElement.onerror = function (e) {
+            imageElement.onerror = function (_e) {
                 if (_this.renderedElement) {
                     var card = _this.getRootElement();
-                    _this.renderedElement.innerHTML = "";
+                    clearElement(_this.renderedElement);
                     if (card && card.designMode) {
                         var errorElement = document.createElement("div");
                         errorElement.style.display = "flex";
@@ -9882,21 +10213,24 @@ var Image = /** @class */ (function (_super) {
             imageElement.classList.add(hostConfig.makeCssClassName("ac-image"));
             if (this.selectAction && hostConfig.supportsInteractivity) {
                 imageElement.onkeypress = function (e) {
-                    if (_this.selectAction && _this.selectAction.isEnabled && (e.code == "Enter" || e.code == "Space")) { // enter or space pressed
+                    if (_this.selectAction &&
+                        _this.selectAction.isEffectivelyEnabled() &&
+                        (e.code === "Enter" || e.code === "Space")) {
+                        // enter or space pressed
                         e.preventDefault();
                         e.cancelBubble = true;
                         _this.selectAction.execute();
                     }
                 };
                 imageElement.onclick = function (e) {
-                    if (_this.selectAction && _this.selectAction.isEnabled) {
+                    if (_this.selectAction && _this.selectAction.isEffectivelyEnabled()) {
                         e.preventDefault();
                         e.cancelBubble = true;
                         _this.selectAction.execute();
                     }
                 };
                 this.selectAction.setupElementForAccessibility(imageElement);
-                if (this.selectAction.isEnabled) {
+                if (this.selectAction.isEffectivelyEnabled()) {
                     imageElement.classList.add(hostConfig.makeCssClassName("ac-selectable"));
                 }
             }
@@ -9906,8 +10240,11 @@ var Image = /** @class */ (function (_super) {
                 imageElement.style.backgroundPosition = "50% 50%";
                 imageElement.style.backgroundRepeat = "no-repeat";
             }
-            imageElement.style.backgroundColor = Utils.stringToCssColor(this.backgroundColor);
-            imageElement.src = this.preProcessPropertyValue(Image.urlProperty);
+            var backgroundColor = Utils.stringToCssColor(this.backgroundColor);
+            if (backgroundColor) {
+                imageElement.style.backgroundColor = backgroundColor;
+            }
+            this.setImageSource(imageElement);
             var altTextProperty = this.preProcessPropertyValue(Image.altTextProperty);
             if (altTextProperty) {
                 imageElement.alt = altTextProperty;
@@ -9919,6 +10256,13 @@ var Image = /** @class */ (function (_super) {
     Image.prototype.getJsonTypeName = function () {
         return "Image";
     };
+    Image.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        if (this.selectAction) {
+            result.push(this.selectAction);
+        }
+        return result;
+    };
     Image.prototype.getActionById = function (id) {
         var result = _super.prototype.getActionById.call(this, id);
         if (!result && this.selectAction) {
@@ -9929,6 +10273,12 @@ var Image = /** @class */ (function (_super) {
     Image.prototype.getResourceInformation = function () {
         return this.url ? [{ url: this.url, mimeType: "image" }] : [];
     };
+    Image.prototype.setImageSource = function (imageElement) {
+        var imageForceLoader = new ImageForceLoader(this.forceLoad, this.url);
+        imageForceLoader.configureImage(this);
+        imageElement.src = this.preProcessPropertyValue(Image.urlProperty);
+        imageForceLoader.resetImage(this);
+    };
     Image.urlProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "url");
     Image.altTextProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "altText");
     Image.backgroundColorProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "backgroundColor");
@@ -9936,34 +10286,66 @@ var Image = /** @class */ (function (_super) {
     Image.sizeProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_0, "size", Enums.Size, Enums.Size.Auto);
     Image.pixelWidthProperty = new ImageDimensionProperty(serialization_1.Versions.v1_1, "width", "pixelWidth");
     Image.pixelHeightProperty = new ImageDimensionProperty(serialization_1.Versions.v1_1, "height", "pixelHeight", CardElement.heightProperty);
-    Image.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", ["Action.ShowCard"]);
+    Image.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", [
+        "Action.ShowCard"
+    ]);
+    Image.shouldForceLoadProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_6, "forceLoad", false);
     __decorate([
-        serialization_1.property(Image.urlProperty)
+        (0, serialization_1.property)(Image.urlProperty)
     ], Image.prototype, "url", void 0);
     __decorate([
-        serialization_1.property(Image.altTextProperty)
+        (0, serialization_1.property)(Image.altTextProperty)
     ], Image.prototype, "altText", void 0);
     __decorate([
-        serialization_1.property(Image.backgroundColorProperty)
+        (0, serialization_1.property)(Image.backgroundColorProperty)
     ], Image.prototype, "backgroundColor", void 0);
     __decorate([
-        serialization_1.property(Image.sizeProperty)
+        (0, serialization_1.property)(Image.sizeProperty)
     ], Image.prototype, "size", void 0);
     __decorate([
-        serialization_1.property(Image.styleProperty)
+        (0, serialization_1.property)(Image.styleProperty)
     ], Image.prototype, "style", void 0);
     __decorate([
-        serialization_1.property(Image.pixelWidthProperty)
+        (0, serialization_1.property)(Image.pixelWidthProperty)
     ], Image.prototype, "pixelWidth", void 0);
     __decorate([
-        serialization_1.property(Image.pixelHeightProperty)
+        (0, serialization_1.property)(Image.pixelHeightProperty)
     ], Image.prototype, "pixelHeight", void 0);
     __decorate([
-        serialization_1.property(Image.selectActionProperty)
+        (0, serialization_1.property)(Image.selectActionProperty)
     ], Image.prototype, "selectAction", void 0);
+    __decorate([
+        (0, serialization_1.property)(Image.shouldForceLoadProperty)
+    ], Image.prototype, "forceLoad", void 0);
     return Image;
 }(CardElement));
 exports.Image = Image;
+// configures Image element to fetch a new image data from url source instead of relying on cache
+// currently rudimentary refreshing scheme is used
+// by attaching unique query string to url, we bypass the cache usage
+var ImageForceLoader = /** @class */ (function () {
+    function ImageForceLoader(doForceLoad, url) {
+        this.doForceLoad = doForceLoad;
+        this.url = url;
+        if (url && url.length && doForceLoad) {
+            // we can do better by appending unique key such as uuid instead of epoch
+            // however the current usage is for front-end ui and networking,  
+            // since ui is running in single main thread, this is sufficient mechanism
+            // without needing to depend on external library for our small use cases.
+            this.uniqueHash = '?' + Date.now();
+            this.urlWithForceLoadOption = url + this.uniqueHash;
+        }
+    }
+    ImageForceLoader.prototype.configureImage = function (image) {
+        if (this.urlWithForceLoadOption && this.urlWithForceLoadOption.length) {
+            image.url = this.urlWithForceLoadOption;
+        }
+    };
+    ImageForceLoader.prototype.resetImage = function (image) {
+        image.url = this.url;
+    };
+    return ImageForceLoader;
+}());
 var CardElementContainer = /** @class */ (function (_super) {
     __extends(CardElementContainer, _super);
     function CardElementContainer() {
@@ -10005,6 +10387,15 @@ var CardElementContainer = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    CardElementContainer.prototype.forbiddenChildElements = function () {
+        return [];
+    };
+    CardElementContainer.prototype.releaseDOMResources = function () {
+        _super.prototype.releaseDOMResources.call(this);
+        for (var i = 0; i < this.getItemCount(); i++) {
+            this.getItemAt(i).releaseDOMResources();
+        }
+    };
     CardElementContainer.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
         for (var i = 0; i < this.getItemCount(); i++) {
@@ -10030,16 +10421,21 @@ var CardElementContainer = /** @class */ (function (_super) {
                 element.style.overflowX = "hidden";
                 element.style.overflowY = "auto";
             }
-            if (element && this.isSelectable && this._selectAction && hostConfig.supportsInteractivity) {
+            if (element &&
+                this.isSelectable &&
+                this._selectAction &&
+                hostConfig.supportsInteractivity) {
                 element.onclick = function (e) {
-                    if (_this._selectAction && _this._selectAction.isEnabled) {
+                    if (_this._selectAction && _this._selectAction.isEffectivelyEnabled()) {
                         e.preventDefault();
                         e.cancelBubble = true;
                         _this._selectAction.execute();
                     }
                 };
                 element.onkeypress = function (e) {
-                    if (_this._selectAction && _this._selectAction.isEnabled && (e.code == "Enter" || e.code == "Space")) {
+                    if (_this._selectAction &&
+                        _this._selectAction.isEffectivelyEnabled() &&
+                        (e.code === "Enter" || e.code === "Space")) {
                         // Enter or space pressed
                         e.preventDefault();
                         e.cancelBubble = true;
@@ -10047,7 +10443,7 @@ var CardElementContainer = /** @class */ (function (_super) {
                     }
                 };
                 this._selectAction.setupElementForAccessibility(element);
-                if (this._selectAction.isEnabled) {
+                if (this._selectAction.isEffectivelyEnabled()) {
                     element.classList.add(hostConfig.makeCssClassName("ac-selectable"));
                 }
             }
@@ -10067,14 +10463,24 @@ var CardElementContainer = /** @class */ (function (_super) {
         if (processActions === void 0) { processActions = true; }
         var result = [];
         for (var i = 0; i < this.getItemCount(); i++) {
-            result = result.concat(this.getItemAt(i).getAllInputs(processActions));
+            result.push.apply(result, this.getItemAt(i).getAllInputs(processActions));
+        }
+        return result;
+    };
+    CardElementContainer.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        for (var i = 0; i < this.getItemCount(); i++) {
+            result.push.apply(result, this.getItemAt(i).getAllActions());
+        }
+        if (this._selectAction) {
+            result.push(this._selectAction);
         }
         return result;
     };
     CardElementContainer.prototype.getResourceInformation = function () {
         var result = [];
         for (var i = 0; i < this.getItemCount(); i++) {
-            result = result.concat(this.getItemAt(i).getResourceInformation());
+            result.push.apply(result, this.getItemAt(i).getResourceInformation());
         }
         return result;
     };
@@ -10094,6 +10500,7 @@ var CardElementContainer = /** @class */ (function (_super) {
      * @inheritdoc
      */
     CardElementContainer.prototype.findDOMNodeOwner = function (node) {
+        var _a;
         var target = undefined;
         for (var i = 0; i < this.getItemCount(); i++) {
             // recur through child elements
@@ -10102,12 +10509,21 @@ var CardElementContainer = /** @class */ (function (_super) {
                 return target;
             }
         }
-        // if not found in children, defer to parent implementation
+        // If not found in children, check the actions
+        for (var i = 0; i < this.getActionCount(); i++) {
+            target = (_a = this.getActionAt(i)) === null || _a === void 0 ? void 0 : _a.findDOMNodeOwner(node);
+            if (target) {
+                return target;
+            }
+        }
+        // if not found in children or actions, defer to parent implementation
         return _super.prototype.findDOMNodeOwner.call(this, node);
     };
-    CardElementContainer.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", ["Action.ShowCard"]);
+    CardElementContainer.selectActionProperty = new ActionProperty(serialization_1.Versions.v1_1, "selectAction", [
+        "Action.ShowCard"
+    ]);
     __decorate([
-        serialization_1.property(CardElementContainer.selectActionProperty)
+        (0, serialization_1.property)(CardElementContainer.selectActionProperty)
     ], CardElementContainer.prototype, "_selectAction", void 0);
     return CardElementContainer;
 }(CardElement));
@@ -10119,6 +10535,8 @@ var ImageSet = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this._images = [];
         _this.imageSize = Enums.ImageSize.Medium;
+        _this.presentationStyle = Enums.ImageSetPresentationStyle.Default;
+        _this.pixelOffset = 0;
         return _this;
     }
     //#endregion
@@ -10146,12 +10564,33 @@ var ImageSet = /** @class */ (function (_super) {
                 if (renderedImage) {
                     renderedImage.style.display = "inline-flex";
                     renderedImage.style.margin = "0px";
-                    renderedImage.style.marginRight = "10px";
+                    if (this.presentationStyle == Enums.ImageSetPresentationStyle.Default) {
+                        renderedImage.style.marginRight = "10px";
+                    }
                     Utils.appendChild(element, renderedImage);
                 }
             }
+            if (this.presentationStyle == Enums.ImageSetPresentationStyle.Stacked) {
+                this.applyStackedPresentationStyle();
+            }
         }
         return element;
+    };
+    ImageSet.prototype.applyStackedPresentationStyle = function () {
+        if (this._images[0].renderedImageElement) {
+            var dimension = StackedImageConfigurator.parseNumericPixelDimension(this._images[0].renderedImageElement.style.height);
+            var bgColor = this.getEffectiveBackgroundColor();
+            if (dimension) {
+                var stackedImageConfigurator = new StackedImageConfigurator(this.pixelOffset, dimension, bgColor);
+                stackedImageConfigurator.configureImagesArrayAsStackedLayout(this._images);
+            }
+        }
+    };
+    ImageSet.prototype.getEffectiveBackgroundColor = function () {
+        var parentContainer = this.getParentContainer();
+        var style = parentContainer === null || parentContainer === void 0 ? void 0 : parentContainer.getEffectiveStyle();
+        var styleDefinition = this.hostConfig.containerStyles.getStyleByName(style, this.hostConfig.containerStyles.getStyleByName(this.defaultStyle));
+        return Utils.stringToCssColor(styleDefinition.backgroundColor);
     };
     ImageSet.prototype.getItemCount = function () {
         return this._images.length;
@@ -10163,7 +10602,9 @@ var ImageSet = /** @class */ (function (_super) {
         return this._images && this._images.length > 0 ? this._images[0] : undefined;
     };
     ImageSet.prototype.getLastVisibleRenderedItem = function () {
-        return this._images && this._images.length > 0 ? this._images[this._images.length - 1] : undefined;
+        return this._images && this._images.length > 0
+            ? this._images[this._images.length - 1]
+            : undefined;
     };
     ImageSet.prototype.removeItem = function (item) {
         if (item instanceof Image) {
@@ -10192,31 +10633,162 @@ var ImageSet = /** @class */ (function (_super) {
     ImageSet.prototype.indexOf = function (cardElement) {
         return cardElement instanceof Image ? this._images.indexOf(cardElement) : -1;
     };
-    ImageSet.imagesProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_0, "images", Image, function (sender, item) { item.setParent(sender); });
+    ImageSet.imagesProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_0, "images", Image, function (sender, item) {
+        item.setParent(sender);
+    });
     ImageSet.imageSizeProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_0, "imageSize", Enums.ImageSize, Enums.ImageSize.Medium);
+    ImageSet.imagePresentationStyle = new serialization_1.EnumProperty(serialization_1.Versions.v1_6, "style", Enums.ImageSetPresentationStyle, Enums.ImageSetPresentationStyle.Default);
+    ImageSet.pixelOffset = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "offset", 0, undefined);
     __decorate([
-        serialization_1.property(ImageSet.imagesProperty)
+        (0, serialization_1.property)(ImageSet.imagesProperty)
     ], ImageSet.prototype, "_images", void 0);
     __decorate([
-        serialization_1.property(ImageSet.imageSizeProperty)
+        (0, serialization_1.property)(ImageSet.imageSizeProperty)
     ], ImageSet.prototype, "imageSize", void 0);
+    __decorate([
+        (0, serialization_1.property)(ImageSet.imagePresentationStyle)
+    ], ImageSet.prototype, "presentationStyle", void 0);
+    __decorate([
+        (0, serialization_1.property)(ImageSet.pixelOffset)
+    ], ImageSet.prototype, "pixelOffset", void 0);
     return ImageSet;
 }(CardElementContainer));
 exports.ImageSet = ImageSet;
-var MediaSource = /** @class */ (function (_super) {
-    __extends(MediaSource, _super);
-    function MediaSource(url, mimeType) {
+var StackedImageConfigurator = /** @class */ (function () {
+    function StackedImageConfigurator(offset, dimension, style) {
+        this.sign45 = 0.7071;
+        this.maxImageCounts = 2;
+        this.offset = 0;
+        this.normalizationConstant = 0;
+        this.border = 5;
+        this.dimension = 0;
+        this.dimension = dimension;
+        this.normalizationConstant = (dimension * this.sign45 - 0.5 * dimension) * 2;
+        // offset determines how far images are placed from each other
+        // at zero, images are separated only by the border
+        // there is no restriction on how far they are apart in positive values, their actual
+        // positioning is limited by maximum size imposed by Image renderer
+        // a negative value can decrease upto the diameter of the image since a value less than the diameter
+        // put the images past each other, and the use of such value is not reasonable request
+        // users should change image positions in such case.
+        this.offset = this.sign45 * (Math.max(offset, -dimension) - this.normalizationConstant);
+        this.style = style ? style : "";
+    }
+    StackedImageConfigurator.prototype.moveImageRight = function (element) {
+        element.style.marginLeft = this.offset + "px";
+    };
+    StackedImageConfigurator.prototype.moveImageUp = function (element) {
+        element.style.marginBottom = this.offset + this.dimension + "px";
+    };
+    StackedImageConfigurator.prototype.moveImageDown = function (element) {
+        element.style.marginTop = this.offset + this.dimension + "px";
+    };
+    StackedImageConfigurator.prototype.makeImageRound = function (element) {
+        element.style.borderRadius = "50%";
+        element.style.backgroundPosition = "50% 50%";
+        element.style.backgroundRepeat = "no-repeat";
+    };
+    StackedImageConfigurator.prototype.applyBorder = function (element) {
+        element.style.height = (this.dimension + this.border * 2) + "px";
+        element.style.border = this.border + "px" + " solid " + this.style;
+    };
+    StackedImageConfigurator.prototype.configureImageForBottomLeft = function (element) {
+        this.moveImageDown(element);
+        this.makeImageRound(element);
+        this.applyBorder(element);
+        element.style.zIndex = "2";
+    };
+    StackedImageConfigurator.prototype.configureImageForTopRight = function (element) {
+        this.moveImageUp(element);
+        this.moveImageRight(element);
+        this.makeImageRound(element);
+        element.style.zIndex = "1";
+    };
+    // stacked layout is applied when there are two images in ImageSet,
+    // first image in the ImageSet is put bottom left of ImageSet,
+    // second image is placed top right diagonally to the first image at 45 angle
+    // first image is placed over the second image should the overlap to occur.
+    StackedImageConfigurator.prototype.configureImagesArrayAsStackedLayout = function (elements) {
+        if (elements.length == 1) {
+            if (elements[0].renderedImageElement) {
+                this.makeImageRound(elements[0].renderedImageElement);
+            }
+        }
+        else if (elements.length <= this.maxImageCounts) {
+            if (elements[0].renderedImageElement && elements[1].renderedImageElement) {
+                this.configureImageForBottomLeft(elements[0].renderedImageElement);
+                this.configureImageForTopRight(elements[1].renderedImageElement);
+            }
+        }
+    };
+    StackedImageConfigurator.parseNumericPixelDimension = function (dimension) {
+        if ((dimension === null || dimension === void 0 ? void 0 : dimension.substring(dimension.length - 2)) == 'px') {
+            return parseInt(dimension.substring(0, dimension.length - 2));
+        }
+        return undefined;
+    };
+    return StackedImageConfigurator;
+}());
+var ContentSource = /** @class */ (function (_super) {
+    __extends(ContentSource, _super);
+    //#endregion
+    function ContentSource(url, mimeType) {
         var _this = _super.call(this) || this;
         _this.url = url;
         _this.mimeType = mimeType;
         return _this;
     }
+    ContentSource.prototype.isValid = function () {
+        return this.mimeType && this.url ? true : false;
+    };
+    //#region Schema
+    ContentSource.mimeTypeProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "mimeType");
+    ContentSource.urlProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "url");
+    __decorate([
+        (0, serialization_1.property)(ContentSource.mimeTypeProperty)
+    ], ContentSource.prototype, "mimeType", void 0);
+    __decorate([
+        (0, serialization_1.property)(ContentSource.urlProperty)
+    ], ContentSource.prototype, "url", void 0);
+    return ContentSource;
+}(serialization_1.SerializableObject));
+exports.ContentSource = ContentSource;
+var CaptionSource = /** @class */ (function (_super) {
+    __extends(CaptionSource, _super);
     //#endregion
+    function CaptionSource(url, mimeType, label) {
+        var _this = _super.call(this, url, mimeType) || this;
+        _this.label = label;
+        return _this;
+    }
+    CaptionSource.prototype.getSchemaKey = function () {
+        return "CaptionSource";
+    };
+    CaptionSource.prototype.render = function () {
+        var result = undefined;
+        if (this.isValid()) {
+            result = document.createElement("track");
+            result.src = this.url;
+            result.kind = "captions";
+            result.label = this.label;
+        }
+        return result;
+    };
+    //#region Schema
+    CaptionSource.labelProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_6, "label");
+    __decorate([
+        (0, serialization_1.property)(CaptionSource.labelProperty)
+    ], CaptionSource.prototype, "label", void 0);
+    return CaptionSource;
+}(ContentSource));
+exports.CaptionSource = CaptionSource;
+var MediaSource = /** @class */ (function (_super) {
+    __extends(MediaSource, _super);
+    function MediaSource() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
     MediaSource.prototype.getSchemaKey = function () {
         return "MediaSource";
-    };
-    MediaSource.prototype.isValid = function () {
-        return this.mimeType && this.url ? true : false;
     };
     MediaSource.prototype.render = function () {
         var result = undefined;
@@ -10227,57 +10799,311 @@ var MediaSource = /** @class */ (function (_super) {
         }
         return result;
     };
-    //#region Schema
-    MediaSource.mimeTypeProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "mimeType");
-    MediaSource.urlProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "url");
-    __decorate([
-        serialization_1.property(MediaSource.mimeTypeProperty)
-    ], MediaSource.prototype, "mimeType", void 0);
-    __decorate([
-        serialization_1.property(MediaSource.urlProperty)
-    ], MediaSource.prototype, "url", void 0);
     return MediaSource;
-}(serialization_1.SerializableObject));
+}(ContentSource));
 exports.MediaSource = MediaSource;
-var Media = /** @class */ (function (_super) {
-    __extends(Media, _super);
-    function Media() {
-        //#region Schema
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.sources = [];
+var MediaPlayer = /** @class */ (function () {
+    function MediaPlayer() {
+    }
+    MediaPlayer.prototype.play = function () {
+        // Do nothing in base implementation
+    };
+    Object.defineProperty(MediaPlayer.prototype, "posterUrl", {
+        get: function () {
+            return this._posterUrl;
+        },
+        set: function (value) {
+            this._posterUrl = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(MediaPlayer.prototype, "selectedMediaType", {
+        get: function () {
+            return undefined;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return MediaPlayer;
+}());
+exports.MediaPlayer = MediaPlayer;
+var HTML5MediaPlayer = /** @class */ (function (_super) {
+    __extends(HTML5MediaPlayer, _super);
+    function HTML5MediaPlayer(owner) {
+        var _this = _super.call(this) || this;
+        _this.owner = owner;
+        _this._selectedSources = [];
+        _this._captionSources = [];
+        _this.processSources();
         return _this;
     }
-    Media.prototype.getPosterUrl = function () {
-        return this.poster ? this.poster : this.hostConfig.media.defaultPoster;
-    };
-    Media.prototype.processSources = function () {
+    HTML5MediaPlayer.prototype.processSources = function () {
+        var _a;
         this._selectedSources = [];
+        this._captionSources = [];
         this._selectedMediaType = undefined;
-        for (var _i = 0, _a = this.sources; _i < _a.length; _i++) {
-            var source = _a[_i];
-            var mimeComponents = source.mimeType ? source.mimeType.split('/') : [];
-            if (mimeComponents.length == 2) {
+        for (var _i = 0, _b = this.owner.sources; _i < _b.length; _i++) {
+            var source = _b[_i];
+            var mimeComponents = source.mimeType ? source.mimeType.split("/") : [];
+            if (mimeComponents.length === 2) {
                 if (!this._selectedMediaType) {
-                    var index = Media.supportedMediaTypes.indexOf(mimeComponents[0]);
+                    var index = HTML5MediaPlayer.supportedMediaTypes.indexOf(mimeComponents[0]);
                     if (index >= 0) {
-                        this._selectedMediaType = Media.supportedMediaTypes[index];
+                        this._selectedMediaType = HTML5MediaPlayer.supportedMediaTypes[index];
                     }
                 }
-                if (mimeComponents[0] == this._selectedMediaType) {
+                if (mimeComponents[0] === this._selectedMediaType) {
                     this._selectedSources.push(source);
                 }
             }
         }
+        (_a = this._captionSources).push.apply(_a, this.owner.captionSources);
+    };
+    HTML5MediaPlayer.prototype.canPlay = function () {
+        return this._selectedSources.length > 0;
+    };
+    HTML5MediaPlayer.prototype.fetchVideoDetails = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/];
+            });
+        });
+    };
+    HTML5MediaPlayer.prototype.render = function () {
+        if (this._selectedMediaType === "video") {
+            this._mediaElement = document.createElement("video");
+        }
+        else {
+            this._mediaElement = document.createElement("audio");
+        }
+        this._mediaElement.setAttribute("aria-label", this.owner.altText ? this.owner.altText : strings_1.Strings.defaults.mediaPlayerAriaLabel());
+        this._mediaElement.setAttribute("webkit-playsinline", "");
+        this._mediaElement.setAttribute("playsinline", "");
+        // We enable crossorigin for cases where the caption file has a different domain than
+        // the video file. If the caption file lives in a different domain than the video file
+        // and crossorigin is not set, then the caption file will fail to load.
+        this._mediaElement.setAttribute("crossorigin", "");
+        this._mediaElement.autoplay = true;
+        this._mediaElement.controls = true;
+        if (Utils.isMobileOS()) {
+            this._mediaElement.muted = true;
+        }
+        this._mediaElement.preload = "none";
+        this._mediaElement.style.width = "100%";
+        for (var _i = 0, _a = this.owner.sources; _i < _a.length; _i++) {
+            var source = _a[_i];
+            var renderedSource = source.render();
+            Utils.appendChild(this._mediaElement, renderedSource);
+        }
+        for (var _b = 0, _c = this.owner.captionSources; _b < _c.length; _b++) {
+            var captionSource = _c[_b];
+            if (captionSource.mimeType == "vtt") {
+                var renderedCaptionSource = captionSource.render();
+                Utils.appendChild(this._mediaElement, renderedCaptionSource);
+            }
+        }
+        return this._mediaElement;
+    };
+    HTML5MediaPlayer.prototype.play = function () {
+        if (this._mediaElement) {
+            this._mediaElement.play();
+        }
+    };
+    Object.defineProperty(HTML5MediaPlayer.prototype, "selectedMediaType", {
+        get: function () {
+            return this._selectedMediaType;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    HTML5MediaPlayer.supportedMediaTypes = ["audio", "video"];
+    return HTML5MediaPlayer;
+}(MediaPlayer));
+exports.HTML5MediaPlayer = HTML5MediaPlayer;
+var CustomMediaPlayer = /** @class */ (function (_super) {
+    __extends(CustomMediaPlayer, _super);
+    function CustomMediaPlayer(matches) {
+        return _super.call(this) || this;
+    }
+    return CustomMediaPlayer;
+}(MediaPlayer));
+exports.CustomMediaPlayer = CustomMediaPlayer;
+var IFrameMediaMediaPlayer = /** @class */ (function (_super) {
+    __extends(IFrameMediaMediaPlayer, _super);
+    function IFrameMediaMediaPlayer(matches, iFrameTitle) {
+        var _this = _super.call(this, matches) || this;
+        _this.iFrameTitle = iFrameTitle;
+        if (matches.length >= 2) {
+            _this._videoId = matches[1];
+        }
+        return _this;
+    }
+    IFrameMediaMediaPlayer.prototype.canPlay = function () {
+        return this._videoId !== undefined;
+    };
+    IFrameMediaMediaPlayer.prototype.render = function () {
+        var container = document.createElement("div");
+        container.style.position = "relative";
+        container.style.width = "100%";
+        container.style.height = "0";
+        container.style.paddingBottom = "56.25%";
+        var iFrame = document.createElement("iframe");
+        iFrame.style.position = "absolute";
+        iFrame.style.top = "0";
+        iFrame.style.left = "0";
+        iFrame.style.width = "100%";
+        iFrame.style.height = "100%";
+        iFrame.src = this.getEmbedVideoUrl();
+        iFrame.frameBorder = "0";
+        if (this.iFrameTitle) {
+            iFrame.title = this.iFrameTitle;
+        }
+        iFrame.allow =
+            "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iFrame.allowFullscreen = true;
+        container.appendChild(iFrame);
+        return container;
+    };
+    Object.defineProperty(IFrameMediaMediaPlayer.prototype, "videoId", {
+        get: function () {
+            return this._videoId;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return IFrameMediaMediaPlayer;
+}(CustomMediaPlayer));
+exports.IFrameMediaMediaPlayer = IFrameMediaMediaPlayer;
+var VimeoPlayer = /** @class */ (function (_super) {
+    __extends(VimeoPlayer, _super);
+    function VimeoPlayer() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    VimeoPlayer.prototype.fetchVideoDetails = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var oEmbedUrl, response, json;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        oEmbedUrl = "https://vimeo.com/api/oembed.json?url=".concat(this.getEmbedVideoUrl());
+                        return [4 /*yield*/, fetch(oEmbedUrl)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.ok) return [3 /*break*/, 3];
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        json = _a.sent();
+                        this.posterUrl = json["thumbnail_url"];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    VimeoPlayer.prototype.getEmbedVideoUrl = function () {
+        return "https://player.vimeo.com/video/".concat(this.videoId, "?autoplay=1");
+    };
+    return VimeoPlayer;
+}(IFrameMediaMediaPlayer));
+exports.VimeoPlayer = VimeoPlayer;
+var DailymotionPlayer = /** @class */ (function (_super) {
+    __extends(DailymotionPlayer, _super);
+    function DailymotionPlayer() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DailymotionPlayer.prototype.fetchVideoDetails = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var apiUrl, response, json;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        apiUrl = "https://api.dailymotion.com/video/".concat(this.videoId, "?fields=thumbnail_720_url");
+                        return [4 /*yield*/, fetch(apiUrl)];
+                    case 1:
+                        response = _a.sent();
+                        if (!response.ok) return [3 /*break*/, 3];
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        json = _a.sent();
+                        this.posterUrl = json["thumbnail_720_url"];
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    DailymotionPlayer.prototype.getEmbedVideoUrl = function () {
+        return "https://www.dailymotion.com/embed/video/".concat(this.videoId, "?autoplay=1");
+    };
+    return DailymotionPlayer;
+}(IFrameMediaMediaPlayer));
+exports.DailymotionPlayer = DailymotionPlayer;
+var YouTubePlayer = /** @class */ (function (_super) {
+    __extends(YouTubePlayer, _super);
+    function YouTubePlayer(matches, iFrameTitle) {
+        var _this = _super.call(this, matches, iFrameTitle) || this;
+        _this.iFrameTitle = iFrameTitle;
+        if (matches.length >= 3 && matches[2] !== undefined) {
+            _this._startTimeIndex = parseInt(matches[2]);
+        }
+        return _this;
+    }
+    YouTubePlayer.prototype.fetchVideoDetails = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                this.posterUrl = this.videoId
+                    ? "https://img.youtube.com/vi/".concat(this.videoId, "/maxresdefault.jpg")
+                    : undefined;
+                return [2 /*return*/];
+            });
+        });
+    };
+    YouTubePlayer.prototype.getEmbedVideoUrl = function () {
+        var url = "https://www.youtube.com/embed/".concat(this.videoId, "?autoplay=1");
+        if (this._startTimeIndex !== undefined) {
+            url += "&start=".concat(this._startTimeIndex);
+        }
+        return url;
+    };
+    return YouTubePlayer;
+}(IFrameMediaMediaPlayer));
+exports.YouTubePlayer = YouTubePlayer;
+var Media = /** @class */ (function (_super) {
+    __extends(Media, _super);
+    function Media() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.sources = [];
+        _this.captionSources = [];
+        return _this;
+    }
+    Media.prototype.createMediaPlayer = function () {
+        for (var _i = 0, _a = Media.customMediaPlayers; _i < _a.length; _i++) {
+            var provider = _a[_i];
+            for (var _b = 0, _c = this.sources; _b < _c.length; _b++) {
+                var source = _c[_b];
+                if (source.url) {
+                    for (var _d = 0, _f = provider.urlPatterns; _d < _f.length; _d++) {
+                        var pattern = _f[_d];
+                        var matches = pattern.exec(source.url);
+                        if (matches !== null) {
+                            return provider.createMediaPlayer(matches);
+                        }
+                    }
+                }
+            }
+        }
+        return new HTML5MediaPlayer(this);
     };
     Media.prototype.handlePlayButtonInvoke = function (event) {
         if (this.hostConfig.media.allowInlinePlayback) {
             event.preventDefault();
             event.cancelBubble = true;
             if (this.renderedElement) {
-                var mediaPlayerElement = this.renderMediaPlayer();
-                this.renderedElement.innerHTML = "";
+                var mediaPlayerElement = this._mediaPlayer.render();
+                clearElement(this.renderedElement);
                 this.renderedElement.appendChild(mediaPlayerElement);
-                mediaPlayerElement.play();
+                this._mediaPlayer.play();
                 mediaPlayerElement.focus();
             }
         }
@@ -10289,133 +11115,144 @@ var Media = /** @class */ (function (_super) {
             }
         }
     };
-    Media.prototype.renderPoster = function () {
-        var _this = this;
-        var playButtonArrowWidth = 12;
-        var playButtonArrowHeight = 15;
-        var posterRootElement = document.createElement("div");
-        posterRootElement.className = this.hostConfig.makeCssClassName("ac-media-poster");
-        posterRootElement.setAttribute("role", "contentinfo");
-        posterRootElement.setAttribute("aria-label", this.altText ? this.altText : strings_1.Strings.defaults.mediaPlayerAriaLabel());
-        posterRootElement.style.position = "relative";
-        posterRootElement.style.display = "flex";
-        var posterUrl = this.getPosterUrl();
-        if (posterUrl) {
-            var posterImageElement_1 = document.createElement("img");
-            posterImageElement_1.style.width = "100%";
-            posterImageElement_1.style.height = "100%";
-            posterImageElement_1.setAttribute("role", "presentation");
-            posterImageElement_1.onerror = function (e) {
-                if (posterImageElement_1.parentNode) {
-                    posterImageElement_1.parentNode.removeChild(posterImageElement_1);
+    Media.prototype.displayPoster = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var playButtonArrowWidth, playButtonArrowHeight, posterRootElement_1, posterUrl, posterImageElement_1, playButtonOuterElement, playButtonInnerElement, playButtonContainer;
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (this.renderedElement) {
+                    playButtonArrowWidth = 12;
+                    playButtonArrowHeight = 15;
+                    posterRootElement_1 = document.createElement("div");
+                    posterRootElement_1.className = this.hostConfig.makeCssClassName("ac-media-poster");
+                    posterRootElement_1.setAttribute("role", "contentinfo");
+                    posterRootElement_1.setAttribute("aria-label", this.altText ? this.altText : strings_1.Strings.defaults.mediaPlayerAriaLabel());
+                    posterRootElement_1.style.position = "relative";
+                    posterRootElement_1.style.display = "flex";
+                    posterUrl = this.poster ? this.poster : this._mediaPlayer.posterUrl;
+                    if (!posterUrl) {
+                        posterUrl = this.hostConfig.media.defaultPoster;
+                    }
+                    if (posterUrl) {
+                        posterImageElement_1 = document.createElement("img");
+                        posterImageElement_1.style.width = "100%";
+                        posterImageElement_1.style.height = "100%";
+                        posterImageElement_1.setAttribute("role", "presentation");
+                        posterImageElement_1.onerror = function (_e) {
+                            if (posterImageElement_1.parentNode) {
+                                posterImageElement_1.parentNode.removeChild(posterImageElement_1);
+                            }
+                            posterRootElement_1.classList.add("empty");
+                            posterRootElement_1.style.minHeight = "150px";
+                        };
+                        posterImageElement_1.src = posterUrl;
+                        posterRootElement_1.appendChild(posterImageElement_1);
+                    }
+                    else {
+                        posterRootElement_1.classList.add("empty");
+                        posterRootElement_1.style.minHeight = "150px";
+                    }
+                    if (this.hostConfig.supportsInteractivity && this._mediaPlayer.canPlay()) {
+                        playButtonOuterElement = document.createElement("div");
+                        playButtonOuterElement.tabIndex = 0;
+                        playButtonOuterElement.setAttribute("role", "button");
+                        playButtonOuterElement.setAttribute("aria-label", strings_1.Strings.defaults.mediaPlayerPlayMedia());
+                        playButtonOuterElement.className =
+                            this.hostConfig.makeCssClassName("ac-media-playButton");
+                        playButtonOuterElement.style.display = "flex";
+                        playButtonOuterElement.style.alignItems = "center";
+                        playButtonOuterElement.style.justifyContent = "center";
+                        playButtonOuterElement.onclick = function (e) {
+                            _this.handlePlayButtonInvoke(e);
+                        };
+                        playButtonOuterElement.onkeypress = function (e) {
+                            if (e.code === "Enter" || e.code === "Space") {
+                                // space or enter
+                                _this.handlePlayButtonInvoke(e);
+                            }
+                        };
+                        playButtonInnerElement = document.createElement("div");
+                        playButtonInnerElement.className = this.hostConfig.makeCssClassName("ac-media-playButton-arrow");
+                        playButtonInnerElement.style.width = playButtonArrowWidth + "px";
+                        playButtonInnerElement.style.height = playButtonArrowHeight + "px";
+                        playButtonInnerElement.style.borderTopWidth = playButtonArrowHeight / 2 + "px";
+                        playButtonInnerElement.style.borderBottomWidth = playButtonArrowHeight / 2 + "px";
+                        playButtonInnerElement.style.borderLeftWidth = playButtonArrowWidth + "px";
+                        playButtonInnerElement.style.borderRightWidth = "0";
+                        playButtonInnerElement.style.borderStyle = "solid";
+                        playButtonInnerElement.style.borderTopColor = "transparent";
+                        playButtonInnerElement.style.borderRightColor = "transparent";
+                        playButtonInnerElement.style.borderBottomColor = "transparent";
+                        playButtonInnerElement.style.transform =
+                            "translate(" + playButtonArrowWidth / 10 + "px,0px)";
+                        playButtonOuterElement.appendChild(playButtonInnerElement);
+                        playButtonContainer = document.createElement("div");
+                        playButtonContainer.style.position = "absolute";
+                        playButtonContainer.style.left = "0";
+                        playButtonContainer.style.top = "0";
+                        playButtonContainer.style.width = "100%";
+                        playButtonContainer.style.height = "100%";
+                        playButtonContainer.style.display = "flex";
+                        playButtonContainer.style.justifyContent = "center";
+                        playButtonContainer.style.alignItems = "center";
+                        playButtonContainer.appendChild(playButtonOuterElement);
+                        posterRootElement_1.appendChild(playButtonContainer);
+                    }
+                    clearElement(this.renderedElement);
+                    this.renderedElement.appendChild(posterRootElement_1);
                 }
-                posterRootElement.classList.add("empty");
-                posterRootElement.style.minHeight = "150px";
-            };
-            posterImageElement_1.src = posterUrl;
-            posterRootElement.appendChild(posterImageElement_1);
-        }
-        else {
-            posterRootElement.classList.add("empty");
-            posterRootElement.style.minHeight = "150px";
-        }
-        if (this.hostConfig.supportsInteractivity && this._selectedSources.length > 0) {
-            var playButtonOuterElement = document.createElement("div");
-            playButtonOuterElement.tabIndex = 0;
-            playButtonOuterElement.setAttribute("role", "button");
-            playButtonOuterElement.setAttribute("aria-label", strings_1.Strings.defaults.mediaPlayerPlayMedia());
-            playButtonOuterElement.className = this.hostConfig.makeCssClassName("ac-media-playButton");
-            playButtonOuterElement.style.display = "flex";
-            playButtonOuterElement.style.alignItems = "center";
-            playButtonOuterElement.style.justifyContent = "center";
-            playButtonOuterElement.onclick = function (e) {
-                _this.handlePlayButtonInvoke(e);
-            };
-            playButtonOuterElement.onkeypress = function (e) {
-                if (e.code == "Enter" || e.code == "Space") { // space or enter
-                    _this.handlePlayButtonInvoke(e);
-                }
-            };
-            var playButtonInnerElement = document.createElement("div");
-            playButtonInnerElement.className = this.hostConfig.makeCssClassName("ac-media-playButton-arrow");
-            playButtonInnerElement.style.width = playButtonArrowWidth + "px";
-            playButtonInnerElement.style.height = playButtonArrowHeight + "px";
-            playButtonInnerElement.style.borderTopWidth = (playButtonArrowHeight / 2) + "px";
-            playButtonInnerElement.style.borderBottomWidth = (playButtonArrowHeight / 2) + "px";
-            playButtonInnerElement.style.borderLeftWidth = playButtonArrowWidth + "px";
-            playButtonInnerElement.style.borderRightWidth = "0";
-            playButtonInnerElement.style.borderStyle = "solid";
-            playButtonInnerElement.style.borderTopColor = "transparent";
-            playButtonInnerElement.style.borderRightColor = "transparent";
-            playButtonInnerElement.style.borderBottomColor = "transparent";
-            playButtonInnerElement.style.transform = "translate(" + (playButtonArrowWidth / 10) + "px,0px)";
-            playButtonOuterElement.appendChild(playButtonInnerElement);
-            var playButtonContainer = document.createElement("div");
-            playButtonContainer.style.position = "absolute";
-            playButtonContainer.style.left = "0";
-            playButtonContainer.style.top = "0";
-            playButtonContainer.style.width = "100%";
-            playButtonContainer.style.height = "100%";
-            playButtonContainer.style.display = "flex";
-            playButtonContainer.style.justifyContent = "center";
-            playButtonContainer.style.alignItems = "center";
-            playButtonContainer.appendChild(playButtonOuterElement);
-            posterRootElement.appendChild(playButtonContainer);
-        }
-        return posterRootElement;
-    };
-    Media.prototype.renderMediaPlayer = function () {
-        var mediaElement;
-        if (this._selectedMediaType == "video") {
-            var videoPlayer = document.createElement("video");
-            var posterUrl = this.getPosterUrl();
-            if (posterUrl) {
-                videoPlayer.poster = posterUrl;
-            }
-            mediaElement = videoPlayer;
-        }
-        else {
-            mediaElement = document.createElement("audio");
-        }
-        mediaElement.setAttribute("aria-label", this.altText ? this.altText : strings_1.Strings.defaults.mediaPlayerAriaLabel());
-        mediaElement.setAttribute("webkit-playsinline", "");
-        mediaElement.setAttribute("playsinline", "");
-        mediaElement.autoplay = true;
-        mediaElement.controls = true;
-        if (Utils.isMobileOS()) {
-            mediaElement.muted = true;
-        }
-        mediaElement.preload = "none";
-        mediaElement.style.width = "100%";
-        for (var _i = 0, _a = this.sources; _i < _a.length; _i++) {
-            var source = _a[_i];
-            var renderedSource = source.render();
-            Utils.appendChild(mediaElement, renderedSource);
-        }
-        return mediaElement;
+                return [2 /*return*/];
+            });
+        });
     };
     Media.prototype.internalRender = function () {
         var element = document.createElement("div");
         element.className = this.hostConfig.makeCssClassName("ac-media");
-        this.processSources();
-        element.appendChild(this.renderPoster());
         return element;
+    };
+    Media.prototype.render = function () {
+        var _this = this;
+        var result = _super.prototype.render.call(this);
+        if (result) {
+            this._mediaPlayer = this.createMediaPlayer();
+            this._mediaPlayer.fetchVideoDetails().then(function () { return _this.displayPoster(); });
+        }
+        return result;
+    };
+    Media.prototype.releaseDOMResources = function () {
+        _super.prototype.releaseDOMResources.call(this);
+        this.displayPoster();
     };
     Media.prototype.getJsonTypeName = function () {
         return "Media";
     };
     Media.prototype.getResourceInformation = function () {
         var result = [];
-        var posterUrl = this.getPosterUrl();
-        if (posterUrl) {
-            result.push({ url: posterUrl, mimeType: "image" });
+        if (this._mediaPlayer) {
+            var posterUrl = this.poster ? this.poster : this.hostConfig.media.defaultPoster;
+            if (posterUrl) {
+                result.push({ url: posterUrl, mimeType: "image" });
+            }
         }
         for (var _i = 0, _a = this.sources; _i < _a.length; _i++) {
             var mediaSource = _a[_i];
             if (mediaSource.isValid()) {
                 result.push({
+                    /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion -- `mediaSource.url` is of type `string | undefined`, but is validated by `isValid()` call */
                     url: mediaSource.url,
                     mimeType: mediaSource.mimeType
+                    /* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
+                });
+            }
+        }
+        for (var _b = 0, _c = this.captionSources; _b < _c.length; _b++) {
+            var captionSource = _c[_b];
+            if (captionSource.isValid()) {
+                result.push({
+                    /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion -- `captionSource.url` is of type `string | undefined`, but is validated by `isValid()` call */
+                    url: captionSource.url,
+                    mimeType: captionSource.mimeType
+                    /* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
                 });
             }
         }
@@ -10423,32 +11260,67 @@ var Media = /** @class */ (function (_super) {
     };
     Object.defineProperty(Media.prototype, "selectedMediaType", {
         get: function () {
-            return this._selectedMediaType;
+            return this._mediaPlayer.selectedMediaType;
         },
         enumerable: false,
         configurable: true
     });
+    Media.customMediaPlayers = [
+        {
+            urlPatterns: [
+                /^(?:https?:\/\/)?(?:www.)?youtube.com\/watch\?(?=.*v=([\w\d-_]+))(?=(?:.*t=(\d+))?).*/gi,
+                /^(?:https?:\/\/)?youtu.be\/([\w\d-_]+)(?:\?t=(\d+))?/gi
+            ],
+            createMediaPlayer: function (matches) {
+                return new YouTubePlayer(matches, strings_1.Strings.defaults.youTubeVideoPlayer());
+            }
+        },
+        {
+            urlPatterns: [/^(?:https?:\/\/)?vimeo.com\/([\w\d-_]+).*/gi],
+            createMediaPlayer: function (matches) {
+                return new VimeoPlayer(matches, strings_1.Strings.defaults.vimeoVideoPlayer());
+            }
+        },
+        {
+            urlPatterns: [/^(?:https?:\/\/)?(?:www.)?dailymotion.com\/video\/([\w\d-_]+).*/gi],
+            createMediaPlayer: function (matches) {
+                return new DailymotionPlayer(matches, strings_1.Strings.defaults.dailymotionVideoPlayer());
+            }
+        }
+    ];
+    //#region Schema
     Media.sourcesProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_1, "sources", MediaSource);
+    Media.captionSourcesProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_6, "captionSources", CaptionSource);
     Media.posterProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "poster");
     Media.altTextProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_1, "altText");
-    //#endregion
-    Media.supportedMediaTypes = ["audio", "video"];
     __decorate([
-        serialization_1.property(Media.sourcesProperty)
+        (0, serialization_1.property)(Media.sourcesProperty)
     ], Media.prototype, "sources", void 0);
     __decorate([
-        serialization_1.property(Media.posterProperty)
+        (0, serialization_1.property)(Media.captionSourcesProperty)
+    ], Media.prototype, "captionSources", void 0);
+    __decorate([
+        (0, serialization_1.property)(Media.posterProperty)
     ], Media.prototype, "poster", void 0);
     __decorate([
-        serialization_1.property(Media.altTextProperty)
+        (0, serialization_1.property)(Media.altTextProperty)
     ], Media.prototype, "altText", void 0);
     return Media;
 }(CardElement));
 exports.Media = Media;
+var InputEventType;
+(function (InputEventType) {
+    InputEventType[InputEventType["InitialRender"] = 0] = "InitialRender";
+    InputEventType[InputEventType["MouseEnterOnCard"] = 1] = "MouseEnterOnCard";
+    InputEventType[InputEventType["MouseLeaveOnCard"] = 2] = "MouseLeaveOnCard";
+    InputEventType[InputEventType["FocusLeave"] = 3] = "FocusLeave";
+})(InputEventType || (InputEventType = {}));
 var Input = /** @class */ (function (_super) {
     __extends(Input, _super);
     function Input() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.inputStyle = Enums.InputStyle.Default;
+        return _this;
     }
     Input.prototype.getAllLabelIds = function () {
         var labelIds = [];
@@ -10496,10 +11368,16 @@ var Input = /** @class */ (function (_super) {
         configurable: true
     });
     Input.prototype.overrideInternalRender = function () {
+        var _this = this;
         var hostConfig = this.hostConfig;
         this._outerContainerElement = document.createElement("div");
         this._outerContainerElement.style.display = "flex";
-        this._outerContainerElement.style.flexDirection = "column";
+        if (this.labelPosition === Enums.InputLabelPosition.Inline) {
+            this._outerContainerElement.style.flexDirection = "row";
+        }
+        else {
+            this._outerContainerElement.style.flexDirection = "column";
+        }
         var renderedInputControlId = Utils.generateUniqueId();
         if (this.label) {
             var labelRichTextBlock = new RichTextBlock();
@@ -10520,12 +11398,20 @@ var Input = /** @class */ (function (_super) {
             this._renderedLabelElement = labelRichTextBlock.render();
             if (this._renderedLabelElement) {
                 this._renderedLabelElement.id = Utils.generateUniqueId();
-                this._renderedLabelElement.style.marginBottom = hostConfig.getEffectiveSpacing(hostConfig.inputs.label.inputSpacing) + "px";
+                if (this.labelPosition === Enums.InputLabelPosition.Inline) {
+                    // For inline label position: label should be in center of the div and no extra spacing needed
+                    this._renderedLabelElement.style.alignSelf = "center";
+                }
+                else {
+                    this._renderedLabelElement.style.marginBottom =
+                        hostConfig.getEffectiveSpacing(hostConfig.inputs.label.inputSpacing) + "px";
+                }
                 this._outerContainerElement.appendChild(this._renderedLabelElement);
             }
         }
         this._inputControlContainerElement = document.createElement("div");
-        this._inputControlContainerElement.className = hostConfig.makeCssClassName("ac-input-container");
+        this._inputControlContainerElement.className =
+            hostConfig.makeCssClassName("ac-input-container");
         this._inputControlContainerElement.style.display = "flex";
         if (this.height === "stretch") {
             this._inputControlContainerElement.style.alignItems = "stretch";
@@ -10541,12 +11427,36 @@ var Input = /** @class */ (function (_super) {
             }
             this._inputControlContainerElement.appendChild(this._renderedInputControlElement);
             this._outerContainerElement.appendChild(this._inputControlContainerElement);
+            if (this._renderedLabelElement && this.labelPosition === Enums.InputLabelPosition.Inline) {
+                if (!this.labelWidth) {
+                    var defaultLabelWidth = hostConfig.inputs.label.width;
+                    this._renderedLabelElement.style.width = defaultLabelWidth.toString() + "%";
+                    this._inputControlContainerElement.style.width = (100 - defaultLabelWidth) + "%";
+                }
+                else if (this.labelWidth.unit == Enums.SizeUnit.Weight) {
+                    var labelWidthInPercent = this.labelWidth.physicalSize;
+                    this._renderedLabelElement.style.width = labelWidthInPercent.toString() + "%";
+                    this._inputControlContainerElement.style.width = (100 - labelWidthInPercent).toString() + "%";
+                }
+                else if (this.labelWidth.unit == Enums.SizeUnit.Pixel) {
+                    var labelWidthInPixel = this.labelWidth.physicalSize;
+                    this._renderedLabelElement.style.width = labelWidthInPixel.toString() + "px";
+                }
+            }
+            this.updateVisualState(InputEventType.InitialRender);
+            if (this._renderedInputControlElement) {
+                this._renderedInputControlElement.onblur = function (ev) {
+                    _this.updateVisualState(InputEventType.FocusLeave);
+                };
+            }
             this.updateInputControlAriaLabelledBy();
             return this._outerContainerElement;
         }
+        this.resetDirtyState();
         return undefined;
     };
     Input.prototype.valueChanged = function () {
+        this.getRootElement().updateActionsEnabledState();
         if (this.isValid()) {
             this.resetValidationFailureCue();
         }
@@ -10566,7 +11476,9 @@ var Input = /** @class */ (function (_super) {
         }
     };
     Input.prototype.showValidationErrorMessage = function () {
-        if (this.renderedElement && this.errorMessage && shared_1.GlobalSettings.displayInputValidationErrors) {
+        if (this.renderedElement &&
+            this.errorMessage &&
+            shared_1.GlobalSettings.displayInputValidationErrors) {
             var errorMessageTextBlock = new TextBlock();
             errorMessageTextBlock.setParent(this);
             errorMessageTextBlock.text = this.errorMessage;
@@ -10580,6 +11492,48 @@ var Input = /** @class */ (function (_super) {
             }
         }
     };
+    Object.defineProperty(Input.prototype, "allowRevealOnHoverStyle", {
+        get: function () {
+            return this.hostConfig.inputs && this.hostConfig.inputs.allowRevealOnHoverStyle;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Input.prototype.shouldHideInputAdornersForRevealOnHover = function (input, eventType) {
+        // show/hide input adorners (date picker, time picker, select dropdown picker) with inputStyle RevealOnHover
+        // 1. intial render of card: hide input adorners
+        // 2. mouse hover on the card: show input adorners
+        // 3. mouse hover outside the card: hide input adorners unless input is still in focus state
+        // 4. input loses focus: hide the input adorners unless mouse is still hovering on the card
+        // check if input still has the focus
+        var isInputInFocus = input === document.activeElement;
+        // check if mouse is still on the card
+        var inputHoverClassName = this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onhover");
+        var isMouseOverCard = input.classList.contains(inputHoverClassName);
+        var hideInputAdorners = (eventType === InputEventType.InitialRender) ||
+            (eventType === InputEventType.FocusLeave && !isMouseOverCard) ||
+            (eventType === InputEventType.MouseLeaveOnCard && !isInputInFocus);
+        return hideInputAdorners;
+    };
+    Input.prototype.updateVisualState = function (eventType) {
+        if (!this.allowRevealOnHoverStyle ||
+            !this._renderedInputControlElement ||
+            this.inputStyle !== Enums.InputStyle.RevealOnHover) {
+            return;
+        }
+        if (eventType === InputEventType.InitialRender) {
+            // on initial render, we will show input fields as read only view
+            this._renderedInputControlElement.classList.add(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onrender"));
+        }
+        else if (eventType === InputEventType.MouseEnterOnCard) {
+            // on hover on the card, we will reveal the inputs by showing borders etc
+            // ac-inputStyle-revealOnHover-onhover class is also used to identify if mouse is hovering on the card
+            this._renderedInputControlElement.classList.add(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onhover"));
+        }
+        else if (eventType === InputEventType.MouseLeaveOnCard) {
+            this._renderedInputControlElement.classList.remove(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onhover"));
+        }
+    };
     Input.prototype.focus = function () {
         if (this._renderedInputControlElement) {
             this._renderedInputControlElement.focus();
@@ -10587,6 +11541,12 @@ var Input = /** @class */ (function (_super) {
     };
     Input.prototype.isValid = function () {
         return true;
+    };
+    Input.prototype.isDirty = function () {
+        return this.value !== this._oldValue;
+    };
+    Input.prototype.resetDirtyState = function () {
+        this._oldValue = this.value;
     };
     Input.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
@@ -10615,6 +11575,11 @@ var Input = /** @class */ (function (_super) {
         if (processActions === void 0) { processActions = true; }
         return [this];
     };
+    Input.prototype.render = function () {
+        var result = _super.prototype.render.call(this);
+        this.resetDirtyState();
+        return result;
+    };
     Object.defineProperty(Input.prototype, "isInteractive", {
         get: function () {
             return true;
@@ -10626,15 +11591,68 @@ var Input = /** @class */ (function (_super) {
     Input.labelProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_3, "label", true);
     Input.isRequiredProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_3, "isRequired", false);
     Input.errorMessageProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_3, "errorMessage", true);
+    Input.inputStyleProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_6, "inputStyle", Enums.InputStyle, Enums.InputStyle.Default, [
+        { value: Enums.InputStyle.RevealOnHover },
+        { value: Enums.InputStyle.Default }
+    ]);
+    Input.labelWidthProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_6, "labelWidth", function (sender, prop, source, context) {
+        var result = prop.defaultValue;
+        var value = source[prop.name];
+        var invalidLabelWidth = false;
+        if (typeof value === "number" && !isNaN(value)) {
+            result = new shared_1.SizeAndUnit(value, Enums.SizeUnit.Weight);
+            if (result.physicalSize < 0 || result.physicalSize > 100) {
+                invalidLabelWidth = true;
+            }
+        }
+        else if (typeof value === "string") {
+            try {
+                result = shared_1.SizeAndUnit.parse(value);
+            }
+            catch (e) {
+                invalidLabelWidth = true;
+            }
+        }
+        else {
+            invalidLabelWidth = true;
+        }
+        if (invalidLabelWidth) {
+            context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, strings_1.Strings.errors.invalidInputLabelWidth());
+            result = undefined;
+        }
+        return result;
+    }, function (sender, property, target, value, context) {
+        if (value instanceof shared_1.SizeAndUnit) {
+            if (value.unit === Enums.SizeUnit.Pixel) {
+                context.serializeValue(target, "labelWidth", value.physicalSize + "px");
+            }
+            else {
+                context.serializeNumber(target, "labelWidth", value.physicalSize);
+            }
+        }
+    }, undefined);
+    Input.labelPositionProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_6, "labelPosition", Enums.InputLabelPosition, Enums.InputLabelPosition.Above, [
+        { value: Enums.InputLabelPosition.Inline },
+        { value: Enums.InputLabelPosition.Above }
+    ]);
     __decorate([
-        serialization_1.property(Input.labelProperty)
+        (0, serialization_1.property)(Input.labelProperty)
     ], Input.prototype, "label", void 0);
     __decorate([
-        serialization_1.property(Input.isRequiredProperty)
+        (0, serialization_1.property)(Input.isRequiredProperty)
     ], Input.prototype, "isRequired", void 0);
     __decorate([
-        serialization_1.property(Input.errorMessageProperty)
+        (0, serialization_1.property)(Input.errorMessageProperty)
     ], Input.prototype, "errorMessage", void 0);
+    __decorate([
+        (0, serialization_1.property)(Input.inputStyleProperty)
+    ], Input.prototype, "inputStyle", void 0);
+    __decorate([
+        (0, serialization_1.property)(Input.labelWidthProperty)
+    ], Input.prototype, "labelWidth", void 0);
+    __decorate([
+        (0, serialization_1.property)(Input.labelPositionProperty)
+    ], Input.prototype, "labelPosition", void 0);
     return Input;
 }(CardElement));
 exports.Input = Input;
@@ -10651,7 +11669,7 @@ var TextInput = /** @class */ (function (_super) {
     TextInput.prototype.setupInput = function (input) {
         var _this = this;
         input.style.flex = "1 1 auto";
-        input.tabIndex = 0;
+        input.tabIndex = this.isDesignMode() ? -1 : 0;
         if (this.placeholder) {
             input.placeholder = this.placeholder;
             input.setAttribute("aria-label", this.placeholder);
@@ -10662,10 +11680,15 @@ var TextInput = /** @class */ (function (_super) {
         if (this.maxLength && this.maxLength > 0) {
             input.maxLength = this.maxLength;
         }
-        input.oninput = function () { _this.valueChanged(); };
+        input.oninput = function () {
+            _this.valueChanged();
+        };
         input.onkeypress = function (e) {
             // Ctrl+Enter pressed
-            if (e.ctrlKey && e.code === "Enter" && _this.inlineAction && _this.inlineAction.isEnabled) {
+            if (e.ctrlKey &&
+                e.code === "Enter" &&
+                _this.inlineAction &&
+                _this.inlineAction.isEffectivelyEnabled()) {
                 _this.inlineAction.execute();
             }
         };
@@ -10692,9 +11715,11 @@ var TextInput = /** @class */ (function (_super) {
         var renderedInputControl = _super.prototype.overrideInternalRender.call(this);
         if (this.inlineAction) {
             var button_1 = document.createElement("button");
-            button_1.className = this.hostConfig.makeCssClassName(this.inlineAction.isEnabled ? "ac-inlineActionButton" : "ac-inlineActionButton-disabled");
+            button_1.className = this.hostConfig.makeCssClassName(this.inlineAction.isEffectivelyEnabled()
+                ? "ac-inlineActionButton"
+                : "ac-inlineActionButton-disabled");
             button_1.onclick = function (e) {
-                if (_this.inlineAction && _this.inlineAction.isEnabled) {
+                if (_this.inlineAction && _this.inlineAction.isEffectivelyEnabled()) {
                     e.preventDefault();
                     e.cancelBubble = true;
                     _this.inlineAction.execute();
@@ -10717,15 +11742,22 @@ var TextInput = /** @class */ (function (_super) {
                     button_1.removeChild(icon_1);
                     button_1.classList.remove("iconOnly");
                     button_1.classList.add("textOnly");
-                    button_1.textContent = _this.inlineAction && _this.inlineAction.title ? _this.inlineAction.title : strings_1.Strings.defaults.inlineActionTitle();
+                    button_1.textContent =
+                        _this.inlineAction && _this.inlineAction.title
+                            ? _this.inlineAction.title
+                            : strings_1.Strings.defaults.inlineActionTitle();
                 };
                 icon_1.src = this.inlineAction.iconUrl;
                 button_1.appendChild(icon_1);
-                button_1.title = this.inlineAction.title ? this.inlineAction.title : strings_1.Strings.defaults.inlineActionTitle();
+                button_1.title = this.inlineAction.title
+                    ? this.inlineAction.title
+                    : strings_1.Strings.defaults.inlineActionTitle();
             }
             else {
                 button_1.classList.add("textOnly");
-                button_1.textContent = this.inlineAction.title ? this.inlineAction.title : strings_1.Strings.defaults.inlineActionTitle();
+                button_1.textContent = this.inlineAction.title
+                    ? this.inlineAction.title
+                    : strings_1.Strings.defaults.inlineActionTitle();
             }
             this.inlineAction.setupElementForAccessibility(button_1, true);
             button_1.style.marginLeft = "8px";
@@ -10733,8 +11765,23 @@ var TextInput = /** @class */ (function (_super) {
         }
         return renderedInputControl;
     };
+    TextInput.prototype.updateVisualState = function (eventType) {
+        if (!this.allowRevealOnHoverStyle) {
+            return;
+        }
+        if (!(this.inlineAction || this.isMultiline)) {
+            _super.prototype.updateVisualState.call(this, eventType);
+        }
+    };
     TextInput.prototype.getJsonTypeName = function () {
         return "Input.Text";
+    };
+    TextInput.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        if (this.inlineAction) {
+            result.push(this.inlineAction);
+        }
+        return result;
     };
     TextInput.prototype.getActionById = function (id) {
         var result = _super.prototype.getActionById.call(this, id);
@@ -10783,28 +11830,30 @@ var TextInput = /** @class */ (function (_super) {
         { value: Enums.InputTextStyle.Email },
         { value: Enums.InputTextStyle.Password, targetVersion: serialization_1.Versions.v1_5 }
     ]);
-    TextInput.inlineActionProperty = new ActionProperty(serialization_1.Versions.v1_0, "inlineAction", ["Action.ShowCard"]);
+    TextInput.inlineActionProperty = new ActionProperty(serialization_1.Versions.v1_0, "inlineAction", [
+        "Action.ShowCard"
+    ]);
     TextInput.regexProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_3, "regex", true);
     __decorate([
-        serialization_1.property(TextInput.valueProperty)
+        (0, serialization_1.property)(TextInput.valueProperty)
     ], TextInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(TextInput.maxLengthProperty)
+        (0, serialization_1.property)(TextInput.maxLengthProperty)
     ], TextInput.prototype, "maxLength", void 0);
     __decorate([
-        serialization_1.property(TextInput.isMultilineProperty)
+        (0, serialization_1.property)(TextInput.isMultilineProperty)
     ], TextInput.prototype, "isMultiline", void 0);
     __decorate([
-        serialization_1.property(TextInput.placeholderProperty)
+        (0, serialization_1.property)(TextInput.placeholderProperty)
     ], TextInput.prototype, "placeholder", void 0);
     __decorate([
-        serialization_1.property(TextInput.styleProperty)
+        (0, serialization_1.property)(TextInput.styleProperty)
     ], TextInput.prototype, "style", void 0);
     __decorate([
-        serialization_1.property(TextInput.inlineActionProperty)
+        (0, serialization_1.property)(TextInput.inlineActionProperty)
     ], TextInput.prototype, "inlineAction", void 0);
     __decorate([
-        serialization_1.property(TextInput.regexProperty)
+        (0, serialization_1.property)(TextInput.regexProperty)
     ], TextInput.prototype, "regex", void 0);
     return TextInput;
 }(Input));
@@ -10853,11 +11902,14 @@ var ToggleInput = /** @class */ (function (_super) {
         if (this.isRequired) {
             this._checkboxInputElement.setAttribute("aria-required", "true");
         }
-        this._checkboxInputElement.tabIndex = 0;
-        if (this.defaultValue == this.valueOn) {
+        this._checkboxInputElement.tabIndex = this.isDesignMode() ? -1 : 0;
+        if (this.defaultValue === this.valueOn) {
             this._checkboxInputElement.checked = true;
         }
-        this._checkboxInputElement.onchange = function () { _this.valueChanged(); };
+        this._oldCheckboxValue = this._checkboxInputElement.checked;
+        this._checkboxInputElement.onchange = function () {
+            _this.valueChanged();
+        };
         Utils.appendChild(element, this._checkboxInputElement);
         if (this.title || this.isDesignMode()) {
             var label = new TextBlock();
@@ -10889,6 +11941,8 @@ var ToggleInput = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    ToggleInput.prototype.updateVisualState = function (eventType) {
+    };
     ToggleInput.prototype.getJsonTypeName = function () {
         return "Input.Toggle";
     };
@@ -10902,6 +11956,11 @@ var ToggleInput = /** @class */ (function (_super) {
             return this.value === this.valueOn;
         }
         return this.value ? true : false;
+    };
+    ToggleInput.prototype.isDirty = function () {
+        return this._checkboxInputElement
+            ? this._checkboxInputElement.checked !== this._oldCheckboxValue
+            : false;
     };
     Object.defineProperty(ToggleInput.prototype, "value", {
         get: function () {
@@ -10917,23 +11976,27 @@ var ToggleInput = /** @class */ (function (_super) {
     });
     ToggleInput.valueProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "value");
     ToggleInput.titleProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "title");
-    ToggleInput.valueOnProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "valueOn", true, undefined, "true", function (sender) { return "true"; });
-    ToggleInput.valueOffProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "valueOff", true, undefined, "false", function (sender) { return "false"; });
+    ToggleInput.valueOnProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "valueOn", true, undefined, "true", function (sender) {
+        return "true";
+    });
+    ToggleInput.valueOffProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "valueOff", true, undefined, "false", function (sender) {
+        return "false";
+    });
     ToggleInput.wrapProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_2, "wrap", false);
     __decorate([
-        serialization_1.property(ToggleInput.valueProperty)
+        (0, serialization_1.property)(ToggleInput.valueProperty)
     ], ToggleInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(ToggleInput.titleProperty)
+        (0, serialization_1.property)(ToggleInput.titleProperty)
     ], ToggleInput.prototype, "title", void 0);
     __decorate([
-        serialization_1.property(ToggleInput.valueOnProperty)
+        (0, serialization_1.property)(ToggleInput.valueOnProperty)
     ], ToggleInput.prototype, "valueOn", void 0);
     __decorate([
-        serialization_1.property(ToggleInput.valueOffProperty)
+        (0, serialization_1.property)(ToggleInput.valueOffProperty)
     ], ToggleInput.prototype, "valueOff", void 0);
     __decorate([
-        serialization_1.property(ToggleInput.wrapProperty)
+        (0, serialization_1.property)(ToggleInput.wrapProperty)
     ], ToggleInput.prototype, "wrap", void 0);
     return ToggleInput;
 }(Input));
@@ -10954,14 +12017,48 @@ var Choice = /** @class */ (function (_super) {
     Choice.titleProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "title");
     Choice.valueProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "value");
     __decorate([
-        serialization_1.property(Choice.titleProperty)
+        (0, serialization_1.property)(Choice.titleProperty)
     ], Choice.prototype, "title", void 0);
     __decorate([
-        serialization_1.property(Choice.valueProperty)
+        (0, serialization_1.property)(Choice.valueProperty)
     ], Choice.prototype, "value", void 0);
     return Choice;
 }(serialization_1.SerializableObject));
 exports.Choice = Choice;
+/**
+ * DataQuery class is declared later in the file and derives from subsequent base classes
+ * Hence, it cannot be used in ChoiceSetInput.
+ * Refactor is needed to separate elements and actions in separate files.
+ */
+var ChoiceSetInputDataQuery = /** @class */ (function (_super) {
+    __extends(ChoiceSetInputDataQuery, _super);
+    function ChoiceSetInputDataQuery() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    //#endregion
+    ChoiceSetInputDataQuery.prototype.getSchemaKey = function () {
+        return "choices.data";
+    };
+    //#region Schema
+    ChoiceSetInputDataQuery.typeProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_6, "type", true, new RegExp("^Data.Query$"));
+    ChoiceSetInputDataQuery.datasetProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_6, "dataset");
+    ChoiceSetInputDataQuery.countProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "count");
+    ChoiceSetInputDataQuery.skipProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "skip");
+    __decorate([
+        (0, serialization_1.property)(ChoiceSetInputDataQuery.typeProperty)
+    ], ChoiceSetInputDataQuery.prototype, "type", void 0);
+    __decorate([
+        (0, serialization_1.property)(ChoiceSetInputDataQuery.datasetProperty)
+    ], ChoiceSetInputDataQuery.prototype, "dataset", void 0);
+    __decorate([
+        (0, serialization_1.property)(ChoiceSetInputDataQuery.countProperty)
+    ], ChoiceSetInputDataQuery.prototype, "count", void 0);
+    __decorate([
+        (0, serialization_1.property)(ChoiceSetInputDataQuery.skipProperty)
+    ], ChoiceSetInputDataQuery.prototype, "skip", void 0);
+    return ChoiceSetInputDataQuery;
+}(serialization_1.SerializableObject));
+exports.ChoiceSetInputDataQuery = ChoiceSetInputDataQuery;
 var ChoiceSetInput = /** @class */ (function (_super) {
     __extends(ChoiceSetInput, _super);
     function ChoiceSetInput() {
@@ -10983,21 +12080,61 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         configurable: true
     });
     ChoiceSetInput.getUniqueCategoryName = function () {
-        var uniqueCategoryName = "__ac-category" + ChoiceSetInput.uniqueCategoryCounter;
-        ChoiceSetInput.uniqueCategoryCounter++;
+        var uniqueCategoryName = "__ac-category" + ChoiceSetInput._uniqueCategoryCounter;
+        ChoiceSetInput._uniqueCategoryCounter++;
         return uniqueCategoryName;
+    };
+    ChoiceSetInput.prototype.isDynamicTypeahead = function () {
+        return (!!this.choicesData &&
+            !!this.choicesData.dataset &&
+            this.choicesData.type === "Data.Query");
+    };
+    ChoiceSetInput.prototype.getFilterForDynamicSearch = function () {
+        var _a, _b;
+        return (_b = (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.textInput) === null || _b === void 0 ? void 0 : _b.value;
+    };
+    ChoiceSetInput.prototype.renderChoices = function (fetchedChoices) {
+        var _a;
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.processResponse(fetchedChoices);
+    };
+    ChoiceSetInput.prototype.showLoadingIndicator = function () {
+        var _a;
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.showLoadingIndicator();
+    };
+    ChoiceSetInput.prototype.removeLoadingIndicator = function () {
+        var _a;
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.removeLoadingIndicator();
+    };
+    ChoiceSetInput.prototype.showErrorIndicator = function (error) {
+        var _a;
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.showErrorIndicator(error);
+    };
+    ChoiceSetInput.prototype.createPlaceholderOptionWhenValueDoesNotExist = function () {
+        if (!this.value) {
+            var placeholderOption = document.createElement("option");
+            placeholderOption.selected = true;
+            placeholderOption.disabled = true;
+            placeholderOption.hidden = true;
+            placeholderOption.value = "";
+            if (this.placeholder) {
+                placeholderOption.text = this.placeholder;
+            }
+            return placeholderOption;
+        }
+        return undefined;
     };
     // Make sure `aria-current` is applied to the currently-selected item
     ChoiceSetInput.prototype.internalApplyAriaCurrent = function () {
         if (this._selectElement) {
             var options = this._selectElement.options;
             if (options) {
-                for (var i = 0; i < options.length; i++) {
-                    if (options[i].selected) {
-                        options[i].setAttribute("aria-current", "true");
+                for (var _i = 0, _a = Array.from(options); _i < _a.length; _i++) {
+                    var option = _a[_i];
+                    if (option.selected) {
+                        option.setAttribute("aria-current", "true");
                     }
                     else {
-                        options[i].removeAttribute("aria-current");
+                        option.removeAttribute("aria-current");
                     }
                 }
             }
@@ -11008,6 +12145,7 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         var element = document.createElement("div");
         element.className = this.hostConfig.makeCssClassName("ac-input", cssClassName);
         element.style.width = "100%";
+        element.tabIndex = this.isDesignMode() ? -1 : 0;
         this._toggleInputs = [];
         this._labels = [];
         for (var _i = 0, _a = this.choices; _i < _a.length; _i++) {
@@ -11023,6 +12161,7 @@ var ChoiceSetInput = /** @class */ (function (_super) {
             if (this.isRequired) {
                 input.setAttribute("aria-required", "true");
             }
+            input.tabIndex = this.isDesignMode() ? -1 : 0;
             if (choice.value) {
                 input.value = choice.value;
             }
@@ -11034,7 +12173,9 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                     input.checked = true;
                 }
             }
-            input.onchange = function () { _this.valueChanged(); };
+            input.onchange = function () {
+                _this.valueChanged();
+            };
             this._toggleInputs.push(input);
             var compoundInput = document.createElement("div");
             compoundInput.style.display = "flex";
@@ -11065,7 +12206,9 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         return element;
     };
     ChoiceSetInput.prototype.updateInputControlAriaLabelledBy = function () {
-        if ((this.isMultiSelect || this.style === "expanded") && this._toggleInputs && this._labels) {
+        if ((this.isMultiSelect || this.style === "expanded") &&
+            this._toggleInputs &&
+            this._labels) {
             var labelIds = this.getAllLabelIds();
             for (var i = 0; i < this._toggleInputs.length; i++) {
                 var joinedLabelIds = labelIds.join(" ");
@@ -11088,9 +12231,47 @@ var ChoiceSetInput = /** @class */ (function (_super) {
     ChoiceSetInput.prototype.internalRender = function () {
         var _this = this;
         this._uniqueCategoryName = ChoiceSetInput.getUniqueCategoryName();
-        if (this.isMultiSelect) {
+        if (this.isDynamicTypeahead()) {
+            var filteredChoiceSet_1 = new FilteredChoiceSet(ChoiceSetInput._uniqueCategoryCounter, this.choices, this.hostConfig);
+            filteredChoiceSet_1.render();
+            if (filteredChoiceSet_1.textInput) {
+                this._textInput = filteredChoiceSet_1.textInput;
+                if (this.defaultValue) {
+                    this._textInput.value = this.defaultValue;
+                }
+                if (this.placeholder && !this._textInput.value) {
+                    this._textInput.placeholder = this.placeholder;
+                    this._textInput.setAttribute("aria-label", this.placeholder);
+                }
+                this._textInput.tabIndex = this.isDesignMode() ? -1 : 0;
+                var onInputChangeEventHandler = Utils.debounce(function () {
+                    filteredChoiceSet_1.processStaticChoices();
+                    _this.valueChanged();
+                    if (_this._textInput) {
+                        // Remove aria-label when value is not empty so narration software doesn't
+                        // read the placeholder
+                        if (_this.value) {
+                            _this._textInput.removeAttribute("placeholder");
+                            _this._textInput.removeAttribute("aria-label");
+                        }
+                        else if (_this.placeholder) {
+                            _this._textInput.placeholder = _this.placeholder;
+                            _this._textInput.setAttribute("aria-label", _this.placeholder);
+                        }
+                    }
+                }, this.hostConfig.inputs.debounceTimeInMilliSeconds);
+                this._textInput.onclick = onInputChangeEventHandler;
+                this._textInput.oninput = onInputChangeEventHandler;
+            }
+            filteredChoiceSet_1.parent = this;
+            this._filteredChoiceSet = filteredChoiceSet_1;
+            return filteredChoiceSet_1.renderedElement;
+        }
+        else if (this.isMultiSelect) {
             // Render as a list of toggle inputs
-            return this.renderCompoundInput("ac-choiceSetInput-multiSelect", "checkbox", this.defaultValue ? this.defaultValue.split(this.hostConfig.choiceSetInputValueSeparator) : undefined);
+            return this.renderCompoundInput("ac-choiceSetInput-multiSelect", "checkbox", this.defaultValue
+                ? this.defaultValue.split(this.hostConfig.choiceSetInputValueSeparator)
+                : undefined);
         }
         else {
             if (this.style === "expanded") {
@@ -11127,6 +12308,7 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                     this._textInput.placeholder = this.placeholder;
                     this._textInput.setAttribute("aria-label", this.placeholder);
                 }
+                this._textInput.tabIndex = this.isDesignMode() ? -1 : 0;
                 var dataList = document.createElement("datalist");
                 dataList.id = Utils.generateUniqueId();
                 for (var _i = 0, _a = this.choices; _i < _a.length; _i++) {
@@ -11134,8 +12316,11 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                     var option = document.createElement("option");
                     // To fix https://stackoverflow.com/questions/29882361/show-datalist-labels-but-submit-the-actual-value
                     // value is mapped to choice.title other than choice.value
-                    option.value = choice.title;
-                    option.setAttribute("aria-label", choice.title);
+                    if (choice.title) {
+                        option.value = choice.title;
+                        option.setAttribute("aria-label", choice.title);
+                    }
+                    option.tabIndex = this.isDesignMode() ? -1 : 0;
                     dataList.appendChild(option);
                 }
                 this._textInput.setAttribute("list", dataList.id);
@@ -11147,25 +12332,22 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                 this._selectElement = document.createElement("select");
                 this._selectElement.className = this.hostConfig.makeCssClassName("ac-input", "ac-multichoiceInput", "ac-choiceSetInput-compact");
                 this._selectElement.style.width = "100%";
-                var option = document.createElement("option");
-                option.selected = true;
-                option.disabled = true;
-                option.hidden = true;
-                option.value = "";
-                if (this.placeholder) {
-                    option.text = this.placeholder;
-                }
-                Utils.appendChild(this._selectElement, option);
+                this._selectElement.tabIndex = this.isDesignMode() ? -1 : 0;
+                var placeholderOption = this.createPlaceholderOptionWhenValueDoesNotExist();
+                Utils.appendChild(this._selectElement, placeholderOption);
                 for (var _b = 0, _c = this.choices; _b < _c.length; _b++) {
                     var choice = _c[_b];
-                    var option_1 = document.createElement("option");
-                    option_1.value = choice.value;
-                    option_1.text = choice.title;
-                    option_1.setAttribute("aria-label", choice.title);
-                    if (choice.value == this.defaultValue) {
-                        option_1.selected = true;
+                    var option = document.createElement("option");
+                    option.value = choice.value;
+                    if (choice.title) {
+                        option.text = choice.title;
+                        option.setAttribute("aria-label", choice.title);
                     }
-                    Utils.appendChild(this._selectElement, option_1);
+                    option.tabIndex = this.isDesignMode() ? -1 : 0;
+                    if (choice.value === this.defaultValue) {
+                        option.selected = true;
+                    }
+                    Utils.appendChild(this._selectElement, option);
                 }
                 this._selectElement.onchange = function () {
                     _this.internalApplyAriaCurrent();
@@ -11173,6 +12355,25 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                 };
                 this.internalApplyAriaCurrent();
                 return this._selectElement;
+            }
+        }
+    };
+    ChoiceSetInput.prototype.updateVisualState = function (eventType) {
+        if (!this.allowRevealOnHoverStyle) {
+            return;
+        }
+        if (!this.isMultiSelect && this.isCompact) {
+            _super.prototype.updateVisualState.call(this, eventType);
+            if (this._selectElement && this.inputStyle === Enums.InputStyle.RevealOnHover) {
+                var hideDropDownPicker = this.shouldHideInputAdornersForRevealOnHover(this._selectElement, eventType);
+                if (hideDropDownPicker) {
+                    this._selectElement.style.appearance = "none";
+                    this._selectElement.classList.remove(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+                }
+                else {
+                    this._selectElement.style.appearance = "auto";
+                    this._selectElement.classList.add(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+                }
             }
         }
     };
@@ -11194,7 +12395,7 @@ var ChoiceSetInput = /** @class */ (function (_super) {
     };
     ChoiceSetInput.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
-        if (this.choices.length == 0) {
+        if (this.choices.length === 0) {
             context.addFailure(this, Enums.ValidationEvent.CollectionCantBeEmpty, strings_1.Strings.errors.choiceSetMustHaveAtLeastOneChoice());
         }
         for (var _i = 0, _a = this.choices; _i < _a.length; _i++) {
@@ -11218,6 +12419,14 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                     return true;
                 }
             }
+            if (this.dynamicChoices) {
+                for (var _b = 0, _c = this.dynamicChoices; _b < _c.length; _b++) {
+                    var choice = _c[_b];
+                    if (this.value === choice) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
         return _super.prototype.isValid.call(this);
@@ -11226,7 +12435,9 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         get: function () {
             if (!this.isMultiSelect) {
                 if (this._selectElement) {
-                    return this._selectElement.selectedIndex > 0 ? this._selectElement.value : undefined;
+                    return this._selectElement.selectedIndex > 0
+                        ? this._selectElement.value
+                        : undefined;
                 }
                 else if (this._textInput) {
                     for (var _i = 0, _a = this.choices; _i < _a.length; _i++) {
@@ -11248,14 +12459,14 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                 return undefined;
             }
             else {
-                if (!this._toggleInputs || this._toggleInputs.length == 0) {
+                if (!this._toggleInputs || this._toggleInputs.length === 0) {
                     return undefined;
                 }
                 var result = "";
-                for (var _d = 0, _e = this._toggleInputs; _d < _e.length; _d++) {
-                    var toggleInput = _e[_d];
+                for (var _d = 0, _f = this._toggleInputs; _d < _f.length; _d++) {
+                    var toggleInput = _f[_d];
                     if (toggleInput.checked) {
-                        if (result != "") {
+                        if (result !== "") {
                             result += this.hostConfig.choiceSetInputValueSeparator;
                         }
                         result += toggleInput.value;
@@ -11267,8 +12478,17 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(ChoiceSetInput.prototype, "dynamicChoices", {
+        get: function () {
+            var _a;
+            return (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.dynamicChoices;
+        },
+        enumerable: false,
+        configurable: true
+    });
     ChoiceSetInput.valueProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "value");
     ChoiceSetInput.choicesProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_0, "choices", Choice);
+    ChoiceSetInput.choicesDataProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_6, "choices.data", ChoiceSetInputDataQuery);
     ChoiceSetInput.styleProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_0, "style", [
         { value: "compact" },
         { value: "expanded" },
@@ -11278,28 +12498,253 @@ var ChoiceSetInput = /** @class */ (function (_super) {
     ChoiceSetInput.placeholderProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "placeholder");
     ChoiceSetInput.wrapProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_2, "wrap", false);
     //#endregion
-    ChoiceSetInput.uniqueCategoryCounter = 0;
+    ChoiceSetInput._uniqueCategoryCounter = 0;
     __decorate([
-        serialization_1.property(ChoiceSetInput.valueProperty)
+        (0, serialization_1.property)(ChoiceSetInput.valueProperty)
     ], ChoiceSetInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(ChoiceSetInput.styleProperty)
+        (0, serialization_1.property)(ChoiceSetInput.styleProperty)
     ], ChoiceSetInput.prototype, "style", void 0);
     __decorate([
-        serialization_1.property(ChoiceSetInput.isMultiSelectProperty)
+        (0, serialization_1.property)(ChoiceSetInput.isMultiSelectProperty)
     ], ChoiceSetInput.prototype, "isMultiSelect", void 0);
     __decorate([
-        serialization_1.property(ChoiceSetInput.placeholderProperty)
+        (0, serialization_1.property)(ChoiceSetInput.placeholderProperty)
     ], ChoiceSetInput.prototype, "placeholder", void 0);
     __decorate([
-        serialization_1.property(ChoiceSetInput.wrapProperty)
+        (0, serialization_1.property)(ChoiceSetInput.wrapProperty)
     ], ChoiceSetInput.prototype, "wrap", void 0);
     __decorate([
-        serialization_1.property(ChoiceSetInput.choicesProperty)
+        (0, serialization_1.property)(ChoiceSetInput.choicesProperty)
     ], ChoiceSetInput.prototype, "choices", void 0);
+    __decorate([
+        (0, serialization_1.property)(ChoiceSetInput.choicesDataProperty)
+    ], ChoiceSetInput.prototype, "choicesData", void 0);
     return ChoiceSetInput;
 }(Input));
 exports.ChoiceSetInput = ChoiceSetInput;
+var FilteredChoiceSet = /** @class */ (function () {
+    function FilteredChoiceSet(choiceSetId, choices, hostConfig) {
+        this._choiceSetId = choiceSetId;
+        this._choices = choices;
+        this._dynamicChoices = [];
+        this._visibleChoiceCount = 0;
+        this._hostConfig = hostConfig;
+    }
+    FilteredChoiceSet.prototype.render = function () {
+        var _this = this;
+        var choiceSetContainer = document.createElement("div");
+        choiceSetContainer.style.position = "relative";
+        choiceSetContainer.style.width = "100%";
+        this._textInput = document.createElement("input");
+        this._textInput.className = this.hostConfig.makeCssClassName("ac-input", "ac-multichoiceInput", "ac-choiceSetInput-filtered");
+        this._textInput.type = "text";
+        this._textInput.style.width = "100%";
+        this._textInput.onkeydown = function (event) {
+            if (event.key === "ArrowDown") {
+                _this.focusChoice(0);
+            }
+        };
+        this._dropdown = document.createElement("div");
+        this._dropdown.style.display = "none";
+        this._dropdown.className = this.hostConfig.makeCssClassName("ac-input", "ac-multichoiceInput", "ac-choiceSetInput-filtered-dropdown");
+        choiceSetContainer.append(this._textInput, this._dropdown);
+        document.onclick = function (event) {
+            if (_this._dropdown) {
+                var child = _this._dropdown.firstChild;
+                while (child && event.target !== child) {
+                    child = child.nextSibling;
+                }
+                // Dropdown closes if user clicks outside the choiceset.
+                if (child || !(event.target === _this._textInput)) {
+                    _this._dropdown.style.display = "none";
+                }
+            }
+        };
+        this._renderedElement = choiceSetContainer;
+    };
+    FilteredChoiceSet.prototype.createChoice = function (value, filter, id) {
+        var _this = this;
+        var choice = document.createElement("span");
+        choice.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-choice");
+        choice.id = "ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id);
+        choice.innerHTML = value.replace(filter, "<b>".concat(filter, "</b>"));
+        choice.tabIndex = -1;
+        choice.addEventListener("focusin", function () {
+            choice.classList.add("focused");
+        });
+        choice.addEventListener("focusout", function () {
+            choice.classList.remove("focused");
+        });
+        choice.onclick = function () {
+            if (_this._textInput) {
+                _this._textInput.value = choice.innerText;
+            }
+            if (_this._dropdown) {
+                _this._dropdown.style.display = "none";
+            }
+        };
+        choice.onkeydown = function (event) {
+            if (event.key === "ArrowDown") {
+                _this.focusChoice(id + 1);
+            }
+            else if (event.key === "ArrowUp") {
+                _this.focusChoice(id - 1);
+            }
+            else if (event.key === "Enter") {
+                choice.click();
+            }
+        };
+        choice.onmouseover = function () {
+            _this.focusChoice(id);
+        };
+        return choice;
+    };
+    FilteredChoiceSet.prototype.focusChoice = function (id) {
+        var choice = document.getElementById("ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id));
+        if (choice) {
+            choice.focus();
+        }
+        else if (this._textInput) {
+            this._textInput.focus();
+            var textLength = this._textInput.value.length;
+            this._textInput.setSelectionRange(textLength, textLength);
+        }
+    };
+    FilteredChoiceSet.prototype.filterChoices = function (isDynamic) {
+        var _a, _b;
+        var filter = (_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value.toLowerCase();
+        if (filter) {
+            var choices = isDynamic ? this._dynamicChoices : this._choices;
+            for (var _i = 0, choices_1 = choices; _i < choices_1.length; _i++) {
+                var choice = choices_1[_i];
+                if (choice.title) {
+                    var matchIndex = choice.title.toLowerCase().indexOf(filter);
+                    if (matchIndex !== -1) {
+                        var matchedText = choice.title.substring(matchIndex, matchIndex + filter.length);
+                        var choiceContainer = this.createChoice(choice.title, matchedText, this._visibleChoiceCount++);
+                        (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.appendChild(choiceContainer);
+                    }
+                }
+            }
+        }
+    };
+    FilteredChoiceSet.prototype.getStatusIndicator = function (error) {
+        if (error) {
+            if (!this._errorIndicator) {
+                var errorIndicator = document.createElement("div");
+                errorIndicator.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-statusIndicator", "ac-choiceSetInput-errorIndicator");
+                this._errorIndicator = errorIndicator;
+            }
+            this._errorIndicator.innerText = error;
+            return this._errorIndicator;
+        }
+        else {
+            if (!this._loadingIndicator) {
+                var loadingIndicator = document.createElement("div");
+                loadingIndicator.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-statusIndicator");
+                this._loadingIndicator = loadingIndicator;
+            }
+            this._loadingIndicator.innerText =
+                this._visibleChoiceCount === 0 ? "Loading..." : "Loading more...";
+            return this._loadingIndicator;
+        }
+    };
+    FilteredChoiceSet.prototype.resetDropdown = function () {
+        this._dynamicChoices = [];
+        if (this._dropdown) {
+            Utils.clearElementChildren(this._dropdown);
+            this._visibleChoiceCount = 0;
+        }
+    };
+    FilteredChoiceSet.prototype.showDropdown = function () {
+        var _a;
+        if ((_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.hasChildNodes) {
+            this._dropdown.style.display = "block";
+        }
+    };
+    FilteredChoiceSet.prototype.processStaticChoices = function () {
+        this.resetDropdown();
+        this.filterChoices();
+        this.showDropdown();
+    };
+    FilteredChoiceSet.prototype.processResponse = function (fetchedChoices) {
+        this._dynamicChoices = fetchedChoices;
+        this.filterChoices(true);
+        if (this._visibleChoiceCount === 0) {
+            this.showErrorIndicator("No results found.");
+        }
+    };
+    FilteredChoiceSet.prototype.showLoadingIndicator = function () {
+        var _a;
+        var loadingIndicator = this.getStatusIndicator();
+        (_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.appendChild(loadingIndicator);
+        this.showDropdown();
+    };
+    FilteredChoiceSet.prototype.removeLoadingIndicator = function () {
+        var _a, _b;
+        if (this._loadingIndicator && ((_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.contains(this._loadingIndicator))) {
+            (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.removeChild(this._loadingIndicator);
+        }
+    };
+    FilteredChoiceSet.prototype.showErrorIndicator = function (error) {
+        var _a;
+        this.removeLoadingIndicator();
+        var errorIndicator = this.getStatusIndicator(error);
+        (_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.appendChild(errorIndicator);
+    };
+    Object.defineProperty(FilteredChoiceSet.prototype, "dynamicChoices", {
+        get: function () {
+            var _a;
+            return (_a = this._dynamicChoices) === null || _a === void 0 ? void 0 : _a.map(function (choice) { return choice.title; });
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(FilteredChoiceSet.prototype, "hostConfig", {
+        get: function () {
+            if (this._hostConfig) {
+                return this._hostConfig;
+            }
+            else {
+                if (this.parent) {
+                    return this.parent.hostConfig;
+                }
+                else {
+                    return host_config_1.defaultHostConfig;
+                }
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(FilteredChoiceSet.prototype, "parent", {
+        get: function () {
+            return this._parent;
+        },
+        set: function (value) {
+            this._parent = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(FilteredChoiceSet.prototype, "renderedElement", {
+        get: function () {
+            return this._renderedElement;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(FilteredChoiceSet.prototype, "textInput", {
+        get: function () {
+            return this._textInput;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return FilteredChoiceSet;
+}());
+exports.FilteredChoiceSet = FilteredChoiceSet;
 var NumberInput = /** @class */ (function (_super) {
     __extends(NumberInput, _super);
     function NumberInput() {
@@ -11317,7 +12762,7 @@ var NumberInput = /** @class */ (function (_super) {
         }
         this._numberInputElement.className = this.hostConfig.makeCssClassName("ac-input", "ac-numberInput");
         this._numberInputElement.style.width = "100%";
-        this._numberInputElement.tabIndex = 0;
+        this._numberInputElement.tabIndex = this.isDesignMode() ? -1 : 0;
         if (this.defaultValue !== undefined) {
             this._numberInputElement.valueAsNumber = this.defaultValue;
         }
@@ -11325,7 +12770,9 @@ var NumberInput = /** @class */ (function (_super) {
             this._numberInputElement.placeholder = this.placeholder;
             this._numberInputElement.setAttribute("aria-label", this.placeholder);
         }
-        this._numberInputElement.oninput = function () { _this.valueChanged(); };
+        this._numberInputElement.oninput = function () {
+            _this.valueChanged();
+        };
         return this._numberInputElement;
     };
     NumberInput.prototype.getJsonTypeName = function () {
@@ -11340,16 +12787,21 @@ var NumberInput = /** @class */ (function (_super) {
         }
         var result = true;
         if (this.min !== undefined) {
-            result = result && (this.value >= this.min);
+            result = result && this.value >= this.min;
         }
         if (this.max !== undefined) {
-            result = result && (this.value <= this.max);
+            result = result && this.value <= this.max;
         }
         return result;
     };
     Object.defineProperty(NumberInput.prototype, "value", {
         get: function () {
             return this._numberInputElement ? this._numberInputElement.valueAsNumber : undefined;
+        },
+        set: function (value) {
+            if (value && this._numberInputElement) {
+                this._numberInputElement.value = value.toString();
+            }
         },
         enumerable: false,
         configurable: true
@@ -11360,16 +12812,16 @@ var NumberInput = /** @class */ (function (_super) {
     NumberInput.minProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_0, "min");
     NumberInput.maxProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_0, "max");
     __decorate([
-        serialization_1.property(NumberInput.valueProperty)
+        (0, serialization_1.property)(NumberInput.valueProperty)
     ], NumberInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(NumberInput.minProperty)
+        (0, serialization_1.property)(NumberInput.minProperty)
     ], NumberInput.prototype, "min", void 0);
     __decorate([
-        serialization_1.property(NumberInput.maxProperty)
+        (0, serialization_1.property)(NumberInput.maxProperty)
     ], NumberInput.prototype, "max", void 0);
     __decorate([
-        serialization_1.property(NumberInput.placeholderProperty)
+        (0, serialization_1.property)(NumberInput.placeholderProperty)
     ], NumberInput.prototype, "placeholder", void 0);
     return NumberInput;
 }(Input));
@@ -11393,13 +12845,32 @@ var DateInput = /** @class */ (function (_super) {
             this._dateInputElement.placeholder = this.placeholder;
             this._dateInputElement.setAttribute("aria-label", this.placeholder);
         }
+        this._dateInputElement.tabIndex = this.isDesignMode() ? -1 : 0;
         this._dateInputElement.className = this.hostConfig.makeCssClassName("ac-input", "ac-dateInput");
         this._dateInputElement.style.width = "100%";
-        this._dateInputElement.oninput = function () { _this.valueChanged(); };
+        this._dateInputElement.oninput = function () {
+            _this.valueChanged();
+        };
         if (this.defaultValue) {
             this._dateInputElement.value = this.defaultValue;
         }
         return this._dateInputElement;
+    };
+    DateInput.prototype.updateVisualState = function (eventType) {
+        if (!this.allowRevealOnHoverStyle) {
+            return;
+        }
+        _super.prototype.updateVisualState.call(this, eventType);
+        if (this._dateInputElement && this.inputStyle === Enums.InputStyle.RevealOnHover) {
+            var hideDatePicker = this.shouldHideInputAdornersForRevealOnHover(this._dateInputElement, eventType);
+            if (hideDatePicker) {
+                this._dateInputElement.classList.remove(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+            }
+            else {
+                this._dateInputElement.classList.add(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+            }
+            updateInputAdornersVisibility(this._dateInputElement, hideDatePicker /*hide*/);
+        }
     };
     DateInput.prototype.getJsonTypeName = function () {
         return "Input.Date";
@@ -11415,11 +12886,11 @@ var DateInput = /** @class */ (function (_super) {
         var result = true;
         if (this.min) {
             var minDate = new Date(this.min);
-            result = result && (valueAsDate >= minDate);
+            result = result && valueAsDate >= minDate;
         }
         if (this.max) {
             var maxDate = new Date(this.max);
-            result = result && (valueAsDate <= maxDate);
+            result = result && valueAsDate <= maxDate;
         }
         return result;
     };
@@ -11436,16 +12907,16 @@ var DateInput = /** @class */ (function (_super) {
     DateInput.minProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "min");
     DateInput.maxProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "max");
     __decorate([
-        serialization_1.property(DateInput.valueProperty)
+        (0, serialization_1.property)(DateInput.valueProperty)
     ], DateInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(DateInput.minProperty)
+        (0, serialization_1.property)(DateInput.minProperty)
     ], DateInput.prototype, "min", void 0);
     __decorate([
-        serialization_1.property(DateInput.maxProperty)
+        (0, serialization_1.property)(DateInput.maxProperty)
     ], DateInput.prototype, "max", void 0);
     __decorate([
-        serialization_1.property(DateInput.placeholderProperty)
+        (0, serialization_1.property)(DateInput.placeholderProperty)
     ], DateInput.prototype, "placeholder", void 0);
     return DateInput;
 }(Input));
@@ -11453,14 +12924,14 @@ exports.DateInput = DateInput;
 var TimeProperty = /** @class */ (function (_super) {
     __extends(TimeProperty, _super);
     function TimeProperty(targetVersion, name) {
-        var _this = _super.call(this, targetVersion, name, function (sender, property, source, context) {
-            var value = source[property.name];
+        var _this = _super.call(this, targetVersion, name, function (sender, prop, source, context) {
+            var value = source[prop.name];
             if (typeof value === "string" && value && /^[0-9]{2}:[0-9]{2}$/.test(value)) {
                 return value;
             }
             return undefined;
-        }, function (sender, property, target, value, context) {
-            context.serializeValue(target, property.name, value);
+        }, function (sender, prop, target, value, context) {
+            context.serializeValue(target, prop.name, value);
         }) || this;
         _this.targetVersion = targetVersion;
         _this.name = name;
@@ -11481,19 +12952,42 @@ var TimeInput = /** @class */ (function (_super) {
         var _this = this;
         this._timeInputElement = document.createElement("input");
         this._timeInputElement.setAttribute("type", "time");
-        this._timeInputElement.setAttribute("min", this.min);
-        this._timeInputElement.setAttribute("max", this.max);
+        if (this.min) {
+            this._timeInputElement.setAttribute("min", this.min);
+        }
+        if (this.max) {
+            this._timeInputElement.setAttribute("max", this.max);
+        }
         this._timeInputElement.className = this.hostConfig.makeCssClassName("ac-input", "ac-timeInput");
         this._timeInputElement.style.width = "100%";
-        this._timeInputElement.oninput = function () { _this.valueChanged(); };
+        this._timeInputElement.oninput = function () {
+            _this.valueChanged();
+        };
         if (this.placeholder) {
             this._timeInputElement.placeholder = this.placeholder;
             this._timeInputElement.setAttribute("aria-label", this.placeholder);
         }
+        this._timeInputElement.tabIndex = this.isDesignMode() ? -1 : 0;
         if (this.defaultValue) {
             this._timeInputElement.value = this.defaultValue;
         }
         return this._timeInputElement;
+    };
+    TimeInput.prototype.updateVisualState = function (eventType) {
+        if (!this.allowRevealOnHoverStyle) {
+            return;
+        }
+        _super.prototype.updateVisualState.call(this, eventType);
+        if (this._timeInputElement && this.inputStyle === Enums.InputStyle.RevealOnHover) {
+            var hideTimePicker = this.shouldHideInputAdornersForRevealOnHover(this._timeInputElement, eventType);
+            if (hideTimePicker) {
+                this._timeInputElement.classList.remove(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+            }
+            else {
+                this._timeInputElement.classList.add(this.hostConfig.makeCssClassName("ac-inputStyle-revealOnHover-onfocus"));
+            }
+            updateInputAdornersVisibility(this._timeInputElement, hideTimePicker /*hide*/);
+        }
     };
     TimeInput.prototype.getJsonTypeName = function () {
         return "Input.Time";
@@ -11509,11 +13003,11 @@ var TimeInput = /** @class */ (function (_super) {
         var result = true;
         if (this.min) {
             var minDate = TimeInput.convertTimeStringToDate(this.min);
-            result = result && (valueAsDate >= minDate);
+            result = result && valueAsDate >= minDate;
         }
         if (this.max) {
             var maxDate = TimeInput.convertTimeStringToDate(this.max);
-            result = result && (valueAsDate <= maxDate);
+            result = result && valueAsDate <= maxDate;
         }
         return result;
     };
@@ -11530,16 +13024,16 @@ var TimeInput = /** @class */ (function (_super) {
     TimeInput.minProperty = new TimeProperty(serialization_1.Versions.v1_0, "min");
     TimeInput.maxProperty = new TimeProperty(serialization_1.Versions.v1_0, "max");
     __decorate([
-        serialization_1.property(TimeInput.valueProperty)
+        (0, serialization_1.property)(TimeInput.valueProperty)
     ], TimeInput.prototype, "defaultValue", void 0);
     __decorate([
-        serialization_1.property(TimeInput.minProperty)
+        (0, serialization_1.property)(TimeInput.minProperty)
     ], TimeInput.prototype, "min", void 0);
     __decorate([
-        serialization_1.property(TimeInput.maxProperty)
+        (0, serialization_1.property)(TimeInput.maxProperty)
     ], TimeInput.prototype, "max", void 0);
     __decorate([
-        serialization_1.property(TimeInput.placeholderProperty)
+        (0, serialization_1.property)(TimeInput.placeholderProperty)
     ], TimeInput.prototype, "placeholder", void 0);
     return TimeInput;
 }(Input));
@@ -11563,7 +13057,8 @@ var Action = /** @class */ (function (_super) {
             var titleElement = document.createElement("div");
             titleElement.style.overflow = "hidden";
             titleElement.style.textOverflow = "ellipsis";
-            if (!(hostConfig.actions.iconPlacement == Enums.ActionIconPlacement.AboveTitle || hostConfig.actions.allowTitleToWrap)) {
+            if (!(hostConfig.actions.iconPlacement === Enums.ActionIconPlacement.AboveTitle ||
+                hostConfig.actions.allowTitleToWrap)) {
                 titleElement.style.whiteSpace = "nowrap";
             }
             if (this.title) {
@@ -11579,7 +13074,7 @@ var Action = /** @class */ (function (_super) {
                 iconElement.style.width = hostConfig.actions.iconSize + "px";
                 iconElement.style.height = hostConfig.actions.iconSize + "px";
                 iconElement.style.flex = "0 0 auto";
-                if (hostConfig.actions.iconPlacement == Enums.ActionIconPlacement.AboveTitle) {
+                if (hostConfig.actions.iconPlacement === Enums.ActionIconPlacement.AboveTitle) {
                     this.renderedElement.classList.add("iconAbove");
                     this.renderedElement.style.flexDirection = "column";
                     if (this.title) {
@@ -11604,11 +13099,15 @@ var Action = /** @class */ (function (_super) {
         }
         return this.parent ? this.parent.getParentContainer() : undefined;
     };
+    Action.prototype.isDesignMode = function () {
+        var rootElement = this.getRootObject();
+        return rootElement instanceof CardElement && rootElement.isDesignMode();
+    };
     Action.prototype.updateCssClasses = function () {
         var _a, _b;
         if (this.parent && this.renderedElement) {
             var hostConfig = this.parent.hostConfig;
-            this.renderedElement.className = hostConfig.makeCssClassName(this.isEnabled ? "ac-pushButton" : "ac-pushButton-disabled");
+            this.renderedElement.className = hostConfig.makeCssClassName(this.isEffectivelyEnabled() ? "ac-pushButton" : "ac-pushButton-disabled");
             var parentContainer = this.getParentContainer();
             if (parentContainer) {
                 var parentContainerStyle = parentContainer.getEffectiveStyle();
@@ -11616,8 +13115,11 @@ var Action = /** @class */ (function (_super) {
                     this.renderedElement.classList.add("style-" + parentContainerStyle);
                 }
             }
-            this.renderedElement.tabIndex = this.isFocusable ? 0 : -1;
+            this.renderedElement.tabIndex = !this.isDesignMode() && this.isFocusable ? 0 : -1;
             switch (this._state) {
+                case 0 /* Normal */:
+                    // No additional classes needed
+                    break;
                 case 1 /* Expanded */:
                     this.renderedElement.classList.add(hostConfig.makeCssClassName("expanded"));
                     break;
@@ -11625,7 +13127,7 @@ var Action = /** @class */ (function (_super) {
                     this.renderedElement.classList.add(hostConfig.makeCssClassName("subdued"));
                     break;
             }
-            if (this.style && this.isEnabled) {
+            if (this.style && this.isEffectivelyEnabled()) {
                 if (this.style === Enums.ActionStyle.Positive) {
                     (_a = this.renderedElement.classList).add.apply(_a, hostConfig.makeCssClassNames("primary", "style-positive"));
                 }
@@ -11641,7 +13143,7 @@ var Action = /** @class */ (function (_super) {
     Action.prototype.internalGetReferencedInputs = function () {
         return {};
     };
-    Action.prototype.internalPrepareForExecution = function (inputs) {
+    Action.prototype.internalPrepareForExecution = function (_inputs) {
         // Do nothing in base implementation
     };
     Action.prototype.internalValidateInputs = function (referencedInputs) {
@@ -11666,32 +13168,61 @@ var Action = /** @class */ (function (_super) {
         }
         raiseExecuteActionEvent(this);
     };
+    Action.prototype.internalAfterExecute = function () {
+        var rootObject = this.getRootObject();
+        if (rootObject instanceof CardElement) {
+            rootObject.updateActionsEnabledState();
+        }
+    };
     Action.prototype.getHref = function () {
         return "";
     };
     Action.prototype.getAriaRole = function () {
-        return "button";
+        var ariaRole = this.getAriaRoleFromEnum();
+        return ariaRole !== null && ariaRole !== void 0 ? ariaRole : "button";
+    };
+    Action.prototype.getAriaRoleFromEnum = function () {
+        switch (this.role) {
+            case Enums.ActionRole.Button:
+                return "button";
+            case Enums.ActionRole.Link:
+                return "link";
+            case Enums.ActionRole.Menu:
+                return "menu";
+            case Enums.ActionRole.MenuItem:
+                return "menuitem";
+            case Enums.ActionRole.Tab:
+                return "tab";
+            default:
+                return undefined;
+        }
     };
     Action.prototype.setupElementForAccessibility = function (element, promoteTooltipToLabel) {
         if (promoteTooltipToLabel === void 0) { promoteTooltipToLabel = false; }
-        element.tabIndex = this.isEnabled ? 0 : -1;
+        element.tabIndex = this.isEffectivelyEnabled() && !this.isDesignMode() ? 0 : -1;
         element.setAttribute("role", this.getAriaRole());
         if (element instanceof HTMLButtonElement) {
-            element.disabled = !this.isEnabled;
+            element.disabled = !this.isEffectivelyEnabled();
         }
-        if (!this.isEnabled) {
+        if (!this.isEffectivelyEnabled()) {
             element.setAttribute("aria-disabled", "true");
         }
         else {
+            element.removeAttribute("aria-disabled");
             element.classList.add(this.hostConfig.makeCssClassName("ac-selectable"));
         }
         if (this.title) {
             element.setAttribute("aria-label", this.title);
             element.title = this.title;
         }
+        else {
+            element.removeAttribute("aria-label");
+            element.removeAttribute("title");
+        }
         if (this.tooltip) {
-            var targetAriaAttribute = promoteTooltipToLabel ? (this.title ? "aria-description" : "aria-label") : "aria-description";
-            element.setAttribute(targetAriaAttribute, this.tooltip);
+            if (promoteTooltipToLabel && !this.title) {
+                element.setAttribute("aria-label", this.tooltip);
+            }
             element.title = this.tooltip;
         }
     };
@@ -11706,7 +13237,7 @@ var Action = /** @class */ (function (_super) {
         buttonElement.style.alignItems = "center";
         buttonElement.style.justifyContent = "center";
         buttonElement.onclick = function (e) {
-            if (_this.isEnabled) {
+            if (_this.isEffectivelyEnabled()) {
                 e.preventDefault();
                 e.cancelBubble = true;
                 _this.execute();
@@ -11722,6 +13253,7 @@ var Action = /** @class */ (function (_super) {
             this._actionCollection.actionExecuted(this);
         }
         this.raiseExecuteActionEvent();
+        this.internalAfterExecute();
     };
     Action.prototype.prepareForExecution = function () {
         var referencedInputs = this.getReferencedInputs();
@@ -11733,7 +13265,6 @@ var Action = /** @class */ (function (_super) {
         this.internalPrepareForExecution(referencedInputs);
         return true;
     };
-    ;
     Action.prototype.remove = function () {
         if (this._actionCollection) {
             return this._actionCollection.removeAction(this);
@@ -11743,6 +13274,9 @@ var Action = /** @class */ (function (_super) {
     Action.prototype.getAllInputs = function (processActions) {
         if (processActions === void 0) { processActions = true; }
         return [];
+    };
+    Action.prototype.getAllActions = function () {
+        return [this];
     };
     Action.prototype.getResourceInformation = function () {
         return this.iconUrl ? [{ url: this.iconUrl, mimeType: "image" }] : [];
@@ -11761,16 +13295,22 @@ var Action = /** @class */ (function (_super) {
     Action.prototype.validateInputs = function () {
         return this.internalValidateInputs(this.getReferencedInputs());
     };
+    Action.prototype.updateEnabledState = function () {
+        // Do nothing in base implementation
+    };
+    Action.prototype.isEffectivelyEnabled = function () {
+        return this.isEnabled;
+    };
     Object.defineProperty(Action.prototype, "isPrimary", {
         get: function () {
-            return this.style == Enums.ActionStyle.Positive;
+            return this.style === Enums.ActionStyle.Positive;
         },
         set: function (value) {
             if (value) {
                 this.style = Enums.ActionStyle.Positive;
             }
             else {
-                if (this.style == Enums.ActionStyle.Positive) {
+                if (this.style === Enums.ActionStyle.Positive) {
                     this.style = Enums.ActionStyle.Default;
                 }
             }
@@ -11825,30 +13365,31 @@ var Action = /** @class */ (function (_super) {
         { value: Enums.ActionStyle.Positive },
         { value: Enums.ActionStyle.Destructive }
     ], Enums.ActionStyle.Default);
-    Action.modeProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_5, "mode", [
-        { value: Enums.ActionMode.Primary },
-        { value: Enums.ActionMode.Secondary }
-    ], Enums.ActionMode.Primary);
+    Action.modeProperty = new serialization_1.ValueSetProperty(serialization_1.Versions.v1_5, "mode", [{ value: Enums.ActionMode.Primary }, { value: Enums.ActionMode.Secondary }], Enums.ActionMode.Primary);
     Action.tooltipProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_5, "tooltip");
     Action.isEnabledProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_5, "isEnabled", true);
+    Action.roleProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_6, "role", Enums.ActionRole);
     __decorate([
-        serialization_1.property(Action.titleProperty)
+        (0, serialization_1.property)(Action.titleProperty)
     ], Action.prototype, "title", void 0);
     __decorate([
-        serialization_1.property(Action.iconUrlProperty)
+        (0, serialization_1.property)(Action.iconUrlProperty)
     ], Action.prototype, "iconUrl", void 0);
     __decorate([
-        serialization_1.property(Action.styleProperty)
+        (0, serialization_1.property)(Action.styleProperty)
     ], Action.prototype, "style", void 0);
     __decorate([
-        serialization_1.property(Action.modeProperty)
+        (0, serialization_1.property)(Action.modeProperty)
     ], Action.prototype, "mode", void 0);
     __decorate([
-        serialization_1.property(Action.tooltipProperty)
+        (0, serialization_1.property)(Action.tooltipProperty)
     ], Action.prototype, "tooltip", void 0);
     __decorate([
-        serialization_1.property(Action.isEnabledProperty)
+        (0, serialization_1.property)(Action.isEnabledProperty)
     ], Action.prototype, "isEnabled", void 0);
+    __decorate([
+        (0, serialization_1.property)(Action.roleProperty)
+    ], Action.prototype, "role", void 0);
     return Action;
 }(card_object_1.CardObject));
 exports.Action = Action;
@@ -11857,8 +13398,10 @@ var SubmitActionBase = /** @class */ (function (_super) {
     function SubmitActionBase() {
         //#region Schema
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.disabledUnlessAssociatedInputsChange = false;
         //#endregion
         _this._isPrepared = false;
+        _this._areReferencedInputsDirty = false;
         return _this;
     }
     SubmitActionBase.prototype.internalGetReferencedInputs = function () {
@@ -11867,7 +13410,7 @@ var SubmitActionBase = /** @class */ (function (_super) {
             var current = this.parent;
             var inputs = [];
             while (current) {
-                inputs = inputs.concat(current.getAllInputs(false));
+                inputs.push.apply(inputs, current.getAllInputs(false));
                 current = current.parent;
             }
             for (var _i = 0, inputs_1 = inputs; _i < inputs_1.length; _i++) {
@@ -11891,11 +13434,52 @@ var SubmitActionBase = /** @class */ (function (_super) {
                 var key = _a[_i];
                 var input = inputs[key];
                 if (input.id && input.isSet()) {
-                    this._processedData[input.id] = typeof input.value === "string" ? input.value : input.value.toString();
+                    this._processedData[input.id] =
+                        typeof input.value === "string" ? input.value : input.value.toString();
                 }
             }
         }
         this._isPrepared = true;
+    };
+    SubmitActionBase.prototype.internalAfterExecute = function () {
+        if (shared_1.GlobalSettings.resetInputsDirtyStateAfterActionExecution) {
+            this.resetReferencedInputsDirtyState();
+        }
+    };
+    SubmitActionBase.prototype.resetReferencedInputsDirtyState = function () {
+        var referencedInputs = this.getReferencedInputs();
+        this._areReferencedInputsDirty = false;
+        if (referencedInputs) {
+            for (var _i = 0, _a = Object.keys(referencedInputs); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var input = referencedInputs[key];
+                input.resetDirtyState();
+            }
+        }
+    };
+    SubmitActionBase.prototype.updateEnabledState = function () {
+        this._areReferencedInputsDirty = false;
+        var referencedInputs = this.getReferencedInputs();
+        if (referencedInputs) {
+            for (var _i = 0, _a = Object.keys(referencedInputs); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var input = referencedInputs[key];
+                if (input.isDirty()) {
+                    this._areReferencedInputsDirty = true;
+                    break;
+                }
+            }
+        }
+        this.updateCssClasses();
+        if (this._renderedElement) {
+            this.setupElementForAccessibility(this._renderedElement);
+        }
+    };
+    SubmitActionBase.prototype.isEffectivelyEnabled = function () {
+        var result = _super.prototype.isEffectivelyEnabled.call(this);
+        return this.disabledUnlessAssociatedInputsChange
+            ? result && this._areReferencedInputsDirty
+            : result;
     };
     Object.defineProperty(SubmitActionBase.prototype, "data", {
         get: function () {
@@ -11909,21 +13493,25 @@ var SubmitActionBase = /** @class */ (function (_super) {
         configurable: true
     });
     SubmitActionBase.dataProperty = new serialization_1.PropertyDefinition(serialization_1.Versions.v1_0, "data");
-    SubmitActionBase.associatedInputsProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_3, "associatedInputs", function (sender, property, source, context) {
-        var value = source[property.name];
+    SubmitActionBase.associatedInputsProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_3, "associatedInputs", function (sender, prop, source, context) {
+        var value = source[prop.name];
         if (value !== undefined && typeof value === "string") {
             return value.toLowerCase() === "none" ? "none" : "auto";
         }
         return undefined;
-    }, function (sender, property, target, value, context) {
-        context.serializeValue(target, property.name, value);
+    }, function (sender, prop, target, value, context) {
+        context.serializeValue(target, prop.name, value);
     });
+    SubmitActionBase.disabledUnlessAssociatedInputsChangeProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_6, "disabledUnlessAssociatedInputsChange", false);
     __decorate([
-        serialization_1.property(SubmitActionBase.dataProperty)
+        (0, serialization_1.property)(SubmitActionBase.dataProperty)
     ], SubmitActionBase.prototype, "_originalData", void 0);
     __decorate([
-        serialization_1.property(SubmitActionBase.associatedInputsProperty)
+        (0, serialization_1.property)(SubmitActionBase.associatedInputsProperty)
     ], SubmitActionBase.prototype, "associatedInputs", void 0);
+    __decorate([
+        (0, serialization_1.property)(SubmitActionBase.disabledUnlessAssociatedInputsChangeProperty)
+    ], SubmitActionBase.prototype, "disabledUnlessAssociatedInputsChange", void 0);
     return SubmitActionBase;
 }(Action));
 exports.SubmitActionBase = SubmitActionBase;
@@ -11941,6 +13529,14 @@ var SubmitAction = /** @class */ (function (_super) {
     return SubmitAction;
 }(SubmitActionBase));
 exports.SubmitAction = SubmitAction;
+var UniversalAction = /** @class */ (function (_super) {
+    __extends(UniversalAction, _super);
+    function UniversalAction() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return UniversalAction;
+}(SubmitActionBase));
+exports.UniversalAction = UniversalAction;
 var ExecuteAction = /** @class */ (function (_super) {
     __extends(ExecuteAction, _super);
     function ExecuteAction() {
@@ -11956,11 +13552,50 @@ var ExecuteAction = /** @class */ (function (_super) {
     //#region Schema
     ExecuteAction.verbProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_4, "verb");
     __decorate([
-        serialization_1.property(ExecuteAction.verbProperty)
+        (0, serialization_1.property)(ExecuteAction.verbProperty)
     ], ExecuteAction.prototype, "verb", void 0);
     return ExecuteAction;
-}(SubmitActionBase));
+}(UniversalAction));
 exports.ExecuteAction = ExecuteAction;
+var DataQuery = /** @class */ (function (_super) {
+    __extends(DataQuery, _super);
+    function DataQuery() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    //#endregion
+    DataQuery.prototype.getJsonTypeName = function () {
+        return DataQuery.JsonTypeName;
+    };
+    Object.defineProperty(DataQuery.prototype, "isStandalone", {
+        get: function () {
+            return false;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    // Note the "weird" way this field is declared is to work around a breaking
+    // change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
+    DataQuery.JsonTypeName = "Data.Query";
+    //#region Schema
+    DataQuery.datasetProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_6, "dataset");
+    DataQuery.filterProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_6, "filter");
+    DataQuery.countProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "count");
+    DataQuery.skipProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "skip");
+    __decorate([
+        (0, serialization_1.property)(DataQuery.datasetProperty)
+    ], DataQuery.prototype, "dataset", void 0);
+    __decorate([
+        (0, serialization_1.property)(DataQuery.filterProperty)
+    ], DataQuery.prototype, "filter", void 0);
+    __decorate([
+        (0, serialization_1.property)(DataQuery.countProperty)
+    ], DataQuery.prototype, "count", void 0);
+    __decorate([
+        (0, serialization_1.property)(DataQuery.skipProperty)
+    ], DataQuery.prototype, "skip", void 0);
+    return DataQuery;
+}(UniversalAction));
+exports.DataQuery = DataQuery;
 var OpenUrlAction = /** @class */ (function (_super) {
     __extends(OpenUrlAction, _super);
     function OpenUrlAction() {
@@ -11970,7 +13605,8 @@ var OpenUrlAction = /** @class */ (function (_super) {
         return OpenUrlAction.JsonTypeName;
     };
     OpenUrlAction.prototype.getAriaRole = function () {
-        return "link";
+        var ariaRole = this.getAriaRoleFromEnum();
+        return ariaRole !== null && ariaRole !== void 0 ? ariaRole : "link";
     };
     OpenUrlAction.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
@@ -11988,7 +13624,7 @@ var OpenUrlAction = /** @class */ (function (_super) {
     // change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
     OpenUrlAction.JsonTypeName = "Action.OpenUrl";
     __decorate([
-        serialization_1.property(OpenUrlAction.urlProperty)
+        (0, serialization_1.property)(OpenUrlAction.urlProperty)
     ], OpenUrlAction.prototype, "url", void 0);
     return OpenUrlAction;
 }(Action));
@@ -12029,6 +13665,7 @@ var ToggleVisibilityAction = /** @class */ (function (_super) {
         this.updateAriaControlsAttribute();
     };
     ToggleVisibilityAction.prototype.execute = function () {
+        _super.prototype.execute.call(this);
         if (this.parent) {
             for (var _i = 0, _a = Object.keys(this.targetElements); _i < _a.length; _i++) {
                 var elementId = _a[_i];
@@ -12053,10 +13690,10 @@ var ToggleVisibilityAction = /** @class */ (function (_super) {
         delete this.targetElements[elementId];
         this.updateAriaControlsAttribute();
     };
-    ToggleVisibilityAction.targetElementsProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_2, "targetElements", function (sender, property, source, context) {
+    ToggleVisibilityAction.targetElementsProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_2, "targetElements", function (sender, prop, source, context) {
         var result = {};
-        if (Array.isArray(source[property.name])) {
-            for (var _i = 0, _a = source[property.name]; _i < _a.length; _i++) {
+        if (Array.isArray(source[prop.name])) {
+            for (var _i = 0, _a = source[prop.name]; _i < _a.length; _i++) {
                 var item = _a[_i];
                 if (typeof item === "string") {
                     result[item] = undefined;
@@ -12070,7 +13707,7 @@ var ToggleVisibilityAction = /** @class */ (function (_super) {
             }
         }
         return result;
-    }, function (sender, property, target, value, context) {
+    }, function (sender, prop, target, value, context) {
         var targetElements = [];
         for (var _i = 0, _a = Object.keys(value); _i < _a.length; _i++) {
             var id = _a[_i];
@@ -12084,14 +13721,16 @@ var ToggleVisibilityAction = /** @class */ (function (_super) {
                 targetElements.push(id);
             }
         }
-        context.serializeArray(target, property.name, targetElements);
-    }, {}, function (sender) { return {}; });
+        context.serializeArray(target, prop.name, targetElements);
+    }, {}, function (sender) {
+        return {};
+    });
     //#endregion
     // Note the "weird" way this field is declared is to work around a breaking
     // change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
     ToggleVisibilityAction.JsonTypeName = "Action.ToggleVisibility";
     __decorate([
-        serialization_1.property(ToggleVisibilityAction.targetElementsProperty)
+        (0, serialization_1.property)(ToggleVisibilityAction.targetElementsProperty)
     ], ToggleVisibilityAction.prototype, "targetElements", void 0);
     return ToggleVisibilityAction;
 }(Action));
@@ -12099,7 +13738,9 @@ exports.ToggleVisibilityAction = ToggleVisibilityAction;
 var StringWithSubstitutionProperty = /** @class */ (function (_super) {
     __extends(StringWithSubstitutionProperty, _super);
     function StringWithSubstitutionProperty(targetVersion, name) {
-        var _this = _super.call(this, targetVersion, name, undefined, function () { return new shared_1.StringWithSubstitutions(); }) || this;
+        var _this = _super.call(this, targetVersion, name, undefined, function () {
+            return new shared_1.StringWithSubstitutions();
+        }) || this;
         _this.targetVersion = targetVersion;
         _this.name = name;
         return _this;
@@ -12148,10 +13789,10 @@ var HttpHeader = /** @class */ (function (_super) {
     HttpHeader.nameProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "name");
     HttpHeader.valueProperty = new StringWithSubstitutionProperty(serialization_1.Versions.v1_0, "value");
     __decorate([
-        serialization_1.property(HttpHeader.nameProperty)
+        (0, serialization_1.property)(HttpHeader.nameProperty)
     ], HttpHeader.prototype, "name", void 0);
     __decorate([
-        serialization_1.property(HttpHeader.valueProperty)
+        (0, serialization_1.property)(HttpHeader.valueProperty)
     ], HttpHeader.prototype, "_value", void 0);
     return HttpHeader;
 }(serialization_1.SerializableObject));
@@ -12182,14 +13823,13 @@ var HttpAction = /** @class */ (function (_super) {
             for (var _i = 0, _a = this.headers; _i < _a.length; _i++) {
                 var header = _a[_i];
                 header.prepareForExecution(inputs);
-                if (header.name && header.name.toLowerCase() == "content-type") {
+                if (header.name && header.name.toLowerCase() === "content-type") {
                     contentType = header.value;
                 }
             }
             this._body.substituteInputValues(inputs, contentType);
         }
     };
-    ;
     HttpAction.prototype.getJsonTypeName = function () {
         return HttpAction.JsonTypeName;
     };
@@ -12247,19 +13887,19 @@ var HttpAction = /** @class */ (function (_super) {
     // change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
     HttpAction.JsonTypeName = "Action.Http";
     __decorate([
-        serialization_1.property(HttpAction.urlProperty)
+        (0, serialization_1.property)(HttpAction.urlProperty)
     ], HttpAction.prototype, "_url", void 0);
     __decorate([
-        serialization_1.property(HttpAction.bodyProperty)
+        (0, serialization_1.property)(HttpAction.bodyProperty)
     ], HttpAction.prototype, "_body", void 0);
     __decorate([
-        serialization_1.property(HttpAction.methodProperty)
+        (0, serialization_1.property)(HttpAction.methodProperty)
     ], HttpAction.prototype, "method", void 0);
     __decorate([
-        serialization_1.property(HttpAction.headersProperty)
+        (0, serialization_1.property)(HttpAction.headersProperty)
     ], HttpAction.prototype, "headers", void 0);
     __decorate([
-        serialization_1.property(HttpAction.ignoreInputValidationProperty)
+        (0, serialization_1.property)(HttpAction.ignoreInputValidationProperty)
     ], HttpAction.prototype, "_ignoreInputValidation", void 0);
     return HttpAction;
 }(Action));
@@ -12301,6 +13941,10 @@ var ShowCardAction = /** @class */ (function (_super) {
             _super.prototype.raiseExecuteActionEvent.call(this);
         }
     };
+    ShowCardAction.prototype.releaseDOMResources = function () {
+        _super.prototype.releaseDOMResources.call(this);
+        this.card.releaseDOMResources();
+    };
     ShowCardAction.prototype.getJsonTypeName = function () {
         return ShowCardAction.JsonTypeName;
     };
@@ -12316,8 +13960,15 @@ var ShowCardAction = /** @class */ (function (_super) {
         if (processActions === void 0) { processActions = true; }
         return this.card.getAllInputs(processActions);
     };
+    ShowCardAction.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        result.push.apply(result, this.card.getAllActions());
+        return result;
+    };
     ShowCardAction.prototype.getResourceInformation = function () {
-        return _super.prototype.getResourceInformation.call(this).concat(this.card.getResourceInformation());
+        var result = _super.prototype.getResourceInformation.call(this);
+        result.push.apply(result, this.card.getResourceInformation());
+        return result;
     };
     ShowCardAction.prototype.getActionById = function (id) {
         var result = _super.prototype.getActionById.call(this, id);
@@ -12336,12 +13987,18 @@ var OverflowAction = /** @class */ (function (_super) {
     __extends(OverflowAction, _super);
     function OverflowAction(actions) {
         var _this = _super.call(this) || this;
-        _this.actions = actions;
+        _this._actions = actions;
         _this.title = strings_1.Strings.defaults.overflowButtonText();
+        _this.tooltip = strings_1.Strings.defaults.overflowButtonTooltip();
         return _this;
     }
     OverflowAction.prototype.getActions = function () {
-        return this.actions;
+        return this._actions;
+    };
+    OverflowAction.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        result.push.apply(result, this._actions);
+        return result;
     };
     OverflowAction.prototype.getJsonTypeName = function () {
         return ShowCardAction.JsonTypeName;
@@ -12353,11 +14010,11 @@ var OverflowAction = /** @class */ (function (_super) {
         if (shouldDisplayPopupMenu && this.renderedElement) {
             var contextMenu_1 = new controls_1.PopupMenu();
             contextMenu_1.hostConfig = this.hostConfig;
-            var _loop_1 = function (i) {
-                var menuItem = new controls_1.MenuItem(i.toString(), (_a = this_1.actions[i].title) !== null && _a !== void 0 ? _a : "");
-                menuItem.isEnabled = this_1.actions[i].isEnabled;
+            var _loop_2 = function (i) {
+                var menuItem = new controls_1.MenuItem(i.toString(), (_a = this_1._actions[i].title) !== null && _a !== void 0 ? _a : "");
+                menuItem.isEnabled = this_1._actions[i].isEnabled;
                 menuItem.onClick = function () {
-                    var actionToExecute = _this.actions[i];
+                    var actionToExecute = _this._actions[i];
                     contextMenu_1.closePopup(false);
                     if (actionToExecute.isEnabled) {
                         actionToExecute.execute();
@@ -12366,12 +14023,22 @@ var OverflowAction = /** @class */ (function (_super) {
                 contextMenu_1.items.add(menuItem);
             };
             var this_1 = this;
-            for (var i = 0; i < this.actions.length; i++) {
-                _loop_1(i);
+            for (var i = 0; i < this._actions.length; i++) {
+                _loop_2(i);
             }
-            ;
+            contextMenu_1.onClose = function () {
+                var _a;
+                (_a = _this.renderedElement) === null || _a === void 0 ? void 0 : _a.setAttribute("aria-expanded", "false");
+            };
+            this.renderedElement.setAttribute("aria-expanded", "true");
             contextMenu_1.popup(this.renderedElement);
         }
+    };
+    OverflowAction.prototype.setupElementForAccessibility = function (element, promoteTooltipToLabel) {
+        if (promoteTooltipToLabel === void 0) { promoteTooltipToLabel = false; }
+        _super.prototype.setupElementForAccessibility.call(this, element, promoteTooltipToLabel);
+        element.setAttribute("aria-label", strings_1.Strings.defaults.overflowButtonTooltip());
+        element.setAttribute("aria-expanded", "false");
     };
     OverflowAction.JsonTypeName = "Action.Overflow";
     return OverflowAction;
@@ -12395,12 +14062,15 @@ var ActionCollection = /** @class */ (function () {
         return true;
     };
     ActionCollection.prototype.refreshContainer = function () {
-        this._actionCardContainer.innerHTML = "";
+        clearElement(this._actionCardContainer);
         if (!this._actionCard) {
             this._actionCardContainer.style.marginTop = "0px";
             return;
         }
-        this._actionCardContainer.style.marginTop = this.renderedActionCount > 0 ? this._owner.hostConfig.actions.showCard.inlineTopMargin + "px" : "0px";
+        this._actionCardContainer.style.marginTop =
+            this.renderedActionCount > 0
+                ? this._owner.hostConfig.actions.showCard.inlineTopMargin + "px"
+                : "0px";
         var padding = this._owner.getEffectivePadding();
         this._owner.getImmediateSurroundingPadding(padding);
         var physicalPadding = this._owner.hostConfig.paddingDefinitionToSpacingDefinition(padding);
@@ -12409,7 +14079,7 @@ var ActionCollection = /** @class */ (function () {
             this._actionCard.style.paddingRight = physicalPadding.right + "px";
             this._actionCard.style.marginLeft = "-" + physicalPadding.left + "px";
             this._actionCard.style.marginRight = "-" + physicalPadding.right + "px";
-            if (physicalPadding.bottom != 0 && !this._owner.isDesignMode()) {
+            if (physicalPadding.bottom !== 0 && !this._owner.isDesignMode()) {
                 this._actionCard.style.paddingBottom = physicalPadding.bottom + "px";
                 this._actionCard.style.marginBottom = "-" + physicalPadding.bottom + "px";
             }
@@ -12424,7 +14094,9 @@ var ActionCollection = /** @class */ (function () {
         if (raiseEvent === void 0) { raiseEvent = true; }
         action.card.suppressStyle = suppressStyle;
         // Always re-render a ShowCard action in design mode; reuse already rendered ShowCard (if available) otherwise
-        var renderedCard = action.card.renderedElement && !this._owner.isDesignMode() ? action.card.renderedElement : action.card.render();
+        var renderedCard = action.card.renderedElement && !this._owner.isDesignMode()
+            ? action.card.renderedElement
+            : action.card.render();
         this._actionCard = renderedCard;
         this._expandedAction = action;
         this.refreshContainer();
@@ -12452,8 +14124,9 @@ var ActionCollection = /** @class */ (function () {
         var afterSelectedAction = false;
         for (var _i = 0, _a = this._renderedActions; _i < _a.length; _i++) {
             var renderedAction = _a[_i];
-            // Remove actions after selected action from tabOrder, to skip focus directly to expanded card
-            if (afterSelectedAction) {
+            // Remove actions after selected action from tabOrder if the actions are oriented horizontally, to skip focus directly to expanded card
+            if (this._owner.hostConfig.actions.actionsOrientation == Enums.Orientation.Horizontal &&
+                afterSelectedAction) {
                 renderedAction.isFocusable = false;
             }
             if (renderedAction !== action) {
@@ -12463,7 +14136,7 @@ var ActionCollection = /** @class */ (function () {
                 renderedAction.state = 1 /* Expanded */;
                 afterSelectedAction = true;
                 if (renderedAction.renderedElement) {
-                    renderedAction.renderedElement.onblur = function (e) {
+                    renderedAction.renderedElement.onblur = function (_e) {
                         for (var _i = 0, _a = _this._renderedActions; _i < _a.length; _i++) {
                             var ra = _a[_i];
                             ra.isFocusable = true;
@@ -12474,6 +14147,12 @@ var ActionCollection = /** @class */ (function () {
         }
         this.showActionCard(action, !(this._owner.isAtTheVeryLeft() && this._owner.isAtTheVeryRight()), raiseEvent);
     };
+    ActionCollection.prototype.releaseDOMResources = function () {
+        for (var _i = 0, _a = this._renderedActions; _i < _a.length; _i++) {
+            var action = _a[_i];
+            action.releaseDOMResources();
+        }
+    };
     ActionCollection.prototype.actionExecuted = function (action) {
         if (!(action instanceof ShowCardAction)) {
             this.collapseExpandedAction();
@@ -12482,7 +14161,8 @@ var ActionCollection = /** @class */ (function () {
             if (action === this._expandedAction) {
                 this.collapseExpandedAction();
             }
-            else if (this._owner.hostConfig.actions.showCard.actionMode === Enums.ShowCardActionMode.Inline) {
+            else if (this._owner.hostConfig.actions.showCard.actionMode ===
+                Enums.ShowCardActionMode.Inline) {
                 this.expandShowCardAction(action, true);
             }
         }
@@ -12492,7 +14172,12 @@ var ActionCollection = /** @class */ (function () {
         if (Array.isArray(source)) {
             for (var _i = 0, source_1 = source; _i < source_1.length; _i++) {
                 var jsonAction = source_1[_i];
-                var action = context.parseAction(this._owner, jsonAction, [], !this._owner.isDesignMode());
+                var forbiddenActions = [];
+                // If the action owner is a ContainerWithActions, we should check for forbidden actions
+                if (this._owner instanceof ContainerWithActions) {
+                    forbiddenActions = this._owner.getForbiddenActionNames();
+                }
+                var action = context.parseAction(this._owner, jsonAction, forbiddenActions, !this._owner.isDesignMode());
                 if (action) {
                     this.addAction(action);
                 }
@@ -12520,7 +14205,8 @@ var ActionCollection = /** @class */ (function () {
         return result;
     };
     ActionCollection.prototype.validateProperties = function (context) {
-        if (this._owner.hostConfig.actions.maxActions && this._items.length > this._owner.hostConfig.actions.maxActions) {
+        if (this._owner.hostConfig.actions.maxActions &&
+            this._items.length > this._owner.hostConfig.actions.maxActions) {
             context.addFailure(this._owner, Enums.ValidationEvent.TooManyActions, strings_1.Strings.errors.tooManyActions(this._owner.hostConfig.actions.maxActions));
         }
         if (this._items.length > 0 && !this._owner.hostConfig.supportsInteractivity) {
@@ -12534,17 +14220,22 @@ var ActionCollection = /** @class */ (function () {
             item.internalValidateProperties(context);
         }
     };
-    ActionCollection.prototype.render = function (orientation, isDesignMode) {
+    ActionCollection.prototype.render = function (orientation) {
         // Cache hostConfig for better perf
         var hostConfig = this._owner.hostConfig;
         if (!hostConfig.supportsInteractivity) {
             return undefined;
         }
         var element = document.createElement("div");
-        var maxActions = hostConfig.actions.maxActions ? Math.min(hostConfig.actions.maxActions, this._items.length) : this._items.length;
+        var maxActions = hostConfig.actions.maxActions
+            ? Math.min(hostConfig.actions.maxActions, this._items.length)
+            : this._items.length;
         this._actionCardContainer = document.createElement("div");
         this._renderedActions = [];
-        if (hostConfig.actions.preExpandSingleShowCardAction && maxActions == 1 && this._items[0] instanceof ShowCardAction && this.isActionAllowed(this._items[0])) {
+        if (hostConfig.actions.preExpandSingleShowCardAction &&
+            maxActions === 1 &&
+            this._items[0] instanceof ShowCardAction &&
+            this.isActionAllowed(this._items[0])) {
             this.showActionCard(this._items[0], true);
             this._renderedActions.push(this._items[0]);
         }
@@ -12552,10 +14243,10 @@ var ActionCollection = /** @class */ (function () {
             var buttonStrip = document.createElement("div");
             buttonStrip.className = hostConfig.makeCssClassName("ac-actionSet");
             buttonStrip.style.display = "flex";
-            buttonStrip.setAttribute("role", "menubar");
-            if (orientation == Enums.Orientation.Horizontal) {
+            if (orientation === Enums.Orientation.Horizontal) {
                 buttonStrip.style.flexDirection = "row";
-                if (this._owner.horizontalAlignment && hostConfig.actions.actionAlignment != Enums.ActionAlignment.Stretch) {
+                if (this._owner.horizontalAlignment &&
+                    hostConfig.actions.actionAlignment !== Enums.ActionAlignment.Stretch) {
                     switch (this._owner.horizontalAlignment) {
                         case Enums.HorizontalAlignment.Center:
                             buttonStrip.style.justifyContent = "center";
@@ -12584,7 +14275,8 @@ var ActionCollection = /** @class */ (function () {
             }
             else {
                 buttonStrip.style.flexDirection = "column";
-                if (this._owner.horizontalAlignment && hostConfig.actions.actionAlignment != Enums.ActionAlignment.Stretch) {
+                if (this._owner.horizontalAlignment &&
+                    hostConfig.actions.actionAlignment !== Enums.ActionAlignment.Stretch) {
                     switch (this._owner.horizontalAlignment) {
                         case Enums.HorizontalAlignment.Center:
                             buttonStrip.style.alignItems = "center";
@@ -12618,7 +14310,11 @@ var ActionCollection = /** @class */ (function () {
             var primaryActions_1 = [];
             var secondaryActions_1 = [];
             if (!this._owner.isDesignMode()) {
-                allowedActions.forEach(function (action) { return action.mode === Enums.ActionMode.Secondary ? secondaryActions_1.push(action) : primaryActions_1.push(action); });
+                allowedActions.forEach(function (action) {
+                    return action.mode === Enums.ActionMode.Secondary
+                        ? secondaryActions_1.push(action)
+                        : primaryActions_1.push(action);
+                });
                 // If primaryActions.length > maxActions, extra actions are moved to overflow
                 var overflowPrimaryActions = primaryActions_1.splice(hostConfig.actions.maxActions);
                 if (shared_1.GlobalSettings.allowMoreThanMaxActionsInOverflowMenu) {
@@ -12645,12 +14341,8 @@ var ActionCollection = /** @class */ (function () {
                 var action = primaryActions_1[i];
                 action.render();
                 if (action.renderedElement) {
-                    if (primaryActions_1.length > 1) {
-                        action.renderedElement.setAttribute("aria-posinset", (i + 1).toString());
-                        action.renderedElement.setAttribute("aria-setsize", primaryActions_1.length.toString());
-                        action.renderedElement.setAttribute("role", "menuitem");
-                    }
-                    if (hostConfig.actions.actionsOrientation == Enums.Orientation.Horizontal && hostConfig.actions.actionAlignment == Enums.ActionAlignment.Stretch) {
+                    if (hostConfig.actions.actionsOrientation === Enums.Orientation.Horizontal &&
+                        hostConfig.actions.actionAlignment === Enums.ActionAlignment.Stretch) {
                         action.renderedElement.style.flex = "0 1 100%";
                     }
                     else {
@@ -12679,7 +14371,7 @@ var ActionCollection = /** @class */ (function () {
         Utils.appendChild(element, this._actionCardContainer);
         for (var _i = 0, _a = this._renderedActions; _i < _a.length; _i++) {
             var renderedAction = _a[_i];
-            if (renderedAction.state == 1 /* Expanded */) {
+            if (renderedAction.state === 1 /* Expanded */) {
                 this.expandShowCardAction(renderedAction, false);
                 break;
             }
@@ -12702,7 +14394,7 @@ var ActionCollection = /** @class */ (function () {
         }
     };
     ActionCollection.prototype.removeAction = function (action) {
-        if (this.expandedAction && this._expandedAction == action) {
+        if (this.expandedAction && this._expandedAction === action) {
             this.collapseExpandedAction();
         }
         var actionIndex = this._items.indexOf(action);
@@ -12711,7 +14403,7 @@ var ActionCollection = /** @class */ (function () {
             action.setParent(undefined);
             action["_actionCollection"] = undefined;
             for (var i = 0; i < this._renderedActions.length; i++) {
-                if (this._renderedActions[i] == action) {
+                if (this._renderedActions[i] === action) {
                     this._renderedActions.splice(i, 1);
                     break;
                 }
@@ -12731,7 +14423,7 @@ var ActionCollection = /** @class */ (function () {
         if (processActions) {
             for (var _i = 0, _a = this._items; _i < _a.length; _i++) {
                 var action = _a[_i];
-                result = result.concat(action.getAllInputs());
+                result.push.apply(result, action.getAllInputs());
             }
         }
         return result;
@@ -12740,7 +14432,7 @@ var ActionCollection = /** @class */ (function () {
         var result = [];
         for (var _i = 0, _a = this._items; _i < _a.length; _i++) {
             var action = _a[_i];
-            result = result.concat(action.getResourceInformation());
+            result.push.apply(result, action.getResourceInformation());
         }
         return result;
     };
@@ -12776,15 +14468,22 @@ var ActionSet = /** @class */ (function (_super) {
         this._actionCollection.toJSON(target, "actions", context);
     };
     ActionSet.prototype.internalRender = function () {
-        return this._actionCollection.render(this.orientation !== undefined ? this.orientation : this.hostConfig.actions.actionsOrientation, this.isDesignMode());
+        return this._actionCollection.render(this.orientation !== undefined
+            ? this.orientation
+            : this.hostConfig.actions.actionsOrientation);
+    };
+    ActionSet.prototype.releaseDOMResources = function () {
+        _super.prototype.releaseDOMResources.call(this);
+        this._actionCollection.releaseDOMResources();
     };
     ActionSet.prototype.isBleedingAtBottom = function () {
-        if (this._actionCollection.renderedActionCount == 0) {
+        if (this._actionCollection.renderedActionCount === 0) {
             return _super.prototype.isBleedingAtBottom.call(this);
         }
         else {
-            if (this._actionCollection.getActionCount() == 1) {
-                return this._actionCollection.expandedAction !== undefined && !this.hostConfig.actions.preExpandSingleShowCardAction;
+            if (this._actionCollection.getActionCount() === 1) {
+                return (this._actionCollection.expandedAction !== undefined &&
+                    !this.hostConfig.actions.preExpandSingleShowCardAction);
             }
             else {
                 return this._actionCollection.expandedAction !== undefined;
@@ -12808,6 +14507,16 @@ var ActionSet = /** @class */ (function (_super) {
     ActionSet.prototype.getActionById = function (id) {
         var result = this._actionCollection.getActionById(id);
         return result ? result : _super.prototype.getActionById.call(this, id);
+    };
+    ActionSet.prototype.getAllActions = function () {
+        var result = _super.prototype.getAllActions.call(this);
+        for (var i = 0; i < this.getActionCount(); i++) {
+            var action = this.getActionAt(i);
+            if (action) {
+                result.push(action);
+            }
+        }
+        return result;
     };
     ActionSet.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
@@ -12841,6 +14550,13 @@ var ActionSet = /** @class */ (function (_super) {
         // if not found in any Action, defer to parent implementation
         return _super.prototype.findDOMNodeOwner.call(this, node);
     };
+    ActionSet.prototype.getElementById = function (id) {
+        var result = _super.prototype.getElementById.call(this, id);
+        if (!result) {
+            result = this.getElementByIdFromAction(id);
+        }
+        return result;
+    };
     Object.defineProperty(ActionSet.prototype, "isInteractive", {
         get: function () {
             return true;
@@ -12851,7 +14567,7 @@ var ActionSet = /** @class */ (function (_super) {
     //#region Schema
     ActionSet.orientationProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_1, "orientation", Enums.Orientation);
     __decorate([
-        serialization_1.property(ActionSet.orientationProperty)
+        (0, serialization_1.property)(ActionSet.orientationProperty)
     ], ActionSet.prototype, "orientation", void 0);
     return ActionSet;
 }(CardElement));
@@ -12920,7 +14636,9 @@ var StylableCardElementContainer = /** @class */ (function (_super) {
             var styleDefinition = this.hostConfig.containerStyles.getStyleByName(this.style, this.hostConfig.containerStyles.getStyleByName(this.defaultStyle));
             if (styleDefinition.backgroundColor) {
                 var bgColor = Utils.stringToCssColor(styleDefinition.backgroundColor);
-                this.renderedElement.style.backgroundColor = bgColor;
+                if (bgColor) {
+                    this.renderedElement.style.backgroundColor = bgColor;
+                }
             }
         }
     };
@@ -12948,7 +14666,8 @@ var StylableCardElementContainer = /** @class */ (function (_super) {
                 this.renderedElement.style.marginTop = "-" + surroundingPadding.top + "px";
                 this.renderedElement.style.marginBottom = "-" + surroundingPadding.bottom + "px";
             }
-            if (this.separatorElement && this.separatorOrientation == Enums.Orientation.Horizontal) {
+            if (this.separatorElement &&
+                this.separatorOrientation === Enums.Orientation.Horizontal) {
                 this.separatorElement.style.marginLeft = "-" + surroundingPadding.left + "px";
                 this.separatorElement.style.marginRight = "-" + surroundingPadding.right + "px";
             }
@@ -12958,18 +14677,31 @@ var StylableCardElementContainer = /** @class */ (function (_super) {
             this.renderedElement.style.marginLeft = "0";
             this.renderedElement.style.marginTop = "0";
             this.renderedElement.style.marginBottom = "0";
-            if (this.separatorElement && this.separatorOrientation === Enums.Orientation.Horizontal) {
+            if (this.separatorElement &&
+                this.separatorOrientation === Enums.Orientation.Horizontal) {
                 this.separatorElement.style.marginRight = "0";
                 this.separatorElement.style.marginLeft = "0";
             }
         }
     };
-    StylableCardElementContainer.prototype.getHasBackground = function () {
+    StylableCardElementContainer.prototype.getHasBackground = function (ignoreBackgroundImages) {
+        if (ignoreBackgroundImages === void 0) { ignoreBackgroundImages = false; }
         var currentElement = this.parent;
         while (currentElement) {
-            var currentElementHasBackgroundImage = currentElement instanceof Container ? currentElement.backgroundImage.isValid() : false;
+            var currentElementHasBackgroundImage = false;
+            if (ignoreBackgroundImages) {
+                currentElementHasBackgroundImage = false;
+            }
+            else {
+                currentElementHasBackgroundImage =
+                    currentElement instanceof Container
+                        ? currentElement.backgroundImage.isValid()
+                        : false;
+            }
             if (currentElement instanceof StylableCardElementContainer) {
-                if (this.hasExplicitStyle && (currentElement.getEffectiveStyle() != this.getEffectiveStyle() || currentElementHasBackgroundImage)) {
+                if (this.hasExplicitStyle &&
+                    (currentElement.getEffectiveStyle() !== this.getEffectiveStyle() ||
+                        currentElementHasBackgroundImage)) {
                     return true;
                 }
             }
@@ -12978,8 +14710,9 @@ var StylableCardElementContainer = /** @class */ (function (_super) {
         return false;
     };
     StylableCardElementContainer.prototype.getDefaultPadding = function () {
-        return this.getHasBackground() || this.getHasBorder() ?
-            new shared_1.PaddingDefinition(Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding) : _super.prototype.getDefaultPadding.call(this);
+        return this.getHasBackground() || this.getHasBorder()
+            ? new shared_1.PaddingDefinition(Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding)
+            : _super.prototype.getDefaultPadding.call(this);
     };
     StylableCardElementContainer.prototype.internalValidateProperties = function (context) {
         _super.prototype.internalValidateProperties.call(this, context);
@@ -13006,7 +14739,7 @@ var StylableCardElementContainer = /** @class */ (function (_super) {
     //#region Schema
     StylableCardElementContainer.styleProperty = new ContainerStyleProperty(serialization_1.Versions.v1_0, "style");
     __decorate([
-        serialization_1.property(StylableCardElementContainer.styleProperty)
+        (0, serialization_1.property)(StylableCardElementContainer.styleProperty)
     ], StylableCardElementContainer.prototype, "style", null);
     return StylableCardElementContainer;
 }(CardElementContainer));
@@ -13048,10 +14781,10 @@ var ContainerBase = /** @class */ (function (_super) {
     ContainerBase.bleedProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_2, "bleed", false);
     ContainerBase.minHeightProperty = new serialization_1.PixelSizeProperty(serialization_1.Versions.v1_2, "minHeight");
     __decorate([
-        serialization_1.property(ContainerBase.bleedProperty)
+        (0, serialization_1.property)(ContainerBase.bleedProperty)
     ], ContainerBase.prototype, "_bleed", void 0);
     __decorate([
-        serialization_1.property(ContainerBase.minHeightProperty)
+        (0, serialization_1.property)(ContainerBase.minHeightProperty)
     ], ContainerBase.prototype, "minPixelHeight", void 0);
     return ContainerBase;
 }(StylableCardElementContainer));
@@ -13076,7 +14809,10 @@ var BackgroundImage = /** @class */ (function (_super) {
     };
     BackgroundImage.prototype.apply = function (element) {
         if (this.url && element.renderedElement) {
-            element.renderedElement.style.backgroundImage = "url('" + element.preProcessPropertyValue(BackgroundImage.urlProperty, this.url) + "')";
+            element.renderedElement.style.backgroundImage =
+                "url('" +
+                    element.preProcessPropertyValue(BackgroundImage.urlProperty, this.url) +
+                    "')";
             switch (this.fillMode) {
                 case Enums.FillMode.Repeat:
                     element.renderedElement.style.backgroundRepeat = "repeat";
@@ -13094,6 +14830,8 @@ var BackgroundImage = /** @class */ (function (_super) {
                     break;
             }
             switch (this.horizontalAlignment) {
+                case Enums.HorizontalAlignment.Left:
+                    break;
                 case Enums.HorizontalAlignment.Center:
                     element.renderedElement.style.backgroundPositionX = "center";
                     break;
@@ -13102,6 +14840,8 @@ var BackgroundImage = /** @class */ (function (_super) {
                     break;
             }
             switch (this.verticalAlignment) {
+                case Enums.VerticalAlignment.Top:
+                    break;
                 case Enums.VerticalAlignment.Center:
                     element.renderedElement.style.backgroundPositionY = "center";
                     break;
@@ -13120,16 +14860,16 @@ var BackgroundImage = /** @class */ (function (_super) {
     BackgroundImage.horizontalAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_2, "horizontalAlignment", Enums.HorizontalAlignment, Enums.HorizontalAlignment.Left);
     BackgroundImage.verticalAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_2, "verticalAlignment", Enums.VerticalAlignment, Enums.VerticalAlignment.Top);
     __decorate([
-        serialization_1.property(BackgroundImage.urlProperty)
+        (0, serialization_1.property)(BackgroundImage.urlProperty)
     ], BackgroundImage.prototype, "url", void 0);
     __decorate([
-        serialization_1.property(BackgroundImage.fillModeProperty)
+        (0, serialization_1.property)(BackgroundImage.fillModeProperty)
     ], BackgroundImage.prototype, "fillMode", void 0);
     __decorate([
-        serialization_1.property(BackgroundImage.horizontalAlignmentProperty)
+        (0, serialization_1.property)(BackgroundImage.horizontalAlignmentProperty)
     ], BackgroundImage.prototype, "horizontalAlignment", void 0);
     __decorate([
-        serialization_1.property(BackgroundImage.verticalAlignmentProperty)
+        (0, serialization_1.property)(BackgroundImage.verticalAlignmentProperty)
     ], BackgroundImage.prototype, "verticalAlignment", void 0);
     return BackgroundImage;
 }(serialization_1.SerializableObject));
@@ -13137,7 +14877,6 @@ exports.BackgroundImage = BackgroundImage;
 var Container = /** @class */ (function (_super) {
     __extends(Container, _super);
     function Container() {
-        //#region Schema
         var _this = _super !== null && _super.apply(this, arguments) || this;
         //#endregion
         _this._items = [];
@@ -13179,14 +14918,17 @@ var Container = /** @class */ (function (_super) {
         }
         _super.prototype.applyBackground.call(this);
     };
+    Container.prototype.applyRTL = function (element) {
+        if (this.rtl !== undefined) {
+            element.dir = this.rtl ? "rtl" : "ltr";
+        }
+    };
     Container.prototype.internalRender = function () {
         this._renderedItems = [];
         // Cache hostConfig to avoid walking the parent hierarchy several times
         var hostConfig = this.hostConfig;
         var element = document.createElement("div");
-        if (this.rtl !== undefined) {
-            element.dir = this.rtl ? "rtl" : "ltr";
-        }
+        this.applyRTL(element);
         element.classList.add(hostConfig.makeCssClassName("ac-container"));
         element.style.display = "flex";
         element.style.flexDirection = "column";
@@ -13202,7 +14944,7 @@ var Container = /** @class */ (function (_super) {
             //
             // See the "Browser Rendering Notes" section of this answer:
             // https://stackoverflow.com/questions/36247140/why-doesnt-flex-item-shrink-past-content-size
-            element.style.minHeight = '-webkit-min-content';
+            element.style.minHeight = "-webkit-min-content";
         }
         switch (this.getEffectiveVerticalContentAlignment()) {
             case Enums.VerticalAlignment.Center:
@@ -13248,7 +14990,7 @@ var Container = /** @class */ (function (_super) {
                 if (elt) {
                     switch (Utils.getFitStatus(elt, boundary_1)) {
                         case Enums.ContainerFitStatus.FullyInContainer:
-                            var sizeChanged = cardElement['resetOverflow']();
+                            var sizeChanged = cardElement["resetOverflow"]();
                             // If the element's size changed after resetting content,
                             // we have to check if it still fits fully in the card
                             if (sizeChanged) {
@@ -13256,11 +14998,11 @@ var Container = /** @class */ (function (_super) {
                             }
                             break;
                         case Enums.ContainerFitStatus.Overflowing:
-                            var maxHeight_1 = boundary_1 - elt.offsetTop;
-                            cardElement['handleOverflow'](maxHeight_1);
+                            var containerMaxHeight = boundary_1 - elt.offsetTop;
+                            cardElement["handleOverflow"](containerMaxHeight);
                             break;
                         case Enums.ContainerFitStatus.FullyOutOfContainer:
-                            cardElement['handleOverflow'](0);
+                            cardElement["handleOverflow"](0);
                             break;
                     }
                 }
@@ -13276,11 +15018,13 @@ var Container = /** @class */ (function (_super) {
     Container.prototype.undoOverflowTruncation = function () {
         for (var _i = 0, _a = this._items; _i < _a.length; _i++) {
             var item = _a[_i];
-            item['resetOverflow']();
+            item["resetOverflow"]();
         }
     };
-    Container.prototype.getHasBackground = function () {
-        return this.backgroundImage.isValid() || _super.prototype.getHasBackground.call(this);
+    Container.prototype.getHasBackground = function (ignoreBackgroundImages) {
+        if (ignoreBackgroundImages === void 0) { ignoreBackgroundImages = false; }
+        var result = ignoreBackgroundImages ? false : this.backgroundImage.isValid();
+        return result || _super.prototype.getHasBackground.call(this, ignoreBackgroundImages);
     };
     Container.prototype.internalParse = function (source, context) {
         _super.prototype.internalParse.call(this, source, context);
@@ -13290,7 +15034,7 @@ var Container = /** @class */ (function (_super) {
         if (Array.isArray(jsonItems)) {
             for (var _i = 0, jsonItems_1 = jsonItems; _i < jsonItems_1.length; _i++) {
                 var item = jsonItems_1[_i];
-                var element = context.parseElement(this, item, !this.isDesignMode());
+                var element = context.parseElement(this, item, this.forbiddenChildElements(), !this.isDesignMode());
                 if (element) {
                     this.insertItemAt(element, -1, true);
                 }
@@ -13299,7 +15043,8 @@ var Container = /** @class */ (function (_super) {
     };
     Container.prototype.internalToJSON = function (target, context) {
         _super.prototype.internalToJSON.call(this, target, context);
-        context.serializeArray(target, this.getItemsCollectionPropertyName(), this._items);
+        var collectionPropertyName = this.getItemsCollectionPropertyName();
+        context.serializeArray(target, collectionPropertyName, this._items);
     };
     Object.defineProperty(Container.prototype, "isSelectable", {
         get: function () {
@@ -13308,12 +15053,21 @@ var Container = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Container.prototype.getEffectivePadding = function () {
+        if (shared_1.GlobalSettings.removePaddingFromContainersWithBackgroundImage &&
+            !this.getHasBackground(true)) {
+            return new shared_1.PaddingDefinition();
+        }
+        return _super.prototype.getEffectivePadding.call(this);
+    };
     Container.prototype.getEffectiveVerticalContentAlignment = function () {
         if (this.verticalContentAlignment !== undefined) {
             return this.verticalContentAlignment;
         }
         var parentContainer = this.getParentContainer();
-        return parentContainer ? parentContainer.getEffectiveVerticalContentAlignment() : Enums.VerticalAlignment.Top;
+        return parentContainer
+            ? parentContainer.getEffectiveVerticalContentAlignment()
+            : Enums.VerticalAlignment.Top;
     };
     Container.prototype.getItemCount = function () {
         return this._items.length;
@@ -13329,7 +15083,6 @@ var Container = /** @class */ (function (_super) {
                     return item;
                 }
             }
-            ;
         }
         return undefined;
     };
@@ -13351,7 +15104,7 @@ var Container = /** @class */ (function (_super) {
         for (var _i = 0, _a = this._items; _i < _a.length; _i++) {
             var item = _a[_i];
             if (item.isVisible || designMode) {
-                return item == element;
+                return item === element;
             }
         }
         return false;
@@ -13360,7 +15113,7 @@ var Container = /** @class */ (function (_super) {
         var designMode = this.isDesignMode();
         for (var i = this._items.length - 1; i >= 0; i--) {
             if (this._items[i].isVisible || designMode) {
-                return this._items[i] == element;
+                return this._items[i] === element;
             }
         }
         return false;
@@ -13376,11 +15129,15 @@ var Container = /** @class */ (function (_super) {
     };
     Container.prototype.isBleedingAtTop = function () {
         var firstRenderedItem = this.getFirstVisibleRenderedItem();
-        return this.isBleeding() || (firstRenderedItem ? firstRenderedItem.isBleedingAtTop() : false);
+        return (this.isBleeding() || (firstRenderedItem ? firstRenderedItem.isBleedingAtTop() : false));
     };
     Container.prototype.isBleedingAtBottom = function () {
         var lastRenderedItem = this.getLastVisibleRenderedItem();
-        return this.isBleeding() || (lastRenderedItem ? lastRenderedItem.isBleedingAtBottom() && lastRenderedItem.getEffectiveStyle() == this.getEffectiveStyle() : false);
+        return (this.isBleeding() ||
+            (lastRenderedItem
+                ? lastRenderedItem.isBleedingAtBottom() &&
+                    lastRenderedItem.getEffectiveStyle() === this.getEffectiveStyle()
+                : false));
     };
     Container.prototype.indexOf = function (cardElement) {
         return this._items.indexOf(cardElement);
@@ -13412,6 +15169,7 @@ var Container = /** @class */ (function (_super) {
         var result = _super.prototype.getResourceInformation.call(this);
         if (this.backgroundImage.isValid()) {
             result.push({
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- validated by `isValid()`
                 url: this.backgroundImage.url,
                 mimeType: "image"
             });
@@ -13466,17 +15224,18 @@ var Container = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    //#region Schema
     Container.backgroundImageProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_0, "backgroundImage", BackgroundImage);
     Container.verticalContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_1, "verticalContentAlignment", Enums.VerticalAlignment);
     Container.rtlProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_0, "rtl");
     __decorate([
-        serialization_1.property(Container.backgroundImageProperty)
+        (0, serialization_1.property)(Container.backgroundImageProperty)
     ], Container.prototype, "backgroundImage", null);
     __decorate([
-        serialization_1.property(Container.verticalContentAlignmentProperty)
+        (0, serialization_1.property)(Container.verticalContentAlignmentProperty)
     ], Container.prototype, "verticalContentAlignment", void 0);
     __decorate([
-        serialization_1.property(Container.rtlProperty)
+        (0, serialization_1.property)(Container.rtlProperty)
     ], Container.prototype, "rtl", void 0);
     return Container;
 }(ContainerBase));
@@ -13496,7 +15255,10 @@ var Column = /** @class */ (function (_super) {
         var minDesignTimeColumnHeight = 20;
         if (this.isDesignMode()) {
             renderedElement.style.minWidth = "20px";
-            renderedElement.style.minHeight = (!this.minPixelHeight ? minDesignTimeColumnHeight : Math.max(this.minPixelHeight, minDesignTimeColumnHeight)) + "px";
+            renderedElement.style.minHeight =
+                (!this.minPixelHeight
+                    ? minDesignTimeColumnHeight
+                    : Math.max(this.minPixelHeight, minDesignTimeColumnHeight)) + "px";
         }
         else {
             renderedElement.style.minWidth = "0";
@@ -13511,16 +15273,19 @@ var Column = /** @class */ (function (_super) {
             renderedElement.style.flex = "1 1 50px";
         }
         else if (this.width instanceof shared_1.SizeAndUnit) {
-            if (this.width.unit == Enums.SizeUnit.Pixel) {
+            if (this.width.unit === Enums.SizeUnit.Pixel) {
                 renderedElement.style.flex = "0 0 auto";
                 renderedElement.style.width = this.width.physicalSize + "px";
             }
             else {
-                renderedElement.style.flex = "1 1 " + (this._computedWeight > 0 ? this._computedWeight : this.width.physicalSize) + "%";
+                renderedElement.style.flex =
+                    "1 1 " +
+                        (this._computedWeight > 0 ? this._computedWeight : this.width.physicalSize) +
+                        "%";
             }
         }
     };
-    Column.prototype.shouldSerialize = function (context) {
+    Column.prototype.shouldSerialize = function (_context) {
         return true;
     };
     Object.defineProperty(Column.prototype, "separatorOrientation", {
@@ -13553,9 +15318,9 @@ var Column = /** @class */ (function (_super) {
         configurable: true
     });
     //#region Schema
-    Column.widthProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_0, "width", function (sender, property, source, context) {
-        var result = property.defaultValue;
-        var value = source[property.name];
+    Column.widthProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_0, "width", function (sender, prop, source, context) {
+        var result = prop.defaultValue;
+        var value = source[prop.name];
         var invalidWidth = false;
         if (typeof value === "number" && !isNaN(value)) {
             result = new shared_1.SizeAndUnit(value, Enums.SizeUnit.Weight);
@@ -13566,7 +15331,8 @@ var Column = /** @class */ (function (_super) {
         else if (typeof value === "string") {
             try {
                 result = shared_1.SizeAndUnit.parse(value);
-                if (result.unit === Enums.SizeUnit.Pixel && property.targetVersion.compareTo(context.targetVersion) > 0) {
+                if (result.unit === Enums.SizeUnit.Pixel &&
+                    prop.targetVersion.compareTo(context.targetVersion) > 0) {
                     invalidWidth = true;
                 }
             }
@@ -13596,7 +15362,7 @@ var Column = /** @class */ (function (_super) {
         }
     }, "stretch");
     __decorate([
-        serialization_1.property(Column.widthProperty)
+        (0, serialization_1.property)(Column.widthProperty)
     ], Column.prototype, "width", void 0);
     return Column;
 }(Container));
@@ -13609,10 +15375,9 @@ var ColumnSet = /** @class */ (function (_super) {
         return _this;
     }
     ColumnSet.prototype.createColumnInstance = function (source, context) {
-        return context.parseCardObject(this, source, [], // Forbidden types not supported for elements for now
-        !this.isDesignMode(), function (typeName) {
+        return context.parseCardObject(this, source, [], !this.isDesignMode(), function (typeName) {
             return !typeName || typeName === "Column" ? new Column() : undefined;
-        }, function (typeName, errorType) {
+        }, function (typeName, _errorType) {
             context.logParseEvent(undefined, Enums.ValidationEvent.ElementTypeNotAllowed, strings_1.Strings.errors.elementTypeNotAllowed(typeName));
         });
     };
@@ -13626,7 +15391,7 @@ var ColumnSet = /** @class */ (function (_super) {
             element.style.display = "flex";
             if (shared_1.GlobalSettings.useAdvancedCardBottomTruncation) {
                 // See comment in Container.internalRender()
-                element.style.minHeight = '-webkit-min-content';
+                element.style.minHeight = "-webkit-min-content";
             }
             switch (this.getEffectiveHorizontalAlignment()) {
                 case Enums.HorizontalAlignment.Center:
@@ -13642,14 +15407,17 @@ var ColumnSet = /** @class */ (function (_super) {
             var totalWeight = 0;
             for (var _i = 0, _a = this._columns; _i < _a.length; _i++) {
                 var column = _a[_i];
-                if (column.width instanceof shared_1.SizeAndUnit && (column.width.unit == Enums.SizeUnit.Weight)) {
+                if (column.width instanceof shared_1.SizeAndUnit &&
+                    column.width.unit === Enums.SizeUnit.Weight) {
                     totalWeight += column.width.physicalSize;
                 }
             }
             for (var _b = 0, _c = this._columns; _b < _c.length; _b++) {
                 var column = _c[_b];
-                if (column.width instanceof shared_1.SizeAndUnit && column.width.unit == Enums.SizeUnit.Weight && totalWeight > 0) {
-                    var computedWeight = 100 / totalWeight * column.width.physicalSize;
+                if (column.width instanceof shared_1.SizeAndUnit &&
+                    column.width.unit === Enums.SizeUnit.Weight &&
+                    totalWeight > 0) {
+                    var computedWeight = (100 / totalWeight) * column.width.physicalSize;
                     // Best way to emulate "internal" access I know of
                     column["_computedWeight"] = computedWeight;
                 }
@@ -13672,14 +15440,14 @@ var ColumnSet = /** @class */ (function (_super) {
     ColumnSet.prototype.truncateOverflow = function (maxHeight) {
         for (var _i = 0, _a = this._columns; _i < _a.length; _i++) {
             var column = _a[_i];
-            column['handleOverflow'](maxHeight);
+            column["handleOverflow"](maxHeight);
         }
         return true;
     };
     ColumnSet.prototype.undoOverflowTruncation = function () {
         for (var _i = 0, _a = this._columns; _i < _a.length; _i++) {
             var column = _a[_i];
-            column['resetOverflow']();
+            column["resetOverflow"]();
         }
     };
     Object.defineProperty(ColumnSet.prototype, "isSelectable", {
@@ -13712,7 +15480,7 @@ var ColumnSet = /** @class */ (function (_super) {
         for (var _i = 0, _a = this._columns; _i < _a.length; _i++) {
             var column = _a[_i];
             if (column.isVisible) {
-                return column == element;
+                return column === element;
             }
         }
         return false;
@@ -13815,10 +15583,10 @@ var ColumnSet = /** @class */ (function (_super) {
         return cardElement instanceof Column ? this._columns.indexOf(cardElement) : -1;
     };
     ColumnSet.prototype.isLeftMostElement = function (element) {
-        return this._columns.indexOf(element) == 0;
+        return this._columns.indexOf(element) === 0;
     };
     ColumnSet.prototype.isRightMostElement = function (element) {
-        return this._columns.indexOf(element) == this._columns.length - 1;
+        return this._columns.indexOf(element) === this._columns.length - 1;
     };
     ColumnSet.prototype.isTopElement = function (element) {
         return this._columns.indexOf(element) >= 0;
@@ -13872,33 +15640,39 @@ var ColumnSet = /** @class */ (function (_super) {
 exports.ColumnSet = ColumnSet;
 function raiseImageLoadedEvent(image) {
     var card = image.getRootElement();
-    var onImageLoadedHandler = (card && card.onImageLoaded) ? card.onImageLoaded : AdaptiveCard.onImageLoaded;
+    var onImageLoadedHandler = card && card.onImageLoaded ? card.onImageLoaded : AdaptiveCard.onImageLoaded;
     if (onImageLoadedHandler) {
         onImageLoadedHandler(image);
     }
 }
 function raiseAnchorClickedEvent(element, anchor, ev) {
     var card = element.getRootElement();
-    var onAnchorClickedHandler = (card && card.onAnchorClicked) ? card.onAnchorClicked : AdaptiveCard.onAnchorClicked;
-    return onAnchorClickedHandler !== undefined ? onAnchorClickedHandler(element, anchor, ev) : false;
+    var onAnchorClickedHandler = card && card.onAnchorClicked ? card.onAnchorClicked : AdaptiveCard.onAnchorClicked;
+    return onAnchorClickedHandler !== undefined
+        ? onAnchorClickedHandler(element, anchor, ev)
+        : false;
 }
 function raiseExecuteActionEvent(action) {
     var card = action.parent ? action.parent.getRootElement() : undefined;
-    var onExecuteActionHandler = (card && card.onExecuteAction) ? card.onExecuteAction : AdaptiveCard.onExecuteAction;
+    var onExecuteActionHandler = card && card.onExecuteAction ? card.onExecuteAction : AdaptiveCard.onExecuteAction;
     if (action.prepareForExecution() && onExecuteActionHandler) {
         onExecuteActionHandler(action);
     }
 }
 function raiseInlineCardExpandedEvent(action, isExpanded) {
     var card = action.parent ? action.parent.getRootElement() : undefined;
-    var onInlineCardExpandedHandler = (card && card.onInlineCardExpanded) ? card.onInlineCardExpanded : AdaptiveCard.onInlineCardExpanded;
+    var onInlineCardExpandedHandler = card && card.onInlineCardExpanded
+        ? card.onInlineCardExpanded
+        : AdaptiveCard.onInlineCardExpanded;
     if (onInlineCardExpandedHandler) {
         onInlineCardExpandedHandler(action, isExpanded);
     }
 }
 function raiseInputValueChangedEvent(input) {
     var card = input.getRootElement();
-    var onInputValueChangedHandler = (card && card.onInputValueChanged) ? card.onInputValueChanged : AdaptiveCard.onInputValueChanged;
+    var onInputValueChangedHandler = card && card.onInputValueChanged
+        ? card.onInputValueChanged
+        : AdaptiveCard.onInputValueChanged;
     if (onInputValueChangedHandler) {
         onInputValueChangedHandler(input);
     }
@@ -13910,9 +15684,25 @@ function raiseElementVisibilityChangedEvent(element, shouldUpdateLayout) {
         rootElement.updateLayout();
     }
     var card = rootElement;
-    var onElementVisibilityChangedHandler = (card && card.onElementVisibilityChanged) ? card.onElementVisibilityChanged : AdaptiveCard.onElementVisibilityChanged;
+    var onElementVisibilityChangedHandler = card && card.onElementVisibilityChanged
+        ? card.onElementVisibilityChanged
+        : AdaptiveCard.onElementVisibilityChanged;
     if (onElementVisibilityChangedHandler !== undefined) {
         onElementVisibilityChangedHandler(element);
+    }
+}
+function updateInputAdornersVisibility(input, hide) {
+    if (!!hide) {
+        // hides the time/date picker icon
+        input.readOnly = true;
+        // hides the cross button icon
+        input.required = true;
+    }
+    else {
+        // shows the time/date picker icon
+        input.readOnly = false;
+        // shows the cross button icon
+        input.required = false;
     }
 }
 /**
@@ -13920,16 +15710,24 @@ function raiseElementVisibilityChangedEvent(element, shouldUpdateLayout) {
  */
 function raiseDisplayOverflowActionMenuEvent(action, target) {
     var card = action.parent ? action.parent.getRootElement() : undefined;
-    var onDisplayOverflowActionMenuHandler = (card && card.onDisplayOverflowActionMenu) ? card.onDisplayOverflowActionMenu : AdaptiveCard.onDisplayOverflowActionMenu;
-    return onDisplayOverflowActionMenuHandler !== undefined ? onDisplayOverflowActionMenuHandler(action.getActions(), target) : false;
+    var onDisplayOverflowActionMenuHandler = card && card.onDisplayOverflowActionMenu
+        ? card.onDisplayOverflowActionMenu
+        : AdaptiveCard.onDisplayOverflowActionMenu;
+    return onDisplayOverflowActionMenuHandler !== undefined
+        ? onDisplayOverflowActionMenuHandler(action.getActions(), target)
+        : false;
 }
 /**
  * @returns return false to continue with default action button; return true to skip SDK default action button
  */
 function raiseRenderOverflowActionsEvent(action, isAtRootLevelActions) {
     var card = action.parent ? action.parent.getRootElement() : undefined;
-    var onRenderOverflowActionsHandler = (card && card.onRenderOverflowActions) ? card.onRenderOverflowActions : AdaptiveCard.onRenderOverflowActions;
-    return onRenderOverflowActionsHandler !== undefined ? onRenderOverflowActionsHandler(action.getActions(), isAtRootLevelActions) : false;
+    var onRenderOverflowActionsHandler = card && card.onRenderOverflowActions
+        ? card.onRenderOverflowActions
+        : AdaptiveCard.onRenderOverflowActions;
+    return onRenderOverflowActionsHandler !== undefined
+        ? onRenderOverflowActionsHandler(action.getActions(), isAtRootLevelActions)
+        : false;
 }
 var ContainerWithActions = /** @class */ (function (_super) {
     __extends(ContainerWithActions, _super);
@@ -13940,6 +15738,9 @@ var ContainerWithActions = /** @class */ (function (_super) {
     }
     ContainerWithActions.prototype.internalParse = function (source, context) {
         _super.prototype.internalParse.call(this, source, context);
+        this.parseActions(source, context);
+    };
+    ContainerWithActions.prototype.parseActions = function (source, context) {
         this._actionCollection.parse(source["actions"], context);
     };
     ContainerWithActions.prototype.internalToJSON = function (target, context) {
@@ -13949,7 +15750,7 @@ var ContainerWithActions = /** @class */ (function (_super) {
     ContainerWithActions.prototype.internalRender = function () {
         var element = _super.prototype.internalRender.call(this);
         if (element) {
-            var renderedActions = this._actionCollection.render(this.hostConfig.actions.actionsOrientation, false);
+            var renderedActions = this._actionCollection.render(this.hostConfig.actions.actionsOrientation);
             if (renderedActions) {
                 Utils.appendChild(element, renderSeparation(this.hostConfig, {
                     spacing: this.hostConfig.getEffectiveSpacing(this.hostConfig.actions.spacing)
@@ -13968,11 +15769,12 @@ var ContainerWithActions = /** @class */ (function (_super) {
         }
     };
     ContainerWithActions.prototype.getHasExpandedAction = function () {
-        if (this.renderedActionCount == 0) {
+        if (this.renderedActionCount === 0) {
             return false;
         }
-        else if (this.renderedActionCount == 1) {
-            return this._actionCollection.expandedAction !== undefined && !this.hostConfig.actions.preExpandSingleShowCardAction;
+        else if (this.renderedActionCount === 1) {
+            return (this._actionCollection.expandedAction !== undefined &&
+                !this.hostConfig.actions.preExpandSingleShowCardAction);
         }
         else {
             return this._actionCollection.expandedAction !== undefined;
@@ -13992,6 +15794,10 @@ var ContainerWithActions = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    ContainerWithActions.prototype.releaseDOMResources = function () {
+        _super.prototype.releaseDOMResources.call(this);
+        this._actionCollection.releaseDOMResources();
+    };
     ContainerWithActions.prototype.getActionCount = function () {
         return this._actionCollection.getActionCount();
     };
@@ -14014,7 +15820,7 @@ var ContainerWithActions = /** @class */ (function (_super) {
         }
     };
     ContainerWithActions.prototype.isLastElement = function (element) {
-        return _super.prototype.isLastElement.call(this, element) && this._actionCollection.getActionCount() == 0;
+        return _super.prototype.isLastElement.call(this, element) && this._actionCollection.getActionCount() === 0;
     };
     ContainerWithActions.prototype.addAction = function (action) {
         this._actionCollection.addAction(action);
@@ -14027,25 +15833,38 @@ var ContainerWithActions = /** @class */ (function (_super) {
         if (processActions === void 0) { processActions = true; }
         var result = _super.prototype.getAllInputs.call(this, processActions);
         if (processActions) {
-            result = result.concat(this._actionCollection.getAllInputs(processActions));
+            result.push.apply(result, this._actionCollection.getAllInputs(processActions));
         }
         return result;
     };
     ContainerWithActions.prototype.getResourceInformation = function () {
-        return _super.prototype.getResourceInformation.call(this).concat(this._actionCollection.getResourceInformation());
+        var result = _super.prototype.getResourceInformation.call(this);
+        result.push.apply(result, this._actionCollection.getResourceInformation());
+        return result;
     };
     ContainerWithActions.prototype.isBleedingAtBottom = function () {
-        if (this._actionCollection.renderedActionCount == 0) {
+        if (this._actionCollection.renderedActionCount === 0) {
             return _super.prototype.isBleedingAtBottom.call(this);
         }
         else {
-            if (this._actionCollection.getActionCount() == 1) {
-                return this._actionCollection.expandedAction !== undefined && !this.hostConfig.actions.preExpandSingleShowCardAction;
+            if (this._actionCollection.getActionCount() === 1) {
+                return (this._actionCollection.expandedAction !== undefined &&
+                    !this.hostConfig.actions.preExpandSingleShowCardAction);
             }
             else {
                 return this._actionCollection.expandedAction !== undefined;
             }
         }
+    };
+    ContainerWithActions.prototype.getForbiddenActionNames = function () {
+        return [];
+    };
+    ContainerWithActions.prototype.getElementById = function (id) {
+        var result = _super.prototype.getElementById.call(this, id);
+        if (!result) {
+            result = this.getElementByIdFromAction(id);
+        }
+        return result;
     };
     Object.defineProperty(ContainerWithActions.prototype, "isStandalone", {
         get: function () {
@@ -14107,10 +15926,10 @@ var RefreshDefinition = /** @class */ (function (_super) {
     RefreshDefinition.actionProperty = new RefreshActionProperty(serialization_1.Versions.v1_4, "action");
     RefreshDefinition.userIdsProperty = new serialization_1.StringArrayProperty(serialization_1.Versions.v1_4, "userIds");
     __decorate([
-        serialization_1.property(RefreshDefinition.actionProperty)
+        (0, serialization_1.property)(RefreshDefinition.actionProperty)
     ], RefreshDefinition.prototype, "action", null);
     __decorate([
-        serialization_1.property(RefreshDefinition.userIdsProperty)
+        (0, serialization_1.property)(RefreshDefinition.userIdsProperty)
     ], RefreshDefinition.prototype, "userIds", void 0);
     return RefreshDefinition;
 }(serialization_1.SerializableObject));
@@ -14129,16 +15948,16 @@ var AuthCardButton = /** @class */ (function (_super) {
     AuthCardButton.imageProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_4, "image");
     AuthCardButton.valueProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_4, "value");
     __decorate([
-        serialization_1.property(AuthCardButton.typeProperty)
+        (0, serialization_1.property)(AuthCardButton.typeProperty)
     ], AuthCardButton.prototype, "type", void 0);
     __decorate([
-        serialization_1.property(AuthCardButton.titleProperty)
+        (0, serialization_1.property)(AuthCardButton.titleProperty)
     ], AuthCardButton.prototype, "title", void 0);
     __decorate([
-        serialization_1.property(AuthCardButton.imageProperty)
+        (0, serialization_1.property)(AuthCardButton.imageProperty)
     ], AuthCardButton.prototype, "image", void 0);
     __decorate([
-        serialization_1.property(AuthCardButton.valueProperty)
+        (0, serialization_1.property)(AuthCardButton.valueProperty)
     ], AuthCardButton.prototype, "value", void 0);
     return AuthCardButton;
 }(serialization_1.SerializableObject));
@@ -14156,13 +15975,13 @@ var TokenExchangeResource = /** @class */ (function (_super) {
     TokenExchangeResource.uriProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_4, "uri");
     TokenExchangeResource.providerIdProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_4, "providerId");
     __decorate([
-        serialization_1.property(TokenExchangeResource.idProperty)
+        (0, serialization_1.property)(TokenExchangeResource.idProperty)
     ], TokenExchangeResource.prototype, "id", void 0);
     __decorate([
-        serialization_1.property(TokenExchangeResource.uriProperty)
+        (0, serialization_1.property)(TokenExchangeResource.uriProperty)
     ], TokenExchangeResource.prototype, "uri", void 0);
     __decorate([
-        serialization_1.property(TokenExchangeResource.providerIdProperty)
+        (0, serialization_1.property)(TokenExchangeResource.providerIdProperty)
     ], TokenExchangeResource.prototype, "providerId", void 0);
     return TokenExchangeResource;
 }(serialization_1.SerializableObject));
@@ -14181,16 +16000,16 @@ var Authentication = /** @class */ (function (_super) {
     Authentication.buttonsProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_4, "buttons", AuthCardButton);
     Authentication.tokenExchangeResourceProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_4, "tokenExchangeResource", TokenExchangeResource, true);
     __decorate([
-        serialization_1.property(Authentication.textProperty)
+        (0, serialization_1.property)(Authentication.textProperty)
     ], Authentication.prototype, "text", void 0);
     __decorate([
-        serialization_1.property(Authentication.connectionNameProperty)
+        (0, serialization_1.property)(Authentication.connectionNameProperty)
     ], Authentication.prototype, "connectionName", void 0);
     __decorate([
-        serialization_1.property(Authentication.buttonsProperty)
+        (0, serialization_1.property)(Authentication.buttonsProperty)
     ], Authentication.prototype, "buttons", void 0);
     __decorate([
-        serialization_1.property(Authentication.tokenExchangeResourceProperty)
+        (0, serialization_1.property)(Authentication.tokenExchangeResourceProperty)
     ], Authentication.prototype, "tokenExchangeResource", void 0);
     return Authentication;
 }(serialization_1.SerializableObject));
@@ -14220,7 +16039,8 @@ var AdaptiveCard = /** @class */ (function (_super) {
         get: function () {
             throw new Error(strings_1.Strings.errors.processMarkdownEventRemoved());
         },
-        set: function (value) {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        set: function (_value) {
             throw new Error(strings_1.Strings.errors.processMarkdownEventRemoved());
         },
         enumerable: false,
@@ -14239,8 +16059,10 @@ var AdaptiveCard = /** @class */ (function (_super) {
             result.outputHtml = markdownIt().render(text);
             result.didProcess = true;
         }
-        else {
+        else if (!AdaptiveCard._haveWarnedAboutNoMarkdownProcessing) {
+            // eslint-disable-next-line no-console
             console.warn(strings_1.Strings.errors.markdownProcessingNotEnabled);
+            AdaptiveCard._haveWarnedAboutNoMarkdownProcessing = true;
         }
         return result;
     };
@@ -14251,8 +16073,9 @@ var AdaptiveCard = /** @class */ (function (_super) {
         else {
             var unsupportedVersion = !this.version ||
                 !this.version.isValid ||
-                (this.maxVersion.major < this.version.major) ||
-                (this.maxVersion.major == this.version.major && this.maxVersion.minor < this.version.minor);
+                this.maxVersion.major < this.version.major ||
+                (this.maxVersion.major === this.version.major &&
+                    this.maxVersion.minor < this.version.minor);
             return !unsupportedVersion;
         }
     };
@@ -14264,7 +16087,7 @@ var AdaptiveCard = /** @class */ (function (_super) {
     };
     AdaptiveCard.prototype.internalParse = function (source, context) {
         this._fallbackCard = undefined;
-        var fallbackElement = context.parseElement(undefined, source["fallback"], !this.isDesignMode());
+        var fallbackElement = context.parseElement(undefined, source["fallback"], this.forbiddenChildElements(), !this.isDesignMode());
         if (fallbackElement) {
             this._fallbackCard = new AdaptiveCard();
             this._fallbackCard.addItem(fallbackElement);
@@ -14285,13 +16108,14 @@ var AdaptiveCard = /** @class */ (function (_super) {
         }
         return renderedElement;
     };
-    AdaptiveCard.prototype.getHasBackground = function () {
+    AdaptiveCard.prototype.getHasBackground = function (ignoreBackgroundImages) {
+        if (ignoreBackgroundImages === void 0) { ignoreBackgroundImages = false; }
         return true;
     };
     AdaptiveCard.prototype.getDefaultPadding = function () {
         return new shared_1.PaddingDefinition(Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding, Enums.Spacing.Padding);
     };
-    AdaptiveCard.prototype.shouldSerialize = function (context) {
+    AdaptiveCard.prototype.shouldSerialize = function (_context) {
         return true;
     };
     Object.defineProperty(AdaptiveCard.prototype, "renderIfEmpty", {
@@ -14338,6 +16162,7 @@ var AdaptiveCard = /** @class */ (function (_super) {
         }
     };
     AdaptiveCard.prototype.render = function (target) {
+        var _this = this;
         var renderedCard;
         if (this.shouldFallback() && this._fallbackCard) {
             this._fallbackCard.hostConfig = this.hostConfig;
@@ -14358,6 +16183,13 @@ var AdaptiveCard = /** @class */ (function (_super) {
                 if (this.speak) {
                     renderedCard.setAttribute("aria-label", this.speak);
                 }
+                renderedCard.onmouseenter = function (ev) {
+                    _this.updateInputsVisualState(true /* hover */);
+                };
+                renderedCard.onmouseleave = function (ev) {
+                    _this.updateInputsVisualState(false /* hover */);
+                };
+                this.getRootElement().updateActionsEnabledState();
             }
         }
         if (target) {
@@ -14371,7 +16203,8 @@ var AdaptiveCard = /** @class */ (function (_super) {
         _super.prototype.updateLayout.call(this, processChildren);
         if (shared_1.GlobalSettings.useAdvancedCardBottomTruncation && this.isDisplayed()) {
             var padding = this.hostConfig.getEffectiveSpacing(Enums.Spacing.Default);
-            this['handleOverflow'](this.renderedElement.offsetHeight - padding);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            this["handleOverflow"](this.renderedElement.offsetHeight - padding);
         }
     };
     AdaptiveCard.prototype.shouldFallback = function () {
@@ -14386,41 +16219,44 @@ var AdaptiveCard = /** @class */ (function (_super) {
     });
     AdaptiveCard.schemaUrl = "http://adaptivecards.io/schemas/adaptive-card.json";
     //#region Schema
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     AdaptiveCard.$schemaProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_0, "$schema", function (sender, property, source, context) {
         return AdaptiveCard.schemaUrl;
-    }, function (sender, property, target, value, context) {
-        context.serializeValue(target, property.name, AdaptiveCard.schemaUrl);
+    }, function (sender, prop, target, value, context) {
+        context.serializeValue(target, prop.name, AdaptiveCard.schemaUrl);
     });
-    AdaptiveCard.versionProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_0, "version", function (sender, property, source, context) {
-        var version = serialization_1.Version.parse(source[property.name], context);
+    AdaptiveCard.versionProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_0, "version", function (sender, prop, source, context) {
+        var version = serialization_1.Version.parse(source[prop.name], context);
         if (version === undefined) {
             version = serialization_1.Versions.latest;
             context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, strings_1.Strings.errors.invalidCardVersion(version.toString()));
         }
         return version;
-    }, function (sender, property, target, value, context) {
+    }, function (sender, prop, target, value, context) {
         if (value !== undefined) {
-            context.serializeValue(target, property.name, value.toString());
+            context.serializeValue(target, prop.name, value.toString());
         }
     }, serialization_1.Versions.v1_0);
     AdaptiveCard.fallbackTextProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "fallbackText");
     AdaptiveCard.speakProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "speak");
     AdaptiveCard.refreshProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_4, "refresh", RefreshDefinition, true);
     AdaptiveCard.authenticationProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_4, "authentication", Authentication, true);
+    //#endregion
+    AdaptiveCard._haveWarnedAboutNoMarkdownProcessing = false;
     __decorate([
-        serialization_1.property(AdaptiveCard.versionProperty)
+        (0, serialization_1.property)(AdaptiveCard.versionProperty)
     ], AdaptiveCard.prototype, "version", void 0);
     __decorate([
-        serialization_1.property(AdaptiveCard.fallbackTextProperty)
+        (0, serialization_1.property)(AdaptiveCard.fallbackTextProperty)
     ], AdaptiveCard.prototype, "fallbackText", void 0);
     __decorate([
-        serialization_1.property(AdaptiveCard.speakProperty)
+        (0, serialization_1.property)(AdaptiveCard.speakProperty)
     ], AdaptiveCard.prototype, "speak", void 0);
     __decorate([
-        serialization_1.property(AdaptiveCard.refreshProperty)
+        (0, serialization_1.property)(AdaptiveCard.refreshProperty)
     ], AdaptiveCard.prototype, "refresh", null);
     __decorate([
-        serialization_1.property(AdaptiveCard.authenticationProperty)
+        (0, serialization_1.property)(AdaptiveCard.authenticationProperty)
     ], AdaptiveCard.prototype, "authentication", void 0);
     return AdaptiveCard;
 }(ContainerWithActions));
@@ -14457,7 +16293,9 @@ var InlineAdaptiveCard = /** @class */ (function (_super) {
                 return Enums.ContainerStyle.Default;
             }
             else {
-                return this.hostConfig.actions.showCard.style ? this.hostConfig.actions.showCard.style : Enums.ContainerStyle.Emphasis;
+                return this.hostConfig.actions.showCard.style
+                    ? this.hostConfig.actions.showCard.style
+                    : Enums.ContainerStyle.Emphasis;
             }
         },
         enumerable: false,
@@ -14476,13 +16314,23 @@ var InlineAdaptiveCard = /** @class */ (function (_super) {
 var SerializationContext = /** @class */ (function (_super) {
     __extends(SerializationContext, _super);
     function SerializationContext() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._forbiddenTypes = new Set();
+        return _this;
     }
-    SerializationContext.prototype.internalParseCardObject = function (parent, source, forbiddenTypeNames, allowFallback, createInstanceCallback, logParseEvent) {
+    SerializationContext.prototype.internalParseCardObject = function (parent, source, forbiddenTypes, allowFallback, createInstanceCallback, logParseEvent) {
+        var _this = this;
         var result = undefined;
         if (source && typeof source === "object") {
+            var oldForbiddenTypes_1 = new Set();
+            this._forbiddenTypes.forEach(function (type) {
+                oldForbiddenTypes_1.add(type);
+            });
+            forbiddenTypes.forEach(function (type) {
+                _this._forbiddenTypes.add(type);
+            });
             var typeName = Utils.parseString(source["type"]);
-            if (typeName && forbiddenTypeNames.indexOf(typeName) >= 0) {
+            if (typeName && this._forbiddenTypes.has(typeName)) {
                 logParseEvent(typeName, Enums.TypeErrorType.ForbiddenType);
             }
             else {
@@ -14495,7 +16343,8 @@ var SerializationContext = /** @class */ (function (_super) {
                 else {
                     result.setParent(parent);
                     result.parse(source, this);
-                    tryToFallback = shared_1.GlobalSettings.enableFallback && allowFallback && result.shouldFallback();
+                    tryToFallback =
+                        shared_1.GlobalSettings.enableFallback && allowFallback && result.shouldFallback();
                 }
                 if (tryToFallback) {
                     var fallback = source["fallback"];
@@ -14506,10 +16355,11 @@ var SerializationContext = /** @class */ (function (_super) {
                         result = undefined;
                     }
                     else if (typeof fallback === "object") {
-                        result = this.internalParseCardObject(parent, fallback, forbiddenTypeNames, true, createInstanceCallback, logParseEvent);
+                        result = this.internalParseCardObject(parent, fallback, forbiddenTypes, true, createInstanceCallback, logParseEvent);
                     }
                 }
             }
+            this._forbiddenTypes = oldForbiddenTypes_1;
         }
         return result;
     };
@@ -14533,16 +16383,16 @@ var SerializationContext = /** @class */ (function (_super) {
         }
     };
     SerializationContext.prototype.parseCardObject = function (parent, source, forbiddenTypeNames, allowFallback, createInstanceCallback, logParseEvent) {
-        var result = this.internalParseCardObject(parent, source, forbiddenTypeNames, allowFallback, createInstanceCallback, logParseEvent);
+        var forbiddenTypes = new Set(forbiddenTypeNames);
+        var result = this.internalParseCardObject(parent, source, forbiddenTypes, allowFallback, createInstanceCallback, logParseEvent);
         if (result !== undefined) {
             this.cardObjectParsed(result, source);
         }
         return result;
     };
-    SerializationContext.prototype.parseElement = function (parent, source, allowFallback) {
+    SerializationContext.prototype.parseElement = function (parent, source, forbiddenTypes, allowFallback) {
         var _this = this;
-        return this.parseCardObject(parent, source, [], // Forbidden types not supported for elements for now
-        allowFallback, function (typeName) {
+        return this.parseCardObject(parent, source, forbiddenTypes, allowFallback, function (typeName) {
             return _this.elementRegistry.createInstance(typeName, _this.targetVersion);
         }, function (typeName, errorType) {
             if (errorType === Enums.TypeErrorType.UnknownType) {
@@ -14558,7 +16408,7 @@ var SerializationContext = /** @class */ (function (_super) {
         return this.parseCardObject(parent, source, forbiddenActionTypes, allowFallback, function (typeName) {
             return _this.actionRegistry.createInstance(typeName, _this.targetVersion);
         }, function (typeName, errorType) {
-            if (errorType == Enums.TypeErrorType.UnknownType) {
+            if (errorType === Enums.TypeErrorType.UnknownType) {
                 _this.logParseEvent(undefined, Enums.ValidationEvent.UnknownActionType, strings_1.Strings.errors.unknownActionType(typeName));
             }
             else {
@@ -14568,7 +16418,8 @@ var SerializationContext = /** @class */ (function (_super) {
     };
     Object.defineProperty(SerializationContext.prototype, "elementRegistry", {
         get: function () {
-            return this._elementRegistry ? this._elementRegistry : registry_1.GlobalRegistry.elements;
+            var _a;
+            return (_a = this._elementRegistry) !== null && _a !== void 0 ? _a : registry_1.GlobalRegistry.elements;
         },
         enumerable: false,
         configurable: true
@@ -14580,7 +16431,8 @@ var SerializationContext = /** @class */ (function (_super) {
     };
     Object.defineProperty(SerializationContext.prototype, "actionRegistry", {
         get: function () {
-            return this._actionRegistry ? this._actionRegistry : registry_1.GlobalRegistry.actions;
+            var _a;
+            return (_a = this._actionRegistry) !== null && _a !== void 0 ? _a : registry_1.GlobalRegistry.actions;
         },
         enumerable: false,
         configurable: true
@@ -14699,15 +16551,16 @@ var CardObject = /** @class */ (function (_super) {
         }
         return false;
     };
-    CardObject.prototype.preProcessPropertyValue = function (property, propertyValue) {
-        var value = propertyValue === undefined ? this.getValue(property) : propertyValue;
+    CardObject.prototype.preProcessPropertyValue = function (prop, propertyValue) {
+        var value = propertyValue === undefined ? this.getValue(prop) : propertyValue;
         if (shared_1.GlobalSettings.allowPreProcessingPropertyValues) {
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             var currentObject = this;
             while (currentObject && !currentObject.onPreProcessPropertyValue) {
                 currentObject = currentObject.parent;
             }
             if (currentObject && currentObject.onPreProcessPropertyValue) {
-                return currentObject.onPreProcessPropertyValue(this, property, value);
+                return currentObject.onPreProcessPropertyValue(this, prop, value);
             }
         }
         return value;
@@ -14722,16 +16575,17 @@ var CardObject = /** @class */ (function (_super) {
         return this._shouldFallback || !this.requires.areAllMet(this.hostConfig.hostCapabilities);
     };
     CardObject.prototype.getRootObject = function () {
-        var rootObject = this;
-        while (rootObject.parent) {
-            rootObject = rootObject.parent;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        var currentObject = this;
+        while (currentObject.parent) {
+            currentObject = currentObject.parent;
         }
-        return rootObject;
+        return currentObject;
     };
     CardObject.prototype.internalValidateProperties = function (context) {
         if (this.id) {
             if (context.allIds.hasOwnProperty(this.id)) {
-                if (context.allIds[this.id] == 1) {
+                if (context.allIds[this.id] === 1) {
                     context.addFailure(this, Enums.ValidationEvent.DuplicateId, strings_1.Strings.errors.duplicateId(this.id));
                 }
                 context.allIds[this.id] += 1;
@@ -14758,6 +16612,9 @@ var CardObject = /** @class */ (function (_super) {
         // default implementation for CardObjects with no associated children
         return this.contains(node) ? this : undefined;
     };
+    CardObject.prototype.releaseDOMResources = function () {
+        // Do nothing in base implementation
+    };
     Object.defineProperty(CardObject.prototype, "parent", {
         get: function () {
             return this._parent;
@@ -14778,15 +16635,659 @@ var CardObject = /** @class */ (function (_super) {
     CardObject.idProperty = new serialization_1.StringProperty(serialization_1.Versions.v1_0, "id");
     CardObject.requiresProperty = new serialization_1.SerializableObjectProperty(serialization_1.Versions.v1_2, "requires", host_capabilities_1.HostCapabilities, false, new host_capabilities_1.HostCapabilities());
     __decorate([
-        serialization_1.property(CardObject.idProperty)
+        (0, serialization_1.property)(CardObject.idProperty)
     ], CardObject.prototype, "id", void 0);
     __decorate([
-        serialization_1.property(CardObject.requiresProperty)
+        (0, serialization_1.property)(CardObject.requiresProperty)
     ], CardObject.prototype, "requires", null);
     return CardObject;
 }(serialization_1.SerializableObject));
 exports.CardObject = CardObject;
 //# sourceMappingURL=card-object.js.map
+
+/***/ }),
+
+/***/ 2606:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CarouselEvent = exports.Carousel = exports.CarouselPage = void 0;
+// Copyright (C) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+var card_elements_1 = __nccwpck_require__(8064);
+var Enums = __nccwpck_require__(4926);
+var serialization_1 = __nccwpck_require__(5457);
+var registry_1 = __nccwpck_require__(4553);
+var enums_1 = __nccwpck_require__(4926);
+var strings_1 = __nccwpck_require__(1920);
+var swiper_1 = __nccwpck_require__(1602);
+var Utils = __nccwpck_require__(909);
+var shared_1 = __nccwpck_require__(5181);
+// Note: to function correctly, consumers need to have CSS from swiper/css, swiper/css/pagination, and
+// swiper/css/navigation
+var CarouselPage = /** @class */ (function (_super) {
+    __extends(CarouselPage, _super);
+    function CarouselPage() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    //#region Schema
+    CarouselPage.prototype.populateSchema = function (schema) {
+        _super.prototype.populateSchema.call(this, schema);
+        // `style`, `bleed`, `isVisible` are not supported in CarouselPage
+        schema.remove(card_elements_1.Container.styleProperty);
+        schema.remove(card_elements_1.Container.bleedProperty);
+        schema.remove(card_elements_1.Container.isVisibleProperty);
+    };
+    //#endregion
+    CarouselPage.prototype.internalRender = function () {
+        var carouselSlide = document.createElement("div");
+        carouselSlide.className = this.hostConfig.makeCssClassName("swiper-slide");
+        // `isRtl()` will set the correct value of rtl by reading the value from the parents
+        this.rtl = this.isRtl();
+        var renderedElement = _super.prototype.internalRender.call(this);
+        Utils.appendChild(carouselSlide, renderedElement);
+        return carouselSlide;
+    };
+    CarouselPage.prototype.getForbiddenActionTypes = function () {
+        return [card_elements_1.ShowCardAction, card_elements_1.ToggleVisibilityAction];
+    };
+    CarouselPage.prototype.getForbiddenChildElements = function () {
+        return this.forbiddenChildElements();
+    };
+    CarouselPage.prototype.forbiddenChildElements = function () {
+        return __spreadArray([
+            card_elements_1.ToggleVisibilityAction.JsonTypeName,
+            card_elements_1.ShowCardAction.JsonTypeName,
+            "Media",
+            "ActionSet",
+            "Input.Text",
+            "Input.Date",
+            "Input.Time",
+            "Input.Number",
+            "Input.ChoiceSet",
+            "Input.Toggle",
+            "Carousel"
+        ], _super.prototype.forbiddenChildElements.call(this), true);
+    };
+    CarouselPage.prototype.internalParse = function (source, context) {
+        _super.prototype.internalParse.call(this, source, context);
+        this.setShouldFallback(false);
+    };
+    CarouselPage.prototype.shouldSerialize = function (_context) {
+        return true;
+    };
+    CarouselPage.prototype.getJsonTypeName = function () {
+        return "CarouselPage";
+    };
+    Object.defineProperty(CarouselPage.prototype, "isStandalone", {
+        get: function () {
+            return false;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(CarouselPage.prototype, "hasVisibleSeparator", {
+        get: function () {
+            return false;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return CarouselPage;
+}(card_elements_1.Container));
+exports.CarouselPage = CarouselPage;
+var Carousel = /** @class */ (function (_super) {
+    __extends(Carousel, _super);
+    function Carousel() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.carouselLoop = true;
+        _this.carouselOrientation = Enums.Orientation.Horizontal;
+        _this._pages = [];
+        _this._currentIndex = 0;
+        _this._previousEventType = Enums.CarouselInteractionEvent.Pagination;
+        return _this;
+    }
+    //#region Schema
+    Carousel.prototype.populateSchema = function (schema) {
+        _super.prototype.populateSchema.call(this, schema);
+        // `style`, `bleed`, `isVisible` are not supported in Carousel
+        schema.remove(card_elements_1.Container.styleProperty);
+        schema.remove(card_elements_1.Container.bleedProperty);
+        schema.remove(card_elements_1.Container.isVisibleProperty);
+    };
+    Object.defineProperty(Carousel.prototype, "timer", {
+        get: function () {
+            var timer = this.getValue(Carousel.timerProperty);
+            if (timer && timer < this.hostConfig.carousel.minAutoplayDelay) {
+                console.warn(strings_1.Strings.errors.tooLittleTimeDelay);
+                timer = this.hostConfig.carousel.minAutoplayDelay;
+            }
+            return timer;
+        },
+        set: function (value) {
+            if (value && value < this.hostConfig.carousel.minAutoplayDelay) {
+                console.warn(strings_1.Strings.errors.tooLittleTimeDelay);
+                this.setValue(Carousel.timerProperty, this.hostConfig.carousel.minAutoplayDelay);
+            }
+            else {
+                this.setValue(Carousel.timerProperty, value);
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Carousel.prototype, "initialPageIndex", {
+        get: function () {
+            return this.getValue(Carousel.initialPageProperty);
+        },
+        set: function (value) {
+            if (this.isValidParsedPageIndex(value)) {
+                this.setValue(Carousel.initialPageProperty, value);
+            }
+            else {
+                console.warn(strings_1.Strings.errors.invalidInitialPageIndex(value));
+                this.setValue(Carousel.initialPageProperty, 0);
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Carousel.prototype.isValidParsedPageIndex = function (index) {
+        return this._pages ? this.isValidPageIndex(index, this._pages.length) : false;
+    };
+    Carousel.prototype.isValidRenderedPageIndex = function (index) {
+        return this._renderedPages ? this.isValidPageIndex(index, this._renderedPages.length) : false;
+    };
+    Carousel.prototype.isValidPageIndex = function (index, collectionSize) {
+        return (collectionSize > 0 && 0 <= index && index < collectionSize);
+    };
+    Object.defineProperty(Carousel.prototype, "previousEventType", {
+        //#endregion
+        get: function () {
+            return this._previousEventType;
+        },
+        set: function (eventType) {
+            this._previousEventType = eventType;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    // Question: Why do we place this on the Carousel instead of the CarouselPage?
+    Carousel.prototype.forbiddenChildElements = function () {
+        return __spreadArray([
+            card_elements_1.ToggleVisibilityAction.JsonTypeName,
+            card_elements_1.ShowCardAction.JsonTypeName,
+            "Media",
+            "ActionSet",
+            "Input.Text",
+            "Input.Date",
+            "Input.Time",
+            "Input.Number",
+            "Input.ChoiceSet",
+            "Input.Toggle"
+        ], _super.prototype.forbiddenChildElements.call(this), true);
+    };
+    Carousel.prototype.adjustRenderedElementSize = function (renderedElement) {
+        _super.prototype.adjustRenderedElementSize.call(this, renderedElement);
+        if (this.height == "stretch" && this._containerForAdorners !== undefined) {
+            this._containerForAdorners.style.height = "100%";
+        }
+        // Assign the explicit height to carouselPageContainer if given
+        if (this.carouselHeight) {
+            this._carouselPageContainer.style.height = this.carouselHeight + "px";
+        }
+    };
+    Carousel.prototype.getJsonTypeName = function () {
+        return "Carousel";
+    };
+    Carousel.prototype.getItemCount = function () {
+        return this._pages.length;
+    };
+    Carousel.prototype.getItemAt = function (index) {
+        return this._pages[index];
+    };
+    Carousel.prototype.addPage = function (page) {
+        this._pages.push(page);
+        page.setParent(this);
+    };
+    Carousel.prototype.removeItem = function (item) {
+        if (item instanceof CarouselPage) {
+            var itemIndex = this._pages.indexOf(item);
+            if (itemIndex >= 0) {
+                this._pages.splice(itemIndex, 1);
+                item.setParent(undefined);
+                this.updateLayout();
+                return true;
+            }
+        }
+        return false;
+    };
+    Carousel.prototype.getFirstVisibleRenderedItem = function () {
+        var _a;
+        if (this.renderedElement && ((_a = this._renderedPages) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            return this._renderedPages[0];
+        }
+        else {
+            return undefined;
+        }
+    };
+    Carousel.prototype.getLastVisibleRenderedItem = function () {
+        var _a;
+        if (this.renderedElement && ((_a = this._renderedPages) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            return this._renderedPages[this._renderedPages.length - 1];
+        }
+        else {
+            return undefined;
+        }
+    };
+    Object.defineProperty(Carousel.prototype, "currentPageId", {
+        get: function () {
+            var _a, _b;
+            if ((_b = (_a = this._carousel) === null || _a === void 0 ? void 0 : _a.slides) === null || _b === void 0 ? void 0 : _b.length) {
+                var activeSlide = this._carousel.slides[this._carousel.activeIndex];
+                return activeSlide.id;
+            }
+            return undefined;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Carousel.prototype, "currentPageIndex", {
+        get: function () {
+            var _a;
+            return (_a = this._carousel) === null || _a === void 0 ? void 0 : _a.realIndex;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Carousel.prototype.internalParse = function (source, context) {
+        _super.prototype.internalParse.call(this, source, context);
+        this._pages = [];
+        var jsonPages = source["pages"];
+        if (Array.isArray(jsonPages)) {
+            for (var _i = 0, jsonPages_1 = jsonPages; _i < jsonPages_1.length; _i++) {
+                var item = jsonPages_1[_i];
+                var page = this.createCarouselPageInstance(item, context);
+                if (page) {
+                    this._pages.push(page);
+                }
+            }
+        }
+        // everything is parsed do validate on initial page index
+        this.validateParsing(context);
+    };
+    Carousel.prototype.validateParsing = function (context) {
+        if (!this.isValidParsedPageIndex(this.initialPageIndex)) {
+            context.logParseEvent(this, Enums.ValidationEvent.InvalidPropertyValue, strings_1.Strings.errors.invalidInitialPageIndex(this.initialPageIndex));
+        }
+    };
+    Carousel.prototype.internalToJSON = function (target, context) {
+        _super.prototype.internalToJSON.call(this, target, context);
+        context.serializeArray(target, "pages", this._pages);
+    };
+    Carousel.prototype.internalRender = function () {
+        var _a;
+        this._renderedPages = [];
+        if (this._pages.length <= 0) {
+            return undefined;
+        }
+        this.validateOrientationProperties();
+        var cardLevelContainer = document.createElement("div");
+        cardLevelContainer.className = this.hostConfig.makeCssClassName("ac-carousel-card-level-container");
+        var carouselContainer = document.createElement("div");
+        carouselContainer.className = this.hostConfig.makeCssClassName("swiper", "ac-carousel");
+        this._carouselPageContainer = carouselContainer;
+        var containerForAdorners = document.createElement("div");
+        containerForAdorners.className = this.hostConfig.makeCssClassName("ac-carousel-container");
+        this._containerForAdorners = containerForAdorners;
+        cardLevelContainer.appendChild(containerForAdorners);
+        var navigationContainer = document.createElement("div");
+        navigationContainer.className = this.hostConfig.makeCssClassName("ac-carousel-navigation");
+        containerForAdorners.appendChild(navigationContainer);
+        var carouselWrapper = document.createElement("div");
+        carouselWrapper.className = this.hostConfig.makeCssClassName("swiper-wrapper", "ac-carousel-card-container");
+        carouselWrapper.style.display = "flex";
+        switch (this.getEffectiveVerticalContentAlignment()) {
+            case Enums.VerticalAlignment.Top:
+                carouselWrapper.style.alignItems = "flex-start";
+                break;
+            case Enums.VerticalAlignment.Bottom:
+                carouselWrapper.style.alignItems = "flex-end";
+                break;
+            default:
+                carouselWrapper.style.alignItems = "center";
+                break;
+        }
+        if (shared_1.GlobalSettings.useAdvancedCardBottomTruncation) {
+            // Forces the container to be at least as tall as its content.
+            //
+            // Fixes a quirk in Chrome where, for nested flex elements, the
+            // inner element's height would never exceed the outer element's
+            // height. This caused overflow truncation to break -- containers
+            // would always be measured as not overflowing, since their heights
+            // were constrained by their parents as opposed to truly reflecting
+            // the height of their content.
+            //
+            // See the "Browser Rendering Notes" section of this answer:
+            // https://stackoverflow.com/questions/36247140/why-doesnt-flex-item-shrink-past-content-size
+            carouselWrapper.style.minHeight = "-webkit-min-content";
+        }
+        var prevElementDiv = document.createElement("div");
+        prevElementDiv.className = this.hostConfig.makeCssClassName("swiper-button-prev");
+        var nextElementDiv = document.createElement("div");
+        nextElementDiv.className = this.hostConfig.makeCssClassName("swiper-button-next");
+        if (this.carouselOrientation === Enums.Orientation.Horizontal) {
+            this.updateCssForHorizontalCarousel(prevElementDiv, nextElementDiv);
+        }
+        else {
+            this.updateCssForVerticalCarousel(navigationContainer, prevElementDiv, nextElementDiv);
+        }
+        var pagination = document.createElement("div");
+        pagination.className = this.hostConfig.makeCssClassName("swiper-pagination", "ac-carousel-pagination");
+        navigationContainer.appendChild(prevElementDiv);
+        Utils.addCancelSelectActionEventHandler(prevElementDiv);
+        navigationContainer.appendChild(pagination);
+        Utils.addCancelSelectActionEventHandler(pagination);
+        navigationContainer.appendChild(nextElementDiv);
+        Utils.addCancelSelectActionEventHandler(nextElementDiv);
+        if (this.isDesignMode()) {
+            // If we are in design mode, we need to ensure these elements are in front of the peers
+            prevElementDiv.style.zIndex = "20";
+            nextElementDiv.style.zIndex = "20";
+            pagination.style.zIndex = "20";
+        }
+        var requestedNumberOfPages = Math.min(this._pages.length, this.hostConfig.carousel.maxCarouselPages);
+        if (this._pages.length > this.hostConfig.carousel.maxCarouselPages) {
+            console.warn(strings_1.Strings.errors.tooManyCarouselPages);
+        }
+        if (this._pages.length > 0) {
+            for (var i = 0; i < requestedNumberOfPages; i++) {
+                var page = this._pages[i];
+                var renderedItem = this.isElementAllowed(page) ? page.render() : undefined;
+                renderedItem === null || renderedItem === void 0 ? void 0 : renderedItem.classList.add("ac-carousel-page");
+                (_a = renderedItem === null || renderedItem === void 0 ? void 0 : renderedItem.children[0]) === null || _a === void 0 ? void 0 : _a.classList.add("ac-carousel-page-container");
+                if (renderedItem) {
+                    Utils.appendChild(carouselWrapper, renderedItem);
+                    this._renderedPages.push(page);
+                }
+            }
+        }
+        carouselContainer.appendChild(carouselWrapper);
+        carouselContainer.tabIndex = this.isDesignMode() ? -1 : 0;
+        containerForAdorners.appendChild(carouselContainer);
+        // `isRtl()` will set the correct value of rtl by reading the value from the parents
+        this.rtl = this.isRtl();
+        this.applyRTL(pagination);
+        if (!this.isDesignMode()) {
+            if (this.isValidRenderedPageIndex(this.initialPageIndex)) {
+                this._currentIndex = this.initialPageIndex;
+            }
+            else {
+                console.warn(strings_1.Strings.errors.invalidInitialPageIndex(this.initialPageIndex));
+                this._currentIndex = 0;
+            }
+        }
+        this.initializeCarouselControl(carouselContainer, nextElementDiv, prevElementDiv, pagination, this.rtl);
+        return this._renderedPages.length > 0 ? cardLevelContainer : undefined;
+    };
+    Carousel.prototype.applyRTL = function (pagination) {
+        _super.prototype.applyRTL.call(this, this._carouselPageContainer);
+        if (this.rtl) {
+            pagination.classList.add(this.hostConfig.makeCssClassName("ac-carousel-pagination-rtl"));
+        }
+    };
+    Carousel.prototype.validateOrientationProperties = function () {
+        if (!this.carouselHeight) {
+            this.carouselOrientation = Enums.Orientation.Horizontal;
+        }
+    };
+    Carousel.prototype.updateCssForHorizontalCarousel = function (prevElementDiv, nextElementDiv) {
+        prevElementDiv.classList.add(this.hostConfig.makeCssClassName("ac-carousel-left"));
+        nextElementDiv.classList.add(this.hostConfig.makeCssClassName("ac-carousel-right"));
+    };
+    Carousel.prototype.updateCssForVerticalCarousel = function (navigationContainer, prevElementDiv, nextElementDiv) {
+        this._containerForAdorners.classList.add(this.hostConfig.makeCssClassName("ac-carousel-container-vertical"));
+        navigationContainer.classList.add(this.hostConfig.makeCssClassName("ac-carousel-navigation-vertical"));
+        prevElementDiv.classList.add(this.hostConfig.makeCssClassName("ac-carousel-up"));
+        nextElementDiv.classList.add(this.hostConfig.makeCssClassName("ac-carousel-down"));
+    };
+    Carousel.prototype.initializeCarouselControl = function (carouselContainer, nextElement, prevElement, paginationElement, rtl) {
+        var _this = this;
+        var _a, _b, _c;
+        var nextElementAdjustedForRtl = (rtl === undefined || !rtl ? nextElement : prevElement);
+        var prevElementAdjustedForRtl = (rtl === undefined || !rtl ? prevElement : nextElement);
+        var prevElementAdjustedForOrientation = (Enums.Orientation.Horizontal === this.carouselOrientation) ? prevElementAdjustedForRtl : prevElement;
+        var nextElementAdjustedForOrientation = (Enums.Orientation.Horizontal === this.carouselOrientation) ? nextElementAdjustedForRtl : nextElement;
+        var swiperOptions = {
+            loop: !this.isDesignMode() && this.carouselLoop,
+            modules: [swiper_1.Navigation, swiper_1.Pagination, swiper_1.Scrollbar, swiper_1.A11y, swiper_1.History, swiper_1.Keyboard],
+            pagination: {
+                el: paginationElement,
+                clickable: true
+            },
+            navigation: {
+                prevEl: prevElementAdjustedForOrientation,
+                nextEl: nextElementAdjustedForOrientation
+            },
+            a11y: {
+                enabled: true
+            },
+            keyboard: {
+                enabled: false,
+                onlyInViewport: true
+            },
+            direction: this.carouselOrientation === Enums.Orientation.Horizontal ? "horizontal" : "vertical",
+            resizeObserver: false,
+            initialSlide: this._currentIndex
+        };
+        if (this.timer && !this.isDesignMode()) {
+            (_a = swiperOptions.modules) === null || _a === void 0 ? void 0 : _a.push(swiper_1.Autoplay);
+            swiperOptions.autoplay = { delay: this.timer, pauseOnMouseEnter: true };
+        }
+        var carousel = new swiper_1.Swiper(carouselContainer, swiperOptions);
+        // While the 'pauseOnMouseEnter' option should resume autoplay on
+        // mouse exit it doesn't do it, so adding custom events to handle it
+        carouselContainer.addEventListener("mouseenter", function (_event) {
+            var _a;
+            (_a = carousel.autoplay) === null || _a === void 0 ? void 0 : _a.stop();
+        });
+        carouselContainer.addEventListener("mouseleave", function (_event) {
+            var _a;
+            (_a = carousel.autoplay) === null || _a === void 0 ? void 0 : _a.start();
+        });
+        carousel.on('navigationNext', function (swiper) {
+            _this.raiseCarouselEvent(Enums.CarouselInteractionEvent.NavigationNext);
+        });
+        carousel.on('navigationPrev', function (swiper) {
+            _this.raiseCarouselEvent(Enums.CarouselInteractionEvent.NavigationPrevious);
+        });
+        carousel.on('slideChangeTransitionEnd', function (swiper) {
+            _this.currentIndex = swiper.realIndex;
+            _this.raiseCarouselEvent(Enums.CarouselInteractionEvent.Pagination);
+        });
+        carousel.on('autoplay', function () {
+            _this.raiseCarouselEvent(Enums.CarouselInteractionEvent.Autoplay);
+        });
+        carousel.on('paginationRender', function (swiper, paginationEl) {
+            swiper.pagination.bullets.forEach(function (bullet, index) {
+                bullet.addEventListener("keypress", function (event) {
+                    if (event.key == "Enter") {
+                        event.preventDefault();
+                        swiper.slideTo(index + 1);
+                    }
+                });
+            });
+        });
+        carousel.on('destroy', function () {
+            _this.destroyResizeObserver();
+        });
+        prevElement.title = (_b = prevElement.ariaLabel) !== null && _b !== void 0 ? _b : strings_1.Strings.defaults.carouselNavigationPreviousTooltip();
+        nextElement.title = (_c = nextElement.ariaLabel) !== null && _c !== void 0 ? _c : strings_1.Strings.defaults.carouselNavigationNextTooltip();
+        this._carousel = carousel;
+        this.createResizeObserver();
+    };
+    Carousel.prototype.createCarouselPageInstance = function (source, context) {
+        return context.parseCardObject(this, source, this.forbiddenChildElements(), !this.isDesignMode(), function (typeName) {
+            return !typeName || typeName === "CarouselPage" ? new CarouselPage() : undefined;
+        }, function (typeName, _errorType) {
+            context.logParseEvent(undefined, enums_1.ValidationEvent.ElementTypeNotAllowed, strings_1.Strings.errors.elementTypeNotAllowed(typeName));
+        });
+    };
+    Carousel.prototype.slideTo = function (index) {
+        var _a;
+        (_a = this._carousel) === null || _a === void 0 ? void 0 : _a.slideTo(index);
+    };
+    Object.defineProperty(Carousel.prototype, "carouselPageContainer", {
+        get: function () {
+            return this._carouselPageContainer;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Carousel.prototype, "currentIndex", {
+        get: function () {
+            return this._currentIndex;
+        },
+        set: function (currentIndex) {
+            this._currentIndex = currentIndex;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Carousel.prototype.createCarouselEvent = function (type) {
+        var currentPageId;
+        if (this.currentPageIndex != undefined) {
+            currentPageId = this.getItemAt(this.currentPageIndex).id;
+        }
+        return new CarouselEvent(type, this.id, currentPageId, this.currentPageIndex);
+    };
+    Carousel.prototype.raiseCarouselEvent = function (eventType) {
+        var card = this.parent ? this.parent.getRootElement() : undefined;
+        var onCarouselEventHandler = card && card.onCarouselEvent
+            ? card.onCarouselEvent
+            : card_elements_1.AdaptiveCard.onCarouselEvent;
+        // pagination event is triggered on slide transition end event 
+        if (onCarouselEventHandler && eventType == Enums.CarouselInteractionEvent.Pagination) {
+            // returns the event type that causes slide transition
+            onCarouselEventHandler(this.createCarouselEvent(this.previousEventType));
+        }
+        this.previousEventType = eventType;
+    };
+    /// Swiper version 8 added requestAnimationFrame() call in its resize observer code
+    /// The new call causes flickering issue,
+    /// We've copied resize observer code from Swiper version 7 with some modifications
+    Carousel.prototype.createResizeObserver = function () {
+        var _this = this;
+        var _a;
+        if (!this.checkIfCarouselInValidStateForResizeEvent()) {
+            return;
+        }
+        this._observer = new ResizeObserver(function (entries) {
+            var _a, _b, _c, _d;
+            var width = (_a = _this._carousel) === null || _a === void 0 ? void 0 : _a.width;
+            var height = (_b = _this._carousel) === null || _b === void 0 ? void 0 : _b.height;
+            var newWidth = width;
+            var newHeight = height;
+            entries.forEach(function (_a) {
+                var _b;
+                var contentBoxSize = _a.contentBoxSize, contentRect = _a.contentRect, target = _a.target;
+                if (target && target !== ((_b = _this._carousel) === null || _b === void 0 ? void 0 : _b.el)) {
+                    return;
+                }
+                newWidth = contentRect
+                    ? contentRect.width
+                    : (contentBoxSize[0] || contentBoxSize).inlineSize;
+                newHeight = contentRect
+                    ? contentRect.height
+                    : (contentBoxSize[0] || contentBoxSize).blockSize;
+            });
+            if (newWidth !== width || newHeight !== height) {
+                if (_this.checkIfCarouselInValidStateForResizeEvent()) {
+                    (_c = _this._carousel) === null || _c === void 0 ? void 0 : _c.emit('beforeResize');
+                    (_d = _this._carousel) === null || _d === void 0 ? void 0 : _d.emit('resize');
+                }
+            }
+        });
+        this._observer.observe((_a = this._carousel) === null || _a === void 0 ? void 0 : _a.el);
+    };
+    Carousel.prototype.destroyResizeObserver = function () {
+        var _a;
+        if (this._observer && this._observer.unobserve && ((_a = this._carousel) === null || _a === void 0 ? void 0 : _a.el)) {
+            this._observer.unobserve(this._carousel.el);
+            this._observer = null;
+        }
+    };
+    ;
+    Carousel.prototype.checkIfCarouselInValidStateForResizeEvent = function () {
+        return this._carousel && !this._carousel.destroyed;
+    };
+    Carousel.timerProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "timer", undefined);
+    Carousel.initialPageProperty = new serialization_1.NumProperty(serialization_1.Versions.v1_6, "initialPage", 0);
+    Carousel.loopProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_6, "loop", true);
+    Carousel.orientationProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_6, "orientation", Enums.Orientation, Enums.Orientation.Horizontal);
+    Carousel.carouselHeightProperty = new serialization_1.PixelSizeProperty(serialization_1.Versions.v1_6, "heightInPixels");
+    __decorate([
+        (0, serialization_1.property)(Carousel.timerProperty)
+    ], Carousel.prototype, "timer", null);
+    __decorate([
+        (0, serialization_1.property)(Carousel.initialPageProperty)
+    ], Carousel.prototype, "initialPageIndex", null);
+    __decorate([
+        (0, serialization_1.property)(Carousel.loopProperty)
+    ], Carousel.prototype, "carouselLoop", void 0);
+    __decorate([
+        (0, serialization_1.property)(Carousel.orientationProperty)
+    ], Carousel.prototype, "carouselOrientation", void 0);
+    __decorate([
+        (0, serialization_1.property)(Carousel.carouselHeightProperty)
+    ], Carousel.prototype, "carouselHeight", void 0);
+    return Carousel;
+}(card_elements_1.Container));
+exports.Carousel = Carousel;
+var CarouselEvent = /** @class */ (function () {
+    function CarouselEvent(type, carouselId, activeCarouselPageId, activeCarouselPageIndex) {
+        this.type = type;
+        this.carouselId = carouselId;
+        this.activeCarouselPageId = activeCarouselPageId;
+        this.activeCarouselPageIndex = activeCarouselPageIndex;
+    }
+    return CarouselEvent;
+}());
+exports.CarouselEvent = CarouselEvent;
+registry_1.GlobalRegistry.defaultElements.register("Carousel", Carousel, serialization_1.Versions.v1_6);
+//# sourceMappingURL=carousel.js.map
 
 /***/ }),
 
@@ -14860,10 +17361,11 @@ exports.Collection = Collection;
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Constants = void 0;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Constants = void 0;
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 var Constants = /** @class */ (function () {
     function Constants() {
     }
@@ -14890,7 +17392,11 @@ exports.Constants = Constants;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -14899,6 +17405,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// Copyright (C) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 __exportStar(__nccwpck_require__(3724), exports);
 __exportStar(__nccwpck_require__(1841), exports);
 //# sourceMappingURL=index.js.map
@@ -14950,8 +17458,10 @@ var MenuItem = /** @class */ (function () {
             if (!this.isEnabled) {
                 this._element.setAttribute("aria-disabled", "true");
             }
-            this._element.setAttribute("aria-selected", "false");
-            this._element.onmouseup = function (e) { _this.click(); };
+            this._element.setAttribute("aria-current", "false");
+            this._element.onmouseup = function (_e) {
+                _this.click();
+            };
             this._element.onkeydown = function (e) {
                 if (e.key === constants_1.Constants.keys.enter) {
                     e.cancelBubble = true;
@@ -15018,7 +17528,7 @@ var PopupControl = /** @class */ (function () {
                 break;
         }
     };
-    PopupControl.prototype.render = function (rootElementBounds) {
+    PopupControl.prototype.render = function (_rootElementBounds) {
         var _this = this;
         var element = document.createElement("div");
         element.tabIndex = 0;
@@ -15038,7 +17548,7 @@ var PopupControl = /** @class */ (function () {
         }
     };
     PopupControl.prototype.popup = function (rootElement) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _f;
         var _this = this;
         if (!this._isOpen) {
             this._overlayElement = document.createElement("div");
@@ -15046,12 +17556,16 @@ var PopupControl = /** @class */ (function () {
             this._overlayElement.tabIndex = 0;
             this._overlayElement.style.width = document.documentElement.scrollWidth + "px";
             this._overlayElement.style.height = document.documentElement.scrollHeight + "px";
-            this._overlayElement.onfocus = function (e) { _this.closePopup(true); };
+            this._overlayElement.onfocus = function (_e) {
+                _this.closePopup(true);
+            };
             document.body.appendChild(this._overlayElement);
             var rootElementBounds = rootElement.getBoundingClientRect();
             this._popupElement = this.render(rootElementBounds);
             (_a = this._popupElement.classList).remove.apply(_a, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideLeftToRight", "ac-ctrl-slideRightToLeft", "ac-ctrl-slideTopToBottom", "ac-ctrl-slideRightToLeft"));
-            window.addEventListener("resize", function (e) { _this.closePopup(true); });
+            window.addEventListener("resize", function (_e) {
+                _this.closePopup(true);
+            });
             var rootElementLabel = rootElement.getAttribute("aria-label");
             if (rootElementLabel) {
                 this._popupElement.setAttribute("aria-label", rootElementLabel);
@@ -15060,22 +17574,26 @@ var PopupControl = /** @class */ (function () {
             var popupElementBounds = this._popupElement.getBoundingClientRect();
             var availableSpaceBelow = window.innerHeight - rootElementBounds.bottom;
             var availableSpaceAbove = rootElementBounds.top;
-            var availableSpaceRight = window.innerWidth - rootElementBounds.left;
             var availableSpaceRight = window.innerWidth - rootElementBounds.right;
             var availableSpaceLeft = rootElementBounds.left;
             var left = rootElementBounds.left + Utils.getScrollX();
-            var top;
-            if (availableSpaceAbove < popupElementBounds.height && availableSpaceBelow < popupElementBounds.height) {
+            var top_1;
+            if (availableSpaceAbove < popupElementBounds.height &&
+                availableSpaceBelow < popupElementBounds.height) {
                 // Not enough space above or below root element
                 var actualPopupHeight = Math.min(popupElementBounds.height, window.innerHeight);
                 this._popupElement.style.maxHeight = actualPopupHeight + "px";
                 if (actualPopupHeight < popupElementBounds.height) {
-                    top = Utils.getScrollY();
+                    top_1 = Utils.getScrollY();
                 }
                 else {
-                    top = Utils.getScrollY() + rootElementBounds.top + (rootElementBounds.height - actualPopupHeight) / 2;
+                    top_1 =
+                        Utils.getScrollY() +
+                            rootElementBounds.top +
+                            (rootElementBounds.height - actualPopupHeight) / 2;
                 }
-                if (availableSpaceLeft < popupElementBounds.width && availableSpaceRight < popupElementBounds.width) {
+                if (availableSpaceLeft < popupElementBounds.width &&
+                    availableSpaceRight < popupElementBounds.width) {
                     // Not enough space left or right of root element
                     var actualPopupWidth = Math.min(popupElementBounds.width, window.innerWidth);
                     this._popupElement.style.maxWidth = actualPopupWidth + "px";
@@ -15083,7 +17601,10 @@ var PopupControl = /** @class */ (function () {
                         left = Utils.getScrollX();
                     }
                     else {
-                        left = Utils.getScrollX() + rootElementBounds.left + (rootElementBounds.width - actualPopupWidth) / 2;
+                        left =
+                            Utils.getScrollX() +
+                                rootElementBounds.left +
+                                (rootElementBounds.width - actualPopupWidth) / 2;
                     }
                 }
                 else {
@@ -15093,7 +17614,8 @@ var PopupControl = /** @class */ (function () {
                         (_b = this._popupElement.classList).add.apply(_b, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideLeftToRight"));
                     }
                     else {
-                        left = Utils.getScrollX() + rootElementBounds.left - popupElementBounds.width;
+                        left =
+                            Utils.getScrollX() + rootElementBounds.left - popupElementBounds.width;
                         (_c = this._popupElement.classList).add.apply(_c, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideRightToLeft"));
                     }
                 }
@@ -15101,19 +17623,19 @@ var PopupControl = /** @class */ (function () {
             else {
                 // Enough space above or below root element
                 if (availableSpaceBelow >= popupElementBounds.height) {
-                    top = Utils.getScrollY() + rootElementBounds.bottom;
+                    top_1 = Utils.getScrollY() + rootElementBounds.bottom;
                     (_d = this._popupElement.classList).add.apply(_d, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideTopToBottom"));
                 }
                 else {
-                    top = Utils.getScrollY() + rootElementBounds.top - popupElementBounds.height;
-                    (_e = this._popupElement.classList).add.apply(_e, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideBottomToTop"));
+                    top_1 = Utils.getScrollY() + rootElementBounds.top - popupElementBounds.height;
+                    (_f = this._popupElement.classList).add.apply(_f, this.hostConfig.makeCssClassNames("ac-ctrl-slide", "ac-ctrl-slideBottomToTop"));
                 }
                 if (availableSpaceRight < popupElementBounds.width) {
                     left = Utils.getScrollX() + rootElementBounds.right - popupElementBounds.width;
                 }
             }
             this._popupElement.style.left = left + "px";
-            this._popupElement.style.top = top + "px";
+            this._popupElement.style.top = top_1 + "px";
             this._popupElement.focus();
             this._isOpen = true;
         }
@@ -15181,7 +17703,7 @@ var popup_control_1 = __nccwpck_require__(6785);
 var PopupMenu = /** @class */ (function (_super) {
     __extends(PopupMenu, _super);
     function PopupMenu() {
-        var _this = _super.call(this) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
         _this._items = new collection_1.Collection();
         _this._renderedItems = [];
         _this._selectedIndex = -1;
@@ -15195,7 +17717,7 @@ var PopupMenu = /** @class */ (function (_super) {
             var renderedItem = this._items.get(i).render(this.hostConfig);
             renderedItem.tabIndex = 0;
             element.appendChild(renderedItem);
-            if (i == this.selectedIndex) {
+            if (i === this.selectedIndex) {
                 renderedItem.focus();
             }
             this._renderedItems.push(renderedItem);
@@ -15282,10 +17804,37 @@ exports.PopupMenu = PopupMenu;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LogLevel = exports.RefreshMode = exports.TypeErrorType = exports.ContainerFitStatus = exports.ValidationEvent = exports.ValidationPhase = exports.ContainerStyle = exports.InputTextStyle = exports.ActionIconPlacement = exports.FillMode = exports.Orientation = exports.ShowCardActionMode = exports.ImageStyle = exports.ActionAlignment = exports.VerticalAlignment = exports.HorizontalAlignment = exports.TextColor = exports.Spacing = exports.FontType = exports.TextWeight = exports.TextSize = exports.SizeUnit = exports.ImageSize = exports.Size = exports.ActionMode = exports.ActionStyle = void 0;
-// Note the "weird" way these readonly fields are declared is to work around
-// a breaking change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
-// and adopt this syntax for all other static readonly fields.
+exports.ActionRole = exports.CarouselInteractionEvent = exports.LogLevel = exports.RefreshMode = exports.TypeErrorType = exports.ContainerFitStatus = exports.ValidationEvent = exports.ValidationPhase = exports.InputLabelPosition = exports.InputTextStyle = exports.ActionIconPlacement = exports.FillMode = exports.Orientation = exports.ShowCardActionMode = exports.ImageStyle = exports.ActionAlignment = exports.VerticalAlignment = exports.HorizontalAlignment = exports.TextColor = exports.Spacing = exports.FontType = exports.TextWeight = exports.InputStyle = exports.TextSize = exports.SizeUnit = exports.ImageSetPresentationStyle = exports.ImageSize = exports.Size = exports.ActionMode = exports.ActionStyle = exports.ContainerStyle = void 0;
+/*
+    This should really be a string enum, e.g.
+
+        export enum ContainerStyle {
+            Default = "default",
+            Emphasis = "emphasis"
+        }
+
+    However, some hosts do not use a version of TypeScript
+    recent enough to understand string enums. This is
+    a compatible construct that does not require using
+    a more recent version of TypeScript.
+
+    Also note the "weird" way these readonly fields are declared is to work around
+    a breaking change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
+    and adopt this syntax for all other static readonly fields.
+*/
+/* eslint-disable @typescript-eslint/no-extraneous-class, @typescript-eslint/naming-convention */
+var ContainerStyle = /** @class */ (function () {
+    function ContainerStyle() {
+    }
+    ContainerStyle.Default = "default";
+    ContainerStyle.Emphasis = "emphasis";
+    ContainerStyle.Accent = "accent";
+    ContainerStyle.Good = "good";
+    ContainerStyle.Attention = "attention";
+    ContainerStyle.Warning = "warning";
+    return ContainerStyle;
+}());
+exports.ContainerStyle = ContainerStyle;
 var ActionStyle = /** @class */ (function () {
     function ActionStyle() {
     }
@@ -15303,6 +17852,7 @@ var ActionMode = /** @class */ (function () {
     return ActionMode;
 }());
 exports.ActionMode = ActionMode;
+/* eslint-enable @typescript-eslint/no-extraneous-class, @typescript-eslint/naming-convention */
 var Size;
 (function (Size) {
     Size[Size["Auto"] = 0] = "Auto";
@@ -15317,6 +17867,11 @@ var ImageSize;
     ImageSize[ImageSize["Medium"] = 1] = "Medium";
     ImageSize[ImageSize["Large"] = 2] = "Large";
 })(ImageSize = exports.ImageSize || (exports.ImageSize = {}));
+var ImageSetPresentationStyle;
+(function (ImageSetPresentationStyle) {
+    ImageSetPresentationStyle[ImageSetPresentationStyle["Default"] = 0] = "Default";
+    ImageSetPresentationStyle[ImageSetPresentationStyle["Stacked"] = 1] = "Stacked";
+})(ImageSetPresentationStyle = exports.ImageSetPresentationStyle || (exports.ImageSetPresentationStyle = {}));
 var SizeUnit;
 (function (SizeUnit) {
     SizeUnit[SizeUnit["Weight"] = 0] = "Weight";
@@ -15330,6 +17885,11 @@ var TextSize;
     TextSize[TextSize["Large"] = 3] = "Large";
     TextSize[TextSize["ExtraLarge"] = 4] = "ExtraLarge";
 })(TextSize = exports.TextSize || (exports.TextSize = {}));
+var InputStyle;
+(function (InputStyle) {
+    InputStyle[InputStyle["RevealOnHover"] = 0] = "RevealOnHover";
+    InputStyle[InputStyle["Default"] = 1] = "Default";
+})(InputStyle = exports.InputStyle || (exports.InputStyle = {}));
 var TextWeight;
 (function (TextWeight) {
     TextWeight[TextWeight["Lighter"] = 0] = "Lighter";
@@ -15415,35 +17975,11 @@ var InputTextStyle;
     InputTextStyle[InputTextStyle["Email"] = 3] = "Email";
     InputTextStyle[InputTextStyle["Password"] = 4] = "Password";
 })(InputTextStyle = exports.InputTextStyle || (exports.InputTextStyle = {}));
-/*
-    This should really be a string enum, e.g.
-
-        export enum ContainerStyle {
-            Default = "default",
-            Emphasis = "emphasis"
-        }
-
-    However, some hosts do not use a version of TypeScript
-    recent enough to understand string enums. This is
-    a compatible construct that does not require using
-    a more recent version of TypeScript.
-
-    Also note the "weird" way these readonly fields are declared is to work around
-    a breaking change introduced in TS 3.1 wrt d.ts generation. DO NOT CHANGE
-    and adopt this syntax for all other static readonly fields.
-*/
-var ContainerStyle = /** @class */ (function () {
-    function ContainerStyle() {
-    }
-    ContainerStyle.Default = "default";
-    ContainerStyle.Emphasis = "emphasis";
-    ContainerStyle.Accent = "accent";
-    ContainerStyle.Good = "good";
-    ContainerStyle.Attention = "attention";
-    ContainerStyle.Warning = "warning";
-    return ContainerStyle;
-}());
-exports.ContainerStyle = ContainerStyle;
+var InputLabelPosition;
+(function (InputLabelPosition) {
+    InputLabelPosition[InputLabelPosition["Inline"] = 0] = "Inline";
+    InputLabelPosition[InputLabelPosition["Above"] = 1] = "Above";
+})(InputLabelPosition = exports.InputLabelPosition || (exports.InputLabelPosition = {}));
 var ValidationPhase;
 (function (ValidationPhase) {
     ValidationPhase[ValidationPhase["Parse"] = 0] = "Parse";
@@ -15494,6 +18030,21 @@ var LogLevel;
     LogLevel[LogLevel["Warning"] = 1] = "Warning";
     LogLevel[LogLevel["Error"] = 2] = "Error";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
+var CarouselInteractionEvent;
+(function (CarouselInteractionEvent) {
+    CarouselInteractionEvent[CarouselInteractionEvent["NavigationNext"] = 0] = "NavigationNext";
+    CarouselInteractionEvent[CarouselInteractionEvent["NavigationPrevious"] = 1] = "NavigationPrevious";
+    CarouselInteractionEvent[CarouselInteractionEvent["Pagination"] = 2] = "Pagination";
+    CarouselInteractionEvent[CarouselInteractionEvent["Autoplay"] = 3] = "Autoplay";
+})(CarouselInteractionEvent = exports.CarouselInteractionEvent || (exports.CarouselInteractionEvent = {}));
+var ActionRole;
+(function (ActionRole) {
+    ActionRole[ActionRole["Button"] = 0] = "Button";
+    ActionRole[ActionRole["Link"] = 1] = "Link";
+    ActionRole[ActionRole["Tab"] = 2] = "Tab";
+    ActionRole[ActionRole["Menu"] = 3] = "Menu";
+    ActionRole[ActionRole["MenuItem"] = 4] = "MenuItem";
+})(ActionRole = exports.ActionRole || (exports.ActionRole = {}));
 //# sourceMappingURL=enums.js.map
 
 /***/ }),
@@ -15536,15 +18087,16 @@ var HostCapabilities = /** @class */ (function (_super) {
     HostCapabilities.prototype.internalParse = function (source, context) {
         _super.prototype.internalParse.call(this, source, context);
         if (source) {
+            // eslint-disable-next-line guard-for-in
             for (var name_1 in source) {
                 var jsonVersion = source[name_1];
                 if (typeof jsonVersion === "string") {
-                    if (jsonVersion == "*") {
+                    if (jsonVersion === "*") {
                         this.addCapability(name_1, "*");
                     }
                     else {
                         var version = serialization_1.Version.parse(jsonVersion, context);
-                        if (version && version.isValid) {
+                        if (version === null || version === void 0 ? void 0 : version.isValid) {
                             this.addCapability(name_1, version);
                         }
                     }
@@ -15554,6 +18106,7 @@ var HostCapabilities = /** @class */ (function (_super) {
     };
     HostCapabilities.prototype.internalToJSON = function (target, context) {
         _super.prototype.internalToJSON.call(this, target, context);
+        // eslint-disable-next-line guard-for-in
         for (var key in this._capabilities) {
             target[key] = this._capabilities[key];
         }
@@ -15569,7 +18122,7 @@ var HostCapabilities = /** @class */ (function (_super) {
     };
     HostCapabilities.prototype.hasCapability = function (name, version) {
         if (this._capabilities.hasOwnProperty(name)) {
-            if (version == "*" || this._capabilities[name] == "*") {
+            if (version === "*" || this._capabilities[name] === "*") {
                 return true;
             }
             return version.compareTo(this._capabilities[name]) <= 0;
@@ -15612,7 +18165,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultHostConfig = exports.HostConfig = exports.FontTypeSet = exports.FontTypeDefinition = exports.ContainerStyleSet = exports.ContainerStyleDefinition = exports.ColorSetDefinition = exports.ActionsConfig = exports.ShowCardActionConfig = exports.FactSetConfig = exports.FactTitleDefinition = exports.FactTextDefinition = exports.InputConfig = exports.InputLabelConfig = exports.RequiredInputLabelTextDefinition = exports.TextBlockConfig = exports.TextStyleSet = exports.TextStyleDefinition = exports.BaseTextDefinition = exports.TableConfig = exports.MediaConfig = exports.ImageSetConfig = exports.AdaptiveCardConfig = exports.TextColorDefinition = exports.ColorDefinition = void 0;
+exports.defaultHostConfig = exports.HostConfig = exports.CarouselConfig = exports.FontTypeSet = exports.FontTypeDefinition = exports.ContainerStyleSet = exports.ContainerStyleDefinition = exports.ColorSetDefinition = exports.ActionsConfig = exports.ShowCardActionConfig = exports.FactSetConfig = exports.FactTitleDefinition = exports.FactTextDefinition = exports.InputConfig = exports.InputLabelConfig = exports.RequiredInputLabelTextDefinition = exports.TextBlockConfig = exports.TextStyleSet = exports.TextStyleDefinition = exports.BaseTextDefinition = exports.TableConfig = exports.MediaConfig = exports.ImageSetConfig = exports.AdaptiveCardConfig = exports.TextColorDefinition = exports.ColorDefinition = void 0;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 var Enums = __nccwpck_require__(4926);
@@ -15716,7 +18269,10 @@ var TableConfig = /** @class */ (function () {
     function TableConfig(obj) {
         this.cellSpacing = 8;
         if (obj) {
-            this.cellSpacing = obj.cellSpacing && typeof obj.cellSpacing === "number" ? obj.cellSpacing : this.cellSpacing;
+            this.cellSpacing =
+                obj.cellSpacing && typeof obj.cellSpacing === "number"
+                    ? obj.cellSpacing
+                    : this.cellSpacing;
         }
     }
     TableConfig.prototype.toJSON = function () {
@@ -15735,12 +18291,14 @@ var BaseTextDefinition = /** @class */ (function () {
         this.weight = Enums.TextWeight.Default;
         this.parse(obj);
     }
-    ;
     BaseTextDefinition.prototype.parse = function (obj) {
         if (obj) {
             this.size = parseHostConfigEnum(Enums.TextSize, obj["size"], this.size);
             this.color = parseHostConfigEnum(Enums.TextColor, obj["color"], this.color);
-            this.isSubtle = obj.isSubtle !== undefined && typeof obj.isSubtle === "boolean" ? obj.isSubtle : this.isSubtle;
+            this.isSubtle =
+                obj.isSubtle !== undefined && typeof obj.isSubtle === "boolean"
+                    ? obj.isSubtle
+                    : this.isSubtle;
             this.weight = parseHostConfigEnum(Enums.TextWeight, obj["weight"], this.getDefaultWeight());
         }
     };
@@ -15838,12 +18396,15 @@ exports.RequiredInputLabelTextDefinition = RequiredInputLabelTextDefinition;
 var InputLabelConfig = /** @class */ (function () {
     function InputLabelConfig(obj) {
         this.inputSpacing = Enums.Spacing.Small;
+        this.width = 30;
         this.requiredInputs = new RequiredInputLabelTextDefinition();
         this.optionalInputs = new BaseTextDefinition();
         if (obj) {
             this.inputSpacing = parseHostConfigEnum(Enums.Spacing, obj["inputSpacing"], this.inputSpacing);
             this.requiredInputs = new RequiredInputLabelTextDefinition(obj["requiredInputs"]);
             this.optionalInputs = new BaseTextDefinition(obj["optionalInputs"]);
+            this.width =
+                obj["width"] != null ? obj["width"] : this.width;
         }
     }
     return InputLabelConfig;
@@ -15852,10 +18413,16 @@ exports.InputLabelConfig = InputLabelConfig;
 var InputConfig = /** @class */ (function () {
     function InputConfig(obj) {
         this.label = new InputLabelConfig();
-        this.errorMessage = new BaseTextDefinition({ color: Enums.TextColor.Attention });
+        this.errorMessage = new BaseTextDefinition({
+            color: Enums.TextColor.Attention
+        });
+        this.debounceTimeInMilliSeconds = 0;
+        this.allowRevealOnHoverStyle = false;
         if (obj) {
             this.label = new InputLabelConfig(obj["label"]);
             this.errorMessage = new BaseTextDefinition(obj["errorMessage"]);
+            this.allowRevealOnHoverStyle = obj["allowRevealOnHoverStyle"] || this.allowRevealOnHoverStyle;
+            this.debounceTimeInMilliSeconds = obj.debounceTimeInMilliSeconds;
         }
     }
     return InputConfig;
@@ -15908,7 +18475,8 @@ var FactSetConfig = /** @class */ (function () {
         if (obj) {
             this.title = new FactTitleDefinition(obj["title"]);
             this.value = new FactTextDefinition(obj["value"]);
-            this.spacing = obj.spacing && obj.spacing != null ? obj.spacing && obj.spacing : this.spacing;
+            this.spacing =
+                obj.spacing && obj.spacing != null ? obj.spacing && obj.spacing : this.spacing;
         }
     }
     return FactSetConfig;
@@ -15921,8 +18489,12 @@ var ShowCardActionConfig = /** @class */ (function () {
         this.style = Enums.ContainerStyle.Emphasis;
         if (obj) {
             this.actionMode = parseHostConfigEnum(Enums.ShowCardActionMode, obj["actionMode"], Enums.ShowCardActionMode.Inline);
-            this.inlineTopMargin = obj["inlineTopMargin"] != null ? obj["inlineTopMargin"] : this.inlineTopMargin;
-            this.style = obj["style"] && typeof obj["style"] === "string" ? obj["style"] : Enums.ContainerStyle.Emphasis;
+            this.inlineTopMargin =
+                obj["inlineTopMargin"] != null ? obj["inlineTopMargin"] : this.inlineTopMargin;
+            this.style =
+                obj["style"] && typeof obj["style"] === "string"
+                    ? obj["style"]
+                    : Enums.ContainerStyle.Emphasis;
         }
     }
     ShowCardActionConfig.prototype.toJSON = function () {
@@ -15950,16 +18522,18 @@ var ActionsConfig = /** @class */ (function () {
         if (obj) {
             this.maxActions = obj["maxActions"] != null ? obj["maxActions"] : this.maxActions;
             this.spacing = parseHostConfigEnum(Enums.Spacing, obj.spacing && obj.spacing, Enums.Spacing.Default);
-            this.buttonSpacing = obj["buttonSpacing"] != null ? obj["buttonSpacing"] : this.buttonSpacing;
+            this.buttonSpacing =
+                obj["buttonSpacing"] != null ? obj["buttonSpacing"] : this.buttonSpacing;
             this.showCard = new ShowCardActionConfig(obj["showCard"]);
             this.preExpandSingleShowCardAction = Utils.parseBool(obj["preExpandSingleShowCardAction"], false);
             this.actionsOrientation = parseHostConfigEnum(Enums.Orientation, obj["actionsOrientation"], Enums.Orientation.Horizontal);
             this.actionAlignment = parseHostConfigEnum(Enums.ActionAlignment, obj["actionAlignment"], Enums.ActionAlignment.Left);
             this.iconPlacement = parseHostConfigEnum(Enums.ActionIconPlacement, obj["iconPlacement"], Enums.ActionIconPlacement.LeftOfTitle);
-            this.allowTitleToWrap = obj["allowTitleToWrap"] != null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
+            this.allowTitleToWrap =
+                obj["allowTitleToWrap"] != null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
             try {
                 var sizeAndUnit = Shared.SizeAndUnit.parse(obj["iconSize"]);
-                if (sizeAndUnit.unit == Enums.SizeUnit.Pixel) {
+                if (sizeAndUnit.unit === Enums.SizeUnit.Pixel) {
                     this.iconSize = sizeAndUnit.physicalSize;
                 }
             }
@@ -16160,16 +18734,16 @@ var FontTypeDefinition = /** @class */ (function () {
     FontTypeDefinition.prototype.parse = function (obj) {
         this.fontFamily = obj["fontFamily"] || this.fontFamily;
         this.fontSizes = {
-            small: obj.fontSizes && obj.fontSizes["small"] || this.fontSizes.small,
-            default: obj.fontSizes && obj.fontSizes["default"] || this.fontSizes.default,
-            medium: obj.fontSizes && obj.fontSizes["medium"] || this.fontSizes.medium,
-            large: obj.fontSizes && obj.fontSizes["large"] || this.fontSizes.large,
-            extraLarge: obj.fontSizes && obj.fontSizes["extraLarge"] || this.fontSizes.extraLarge
+            small: (obj.fontSizes && obj.fontSizes["small"]) || this.fontSizes.small,
+            default: (obj.fontSizes && obj.fontSizes["default"]) || this.fontSizes.default,
+            medium: (obj.fontSizes && obj.fontSizes["medium"]) || this.fontSizes.medium,
+            large: (obj.fontSizes && obj.fontSizes["large"]) || this.fontSizes.large,
+            extraLarge: (obj.fontSizes && obj.fontSizes["extraLarge"]) || this.fontSizes.extraLarge
         };
         this.fontWeights = {
-            lighter: obj.fontWeights && obj.fontWeights["lighter"] || this.fontWeights.lighter,
-            default: obj.fontWeights && obj.fontWeights["default"] || this.fontWeights.default,
-            bolder: obj.fontWeights && obj.fontWeights["bolder"] || this.fontWeights.bolder
+            lighter: (obj.fontWeights && obj.fontWeights["lighter"]) || this.fontWeights.lighter,
+            default: (obj.fontWeights && obj.fontWeights["default"]) || this.fontWeights.default,
+            bolder: (obj.fontWeights && obj.fontWeights["bolder"]) || this.fontWeights.bolder
         };
     };
     FontTypeDefinition.monospace = new FontTypeDefinition("'Courier New', Courier, monospace");
@@ -16197,6 +18771,26 @@ var FontTypeSet = /** @class */ (function () {
     return FontTypeSet;
 }());
 exports.FontTypeSet = FontTypeSet;
+var CarouselConfig = /** @class */ (function () {
+    function CarouselConfig(obj) {
+        this.maxCarouselPages = 10;
+        this.minAutoplayDelay = 5000.0;
+        if (obj) {
+            this.maxCarouselPages =
+                obj["maxCarouselPages"] != null ? obj["maxCarouselPages"] : this.maxCarouselPages;
+            this.minAutoplayDelay =
+                obj["minAutoplayDelay"] != null ? obj["minAutoplayDelay"] : this.minAutoplayDelay;
+        }
+    }
+    CarouselConfig.prototype.toJSON = function () {
+        return {
+            maxCarouselPages: this.maxCarouselPages,
+            minAutoplayDelay: this.minAutoplayDelay
+        };
+    };
+    return CarouselConfig;
+}());
+exports.CarouselConfig = CarouselConfig;
 var HostConfig = /** @class */ (function () {
     function HostConfig(obj) {
         this.hostCapabilities = new host_capabilities_1.HostCapabilities();
@@ -16229,13 +18823,20 @@ var HostConfig = /** @class */ (function () {
         this.table = new TableConfig();
         this.textStyles = new TextStyleSet();
         this.textBlock = new TextBlockConfig();
+        this.carousel = new CarouselConfig();
         this.alwaysAllowBleed = false;
         if (obj) {
             if (typeof obj === "string" || obj instanceof String) {
                 obj = JSON.parse(obj);
             }
-            this.choiceSetInputValueSeparator = (obj && typeof obj["choiceSetInputValueSeparator"] === "string") ? obj["choiceSetInputValueSeparator"] : this.choiceSetInputValueSeparator;
-            this.supportsInteractivity = (obj && typeof obj["supportsInteractivity"] === "boolean") ? obj["supportsInteractivity"] : this.supportsInteractivity;
+            this.choiceSetInputValueSeparator =
+                obj && typeof obj["choiceSetInputValueSeparator"] === "string"
+                    ? obj["choiceSetInputValueSeparator"]
+                    : this.choiceSetInputValueSeparator;
+            this.supportsInteractivity =
+                obj && typeof obj["supportsInteractivity"] === "boolean"
+                    ? obj["supportsInteractivity"]
+                    : this.supportsInteractivity;
             this._legacyFontType = new FontTypeDefinition();
             this._legacyFontType.parse(obj);
             if (obj.fontTypes) {
@@ -16250,24 +18851,24 @@ var HostConfig = /** @class */ (function () {
                     extraLarge: obj.lineHeights["extraLarge"]
                 };
             }
-            ;
             this.imageSizes = {
-                small: obj.imageSizes && obj.imageSizes["small"] || this.imageSizes.small,
-                medium: obj.imageSizes && obj.imageSizes["medium"] || this.imageSizes.medium,
-                large: obj.imageSizes && obj.imageSizes["large"] || this.imageSizes.large,
+                small: (obj.imageSizes && obj.imageSizes["small"]) || this.imageSizes.small,
+                medium: (obj.imageSizes && obj.imageSizes["medium"]) || this.imageSizes.medium,
+                large: (obj.imageSizes && obj.imageSizes["large"]) || this.imageSizes.large
             };
             this.containerStyles = new ContainerStyleSet(obj["containerStyles"]);
             this.spacing = {
-                small: obj.spacing && obj.spacing["small"] || this.spacing.small,
-                default: obj.spacing && obj.spacing["default"] || this.spacing.default,
-                medium: obj.spacing && obj.spacing["medium"] || this.spacing.medium,
-                large: obj.spacing && obj.spacing["large"] || this.spacing.large,
-                extraLarge: obj.spacing && obj.spacing["extraLarge"] || this.spacing.extraLarge,
-                padding: obj.spacing && obj.spacing["padding"] || this.spacing.padding
+                small: (obj.spacing && obj.spacing["small"]) || this.spacing.small,
+                default: (obj.spacing && obj.spacing["default"]) || this.spacing.default,
+                medium: (obj.spacing && obj.spacing["medium"]) || this.spacing.medium,
+                large: (obj.spacing && obj.spacing["large"]) || this.spacing.large,
+                extraLarge: (obj.spacing && obj.spacing["extraLarge"]) || this.spacing.extraLarge,
+                padding: (obj.spacing && obj.spacing["padding"]) || this.spacing.padding
             };
             this.separator = {
-                lineThickness: obj.separator && obj.separator["lineThickness"] || this.separator.lineThickness,
-                lineColor: obj.separator && obj.separator["lineColor"] || this.separator.lineColor
+                lineThickness: (obj.separator && obj.separator["lineThickness"]) ||
+                    this.separator.lineThickness,
+                lineColor: (obj.separator && obj.separator["lineColor"]) || this.separator.lineColor
             };
             this.inputs = new InputConfig(obj.inputs || this.inputs);
             this.actions = new ActionsConfig(obj.actions || this.actions);
@@ -16276,6 +18877,7 @@ var HostConfig = /** @class */ (function () {
             this.factSet = new FactSetConfig(obj["factSet"]);
             this.textStyles = new TextStyleSet(obj["textStyles"]);
             this.textBlock = new TextBlockConfig(obj["textBlock"]);
+            this.carousel = new CarouselConfig(obj["carousel"]);
         }
     }
     HostConfig.prototype.getFontTypeDefinition = function (style) {
@@ -16283,7 +18885,9 @@ var HostConfig = /** @class */ (function () {
             return this.fontTypes.getStyleDefinition(style);
         }
         else {
-            return style == Enums.FontType.Monospace ? FontTypeDefinition.monospace : this._legacyFontType;
+            return style === Enums.FontType.Monospace
+                ? FontTypeDefinition.monospace
+                : this._legacyFontType;
         }
     };
     HostConfig.prototype.getEffectiveSpacing = function (spacing) {
@@ -16354,6 +18958,7 @@ var HostConfig = /** @class */ (function () {
     return HostConfig;
 }());
 exports.HostConfig = HostConfig;
+// eslint-disable-next-line @typescript-eslint/naming-convention
 exports.defaultHostConfig = new HostConfig({
     supportsInteractivity: true,
     spacing: {
@@ -16608,25 +19213,19 @@ exports.defaultHostConfig = new HostConfig({
     inputs: {
         label: {
             requiredInputs: {
-                color: Enums.TextColor.Accent,
-                size: Enums.TextSize.ExtraLarge,
                 weight: Enums.TextWeight.Bolder,
-                isSubtle: true,
-                suffix: " (required)",
-                suffixColor: Enums.TextColor.Good
+                suffix: " *",
+                suffixColor: Enums.TextColor.Attention
             },
             optionalInputs: {
-                color: Enums.TextColor.Warning,
-                size: Enums.TextSize.Medium,
-                weight: Enums.TextWeight.Lighter,
-                isSubtle: false
+                weight: Enums.TextWeight.Bolder
             }
         },
         errorMessage: {
-            color: Enums.TextColor.Accent,
-            size: Enums.TextSize.Small,
+            color: Enums.TextColor.Attention,
             weight: Enums.TextWeight.Bolder
-        }
+        },
+        debounceTimeInMilliSeconds: 250
     },
     actions: {
         maxActions: 5,
@@ -16653,16 +19252,23 @@ exports.defaultHostConfig = new HostConfig({
             isSubtle: false,
             weight: Enums.TextWeight.Bolder,
             wrap: true,
-            maxWidth: 150,
+            maxWidth: 150
         },
         value: {
             color: Enums.TextColor.Default,
             size: Enums.TextSize.Default,
             isSubtle: false,
             weight: Enums.TextWeight.Default,
-            wrap: true,
+            wrap: true
         },
         spacing: 10
+    },
+    carousel: {
+        maxCarouselPages: 10,
+        minAutoplayDuration: 5000
+    },
+    textBlock: {
+        headingLevel: 2
     }
 });
 //# sourceMappingURL=host-config.js.map
@@ -16715,7 +19321,9 @@ var CardObjectRegistry = /** @class */ (function () {
     };
     CardObjectRegistry.prototype.createInstance = function (typeName, targetVersion) {
         var registrationInfo = this.findByName(typeName);
-        return (registrationInfo && registrationInfo.schemaVersion.compareTo(targetVersion) <= 0) ? new registrationInfo.objectType() : undefined;
+        return registrationInfo && registrationInfo.schemaVersion.compareTo(targetVersion) <= 0
+            ? new registrationInfo.objectType()
+            : undefined;
     };
     CardObjectRegistry.prototype.getItemCount = function () {
         return Object.keys(this._items).length;
@@ -16727,6 +19335,7 @@ var CardObjectRegistry = /** @class */ (function () {
     return CardObjectRegistry;
 }());
 exports.CardObjectRegistry = CardObjectRegistry;
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 var GlobalRegistry = /** @class */ (function () {
     function GlobalRegistry() {
     }
@@ -16818,7 +19427,7 @@ var Version = /** @class */ (function () {
         result._versionString = versionString;
         var regEx = /(\d+).(\d+)/gi;
         var matches = regEx.exec(versionString);
-        if (matches != null && matches.length == 3) {
+        if (matches != null && matches.length === 3) {
             result._major = parseInt(matches[1]);
             result._minor = parseInt(matches[2]);
         }
@@ -16885,15 +19494,41 @@ var Version = /** @class */ (function () {
     return Version;
 }());
 exports.Version = Version;
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 var Versions = /** @class */ (function () {
     function Versions() {
     }
+    /* eslint-enable @typescript-eslint/naming-convention */
+    Versions.getAllDeclaredVersions = function () {
+        var ctor = Versions;
+        var properties = [];
+        for (var propertyName in ctor) {
+            if (propertyName.match(/^v[0-9_]*$/)) {
+                // filter latest
+                try {
+                    var propertyValue = ctor[propertyName];
+                    if (propertyValue instanceof Version) {
+                        properties.push(propertyValue);
+                    }
+                }
+                catch (_a) {
+                    // If a property happens to have a getter function and
+                    // it throws an exception, we need to catch it here
+                }
+            }
+        }
+        return properties.sort(function (v1, v2) { return v1.compareTo(v2); });
+    };
+    /* eslint-disable @typescript-eslint/naming-convention */
     Versions.v1_0 = new Version(1, 0);
     Versions.v1_1 = new Version(1, 1);
     Versions.v1_2 = new Version(1, 2);
     Versions.v1_3 = new Version(1, 3);
     Versions.v1_4 = new Version(1, 4);
     Versions.v1_5 = new Version(1, 5);
+    // If preview tag is added/removed from any version,
+    // don't forget to update .ac-schema-version-1-?::after too in adaptivecards-site\themes\adaptivecards\source\css\style.css
+    Versions.v1_6 = new Version(1, 6, "1.6 Preview");
     Versions.latest = Versions.v1_5;
     return Versions;
 }());
@@ -16917,43 +19552,77 @@ exports.isVersionLessOrEqual = isVersionLessOrEqual;
 var BaseSerializationContext = /** @class */ (function () {
     function BaseSerializationContext(targetVersion) {
         if (targetVersion === void 0) { targetVersion = Versions.latest; }
-        this.targetVersion = targetVersion;
         this._validationEvents = [];
+        this.targetVersion = targetVersion;
     }
+    BaseSerializationContext.prototype.isTemplateString = function (value) {
+        if (typeof value === "string") {
+            return value.startsWith("${");
+        }
+        else {
+            return false;
+        }
+    };
+    BaseSerializationContext.prototype.tryDeleteValue = function (target, propertyName) {
+        if (!shared_1.GlobalSettings.enableFullJsonRoundTrip) {
+            delete target[propertyName];
+        }
+    };
+    BaseSerializationContext.prototype.tryDeleteDefaultValue = function (target, propertyName) {
+        if (!shared_1.GlobalSettings.enableFullJsonRoundTrip || !this.isTemplateString(target[propertyName])) {
+            delete target[propertyName];
+        }
+    };
     BaseSerializationContext.prototype.serializeValue = function (target, propertyName, propertyValue, defaultValue, forceDeleteIfNullOrDefault) {
         if (defaultValue === void 0) { defaultValue = undefined; }
         if (forceDeleteIfNullOrDefault === void 0) { forceDeleteIfNullOrDefault = false; }
-        if (propertyValue === null || propertyValue === undefined || propertyValue === defaultValue) {
+        if (propertyValue === null ||
+            propertyValue === undefined) {
             if (!shared_1.GlobalSettings.enableFullJsonRoundTrip || forceDeleteIfNullOrDefault) {
                 delete target[propertyName];
             }
         }
         else if (propertyValue === defaultValue) {
-            delete target[propertyName];
+            if (!shared_1.GlobalSettings.enableFullJsonRoundTrip || forceDeleteIfNullOrDefault || !this.isTemplateString(target[propertyName])) {
+                delete target[propertyName];
+            }
         }
         else {
             target[propertyName] = propertyValue;
         }
     };
     BaseSerializationContext.prototype.serializeString = function (target, propertyName, propertyValue, defaultValue) {
-        if (propertyValue === null || propertyValue === undefined || propertyValue === defaultValue) {
-            delete target[propertyName];
+        if (propertyValue === null ||
+            propertyValue === undefined) {
+            this.tryDeleteValue(target, propertyName);
+        }
+        else if (propertyValue === defaultValue) {
+            this.tryDeleteDefaultValue(target, propertyName);
         }
         else {
             target[propertyName] = propertyValue;
         }
     };
     BaseSerializationContext.prototype.serializeBool = function (target, propertyName, propertyValue, defaultValue) {
-        if (propertyValue === null || propertyValue === undefined || propertyValue === defaultValue) {
-            delete target[propertyName];
+        if (propertyValue === null ||
+            propertyValue === undefined) {
+            this.tryDeleteValue(target, propertyName);
+        }
+        else if (propertyValue === defaultValue) {
+            this.tryDeleteDefaultValue(target, propertyName);
         }
         else {
             target[propertyName] = propertyValue;
         }
     };
     BaseSerializationContext.prototype.serializeNumber = function (target, propertyName, propertyValue, defaultValue) {
-        if (propertyValue === null || propertyValue === undefined || propertyValue === defaultValue || isNaN(propertyValue)) {
-            delete target[propertyName];
+        if (propertyValue === null ||
+            propertyValue === undefined ||
+            isNaN(propertyValue)) {
+            this.tryDeleteValue(target, propertyName);
+        }
+        else if (propertyValue === defaultValue) {
+            this.tryDeleteDefaultValue(target, propertyName);
         }
         else {
             target[propertyName] = propertyValue;
@@ -16961,8 +19630,12 @@ var BaseSerializationContext = /** @class */ (function () {
     };
     BaseSerializationContext.prototype.serializeEnum = function (enumType, target, propertyName, propertyValue, defaultValue) {
         if (defaultValue === void 0) { defaultValue = undefined; }
-        if (propertyValue === null || propertyValue === undefined || propertyValue === defaultValue) {
-            delete target[propertyName];
+        if (propertyValue === null ||
+            propertyValue === undefined) {
+            this.tryDeleteValue(target, propertyName);
+        }
+        else if (propertyValue === defaultValue) {
+            this.tryDeleteDefaultValue(target, propertyName);
         }
         else {
             target[propertyName] = enumType[propertyValue];
@@ -16988,7 +19661,7 @@ var BaseSerializationContext = /** @class */ (function () {
                 }
             }
         }
-        if (items.length == 0) {
+        if (items.length === 0) {
             if (target.hasOwnProperty(propertyName) && Array.isArray(target[propertyName])) {
                 delete target[propertyName];
             }
@@ -17135,7 +19808,7 @@ var PixelSizeProperty = /** @class */ (function (_super) {
             var isValid = false;
             try {
                 var size = shared_1.SizeAndUnit.parse(value, true);
-                if (size.unit == Enums.SizeUnit.Pixel) {
+                if (size.unit === Enums.SizeUnit.Pixel) {
                     result = size.physicalSize;
                     isValid = true;
                 }
@@ -17144,7 +19817,7 @@ var PixelSizeProperty = /** @class */ (function (_super) {
                 // Do nothing. A parse error is emitted below
             }
             if (!isValid) {
-                context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, strings_1.Strings.errors.invalidPropertyValue(source[this.name], "minHeight"));
+                context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, strings_1.Strings.errors.invalidPropertyValue(source[this.name], this.name));
             }
         }
         return result;
@@ -17177,7 +19850,7 @@ var StringArrayProperty = /** @class */ (function (_super) {
                 result.push(value);
             }
             else {
-                context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, "Invalid array value \"" + value + "\" of type \"" + typeof value + "\" ignored for \"" + this.name + "\".");
+                context.logParseEvent(sender, Enums.ValidationEvent.InvalidPropertyValue, "Invalid array value \"".concat(JSON.stringify(value), "\" of type \"").concat(typeof value, "\" ignored for \"").concat(this.name, "\"."));
             }
         }
         return result;
@@ -17203,7 +19876,9 @@ var ValueSetProperty = /** @class */ (function (_super) {
         for (var _i = 0, _a = this.values; _i < _a.length; _i++) {
             var versionedValue = _a[_i];
             if (value.toLowerCase() === versionedValue.value.toLowerCase()) {
-                var targetVersion = versionedValue.targetVersion ? versionedValue.targetVersion : this.targetVersion;
+                var targetVersion = versionedValue.targetVersion
+                    ? versionedValue.targetVersion
+                    : this.targetVersion;
                 return targetVersion.compareTo(context.targetVersion) <= 0;
             }
         }
@@ -17218,7 +19893,9 @@ var ValueSetProperty = /** @class */ (function (_super) {
             for (var _i = 0, _a = this.values; _i < _a.length; _i++) {
                 var versionedValue = _a[_i];
                 if (sourceValue.toLowerCase() === versionedValue.value.toLowerCase()) {
-                    var targetVersion = versionedValue.targetVersion ? versionedValue.targetVersion : this.targetVersion;
+                    var targetVersion = versionedValue.targetVersion
+                        ? versionedValue.targetVersion
+                        : this.targetVersion;
                     if (targetVersion.compareTo(context.targetVersion) <= 0) {
                         return versionedValue.value;
                     }
@@ -17239,7 +19916,9 @@ var ValueSetProperty = /** @class */ (function (_super) {
             for (var _i = 0, _a = this.values; _i < _a.length; _i++) {
                 var versionedValue = _a[_i];
                 if (versionedValue.value === value) {
-                    var targetVersion = versionedValue.targetVersion ? versionedValue.targetVersion : this.targetVersion;
+                    var targetVersion = versionedValue.targetVersion
+                        ? versionedValue.targetVersion
+                        : this.targetVersion;
                     if (targetVersion.compareTo(context.targetVersion) <= 0) {
                         invalidValue = false;
                         break;
@@ -17268,6 +19947,7 @@ var EnumProperty = /** @class */ (function (_super) {
         _this.onGetInitialValue = onGetInitialValue;
         _this._values = [];
         if (!values) {
+            // eslint-disable-next-line guard-for-in
             for (var key in enumType) {
                 var keyAsNumber = parseInt(key, 10);
                 if (keyAsNumber >= 0) {
@@ -17290,7 +19970,9 @@ var EnumProperty = /** @class */ (function (_super) {
             for (var _i = 0, _a = this.values; _i < _a.length; _i++) {
                 var versionedValue = _a[_i];
                 if (versionedValue.value === enumValue) {
-                    var targetVersion = versionedValue.targetVersion ? versionedValue.targetVersion : this.targetVersion;
+                    var targetVersion = versionedValue.targetVersion
+                        ? versionedValue.targetVersion
+                        : this.targetVersion;
                     if (targetVersion.compareTo(context.targetVersion) <= 0) {
                         return enumValue;
                     }
@@ -17311,7 +19993,9 @@ var EnumProperty = /** @class */ (function (_super) {
             for (var _i = 0, _a = this.values; _i < _a.length; _i++) {
                 var versionedValue = _a[_i];
                 if (versionedValue.value === value) {
-                    var targetVersion = versionedValue.targetVersion ? versionedValue.targetVersion : this.targetVersion;
+                    var targetVersion = versionedValue.targetVersion
+                        ? versionedValue.targetVersion
+                        : this.targetVersion;
                     if (targetVersion.compareTo(context.targetVersion) <= 0) {
                         invalidValue = false;
                         break;
@@ -17340,7 +20024,9 @@ var SerializableObjectProperty = /** @class */ (function (_super) {
     __extends(SerializableObjectProperty, _super);
     function SerializableObjectProperty(targetVersion, name, objectType, nullable, defaultValue) {
         if (nullable === void 0) { nullable = false; }
-        var _this = _super.call(this, targetVersion, name, defaultValue, function (sender) { return _this.nullable ? undefined : new _this.objectType(); }) || this;
+        var _this = _super.call(this, targetVersion, name, defaultValue, function (sender) {
+            return _this.nullable ? undefined : new _this.objectType();
+        }) || this;
         _this.targetVersion = targetVersion;
         _this.name = name;
         _this.objectType = objectType;
@@ -17372,7 +20058,9 @@ exports.SerializableObjectProperty = SerializableObjectProperty;
 var SerializableObjectCollectionProperty = /** @class */ (function (_super) {
     __extends(SerializableObjectCollectionProperty, _super);
     function SerializableObjectCollectionProperty(targetVersion, name, objectType, onItemAdded) {
-        var _this = _super.call(this, targetVersion, name, undefined, function (sender) { return []; }) || this;
+        var _this = _super.call(this, targetVersion, name, undefined, function (sender) {
+            return [];
+        }) || this;
         _this.targetVersion = targetVersion;
         _this.name = name;
         _this.objectType = objectType;
@@ -17393,7 +20081,11 @@ var SerializableObjectCollectionProperty = /** @class */ (function (_super) {
                 }
             }
         }
-        return result.length > 0 ? result : (this.onGetInitialValue ? this.onGetInitialValue(sender) : undefined);
+        return result.length > 0
+            ? result
+            : this.onGetInitialValue
+                ? this.onGetInitialValue(sender)
+                : undefined;
     };
     SerializableObjectCollectionProperty.prototype.toJSON = function (sender, target, value, context) {
         context.serializeArray(target, this.name, value);
@@ -17432,9 +20124,9 @@ var SerializableObjectSchema = /** @class */ (function () {
     function SerializableObjectSchema() {
         this._properties = [];
     }
-    SerializableObjectSchema.prototype.indexOf = function (property) {
+    SerializableObjectSchema.prototype.indexOf = function (prop) {
         for (var i = 0; i < this._properties.length; i++) {
-            if (this._properties[i] === property) {
+            if (this._properties[i] === prop) {
                 return i;
             }
         }
@@ -17445,9 +20137,10 @@ var SerializableObjectSchema = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             properties[_i] = arguments[_i];
         }
-        for (var i = 0; i < properties.length; i++) {
-            if (this.indexOf(properties[i]) === -1) {
-                this._properties.push(properties[i]);
+        for (var _a = 0, properties_1 = properties; _a < properties_1.length; _a++) {
+            var prop = properties_1[_a];
+            if (this.indexOf(prop) === -1) {
+                this._properties.push(prop);
             }
         }
     };
@@ -17456,10 +20149,10 @@ var SerializableObjectSchema = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             properties[_i] = arguments[_i];
         }
-        for (var _a = 0, properties_1 = properties; _a < properties_1.length; _a++) {
-            var property_1 = properties_1[_a];
+        for (var _a = 0, properties_2 = properties; _a < properties_2.length; _a++) {
+            var prop = properties_2[_a];
             while (true) {
-                var index = this.indexOf(property_1);
+                var index = this.indexOf(prop);
                 if (index >= 0) {
                     this._properties.splice(index, 1);
                 }
@@ -17480,12 +20173,16 @@ var SerializableObjectSchema = /** @class */ (function () {
 exports.SerializableObjectSchema = SerializableObjectSchema;
 // This is a decorator function, used to map SerializableObject descendant class members to
 // schema properties
-function property(property) {
+function property(prop) {
     return function (target, propertyKey) {
         var descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
         if (!descriptor.get && !descriptor.set) {
-            descriptor.get = function () { return this.getValue(property); };
-            descriptor.set = function (value) { this.setValue(property, value); };
+            descriptor.get = function () {
+                return this.getValue(prop);
+            };
+            descriptor.set = function (value) {
+                this.setValue(prop, value);
+            };
             Object.defineProperty(target, propertyKey, descriptor);
         }
     };
@@ -17498,9 +20195,9 @@ var SerializableObject = /** @class */ (function () {
         this.maxVersion = SerializableObject.defaultMaxVersion;
         var s = this.getSchema();
         for (var i = 0; i < s.getCount(); i++) {
-            var property_2 = s.getItemAt(i);
-            if (property_2.onGetInitialValue) {
-                this.setValue(property_2, property_2.onGetInitialValue(this));
+            var prop = s.getItemAt(i);
+            if (prop.onGetInitialValue) {
+                this.setValue(prop, prop.onGetInitialValue(this));
             }
         }
     }
@@ -17510,6 +20207,7 @@ var SerializableObject = /** @class */ (function () {
     SerializableObject.prototype.populateSchema = function (schema) {
         var ctor = this.constructor;
         var properties = [];
+        // eslint-disable-next-line guard-for-in
         for (var propertyName in ctor) {
             try {
                 var propertyValue = ctor[propertyName];
@@ -17538,15 +20236,17 @@ var SerializableObject = /** @class */ (function () {
             SerializableObject.onRegisterCustomProperties(this, schema);
         }
     };
-    SerializableObject.prototype.getValue = function (property) {
-        return this._propertyBag.hasOwnProperty(property.getInternalName()) ? this._propertyBag[property.getInternalName()] : property.defaultValue;
+    SerializableObject.prototype.getValue = function (prop) {
+        return this._propertyBag.hasOwnProperty(prop.getInternalName())
+            ? this._propertyBag[prop.getInternalName()]
+            : prop.defaultValue;
     };
-    SerializableObject.prototype.setValue = function (property, value) {
+    SerializableObject.prototype.setValue = function (prop, value) {
         if (value === undefined || value === null) {
-            delete this._propertyBag[property.getInternalName()];
+            delete this._propertyBag[prop.getInternalName()];
         }
         else {
-            this._propertyBag[property.getInternalName()] = value;
+            this._propertyBag[prop.getInternalName()] = value;
         }
     };
     SerializableObject.prototype.internalParse = function (source, context) {
@@ -17555,18 +20255,20 @@ var SerializableObject = /** @class */ (function () {
         if (source) {
             var s = this.getSchema();
             for (var i = 0; i < s.getCount(); i++) {
-                var property_3 = s.getItemAt(i);
-                if (property_3.isSerializationEnabled) {
-                    var propertyValue = property_3.onGetInitialValue ? property_3.onGetInitialValue(this) : undefined;
-                    if (source.hasOwnProperty(property_3.name)) {
-                        if (property_3.targetVersion.compareTo(context.targetVersion) <= 0) {
-                            propertyValue = property_3.parse(this, source, context);
+                var prop = s.getItemAt(i);
+                if (prop.isSerializationEnabled) {
+                    var propertyValue = prop.onGetInitialValue
+                        ? prop.onGetInitialValue(this)
+                        : undefined;
+                    if (source.hasOwnProperty(prop.name)) {
+                        if (prop.targetVersion.compareTo(context.targetVersion) <= 0) {
+                            propertyValue = prop.parse(this, source, context);
                         }
                         else {
-                            context.logParseEvent(this, Enums.ValidationEvent.UnsupportedProperty, strings_1.Strings.errors.propertyNotSupported(property_3.name, property_3.targetVersion.toString(), context.targetVersion.toString()));
+                            context.logParseEvent(this, Enums.ValidationEvent.UnsupportedProperty, strings_1.Strings.errors.propertyNotSupported(prop.name, prop.targetVersion.toString(), context.targetVersion.toString()));
                         }
                     }
-                    this.setValue(property_3, propertyValue);
+                    this.setValue(prop, propertyValue);
                 }
             }
         }
@@ -17578,17 +20280,19 @@ var SerializableObject = /** @class */ (function () {
         var s = this.getSchema();
         var serializedProperties = [];
         for (var i = 0; i < s.getCount(); i++) {
-            var property_4 = s.getItemAt(i);
+            var prop = s.getItemAt(i);
             // Avoid serializing the same property multiple times. This is necessary
             // because some property definitions map to the same underlying schema
             // property
-            if (property_4.isSerializationEnabled && property_4.targetVersion.compareTo(context.targetVersion) <= 0 && serializedProperties.indexOf(property_4.name) === -1) {
-                property_4.toJSON(this, target, this.getValue(property_4), context);
-                serializedProperties.push(property_4.name);
+            if (prop.isSerializationEnabled &&
+                prop.targetVersion.compareTo(context.targetVersion) <= 0 &&
+                serializedProperties.indexOf(prop.name) === -1) {
+                prop.toJSON(this, target, this.getValue(prop), context);
+                serializedProperties.push(prop.name);
             }
         }
     };
-    SerializableObject.prototype.shouldSerialize = function (context) {
+    SerializableObject.prototype.shouldSerialize = function (_context) {
         return true;
     };
     SerializableObject.prototype.parse = function (source, context) {
@@ -17605,7 +20309,9 @@ var SerializableObject = /** @class */ (function () {
         }
         if (this.shouldSerialize(effectiveContext)) {
             var result = void 0;
-            if (shared_1.GlobalSettings.enableFullJsonRoundTrip && this._rawProperties && typeof this._rawProperties === "object") {
+            if (shared_1.GlobalSettings.enableFullJsonRoundTrip &&
+                this._rawProperties &&
+                typeof this._rawProperties === "object") {
                 result = this._rawProperties;
             }
             else {
@@ -17618,14 +20324,14 @@ var SerializableObject = /** @class */ (function () {
             return undefined;
         }
     };
-    SerializableObject.prototype.hasDefaultValue = function (property) {
-        return this.getValue(property) === property.defaultValue;
+    SerializableObject.prototype.hasDefaultValue = function (prop) {
+        return this.getValue(prop) === prop.defaultValue;
     };
     SerializableObject.prototype.hasAllDefaultValues = function () {
         var s = this.getSchema();
         for (var i = 0; i < s.getCount(); i++) {
-            var property_5 = s.getItemAt(i);
-            if (!this.hasDefaultValue(property_5)) {
+            var prop = s.getItemAt(i);
+            if (!this.hasDefaultValue(prop)) {
                 return false;
             }
         }
@@ -17634,8 +20340,8 @@ var SerializableObject = /** @class */ (function () {
     SerializableObject.prototype.resetDefaultValues = function () {
         var s = this.getSchema();
         for (var i = 0; i < s.getCount(); i++) {
-            var property_6 = s.getItemAt(i);
-            this.setValue(property_6, property_6.defaultValue);
+            var prop = s.getItemAt(i);
+            this.setValue(prop, prop.defaultValue);
         }
     };
     SerializableObject.prototype.setCustomProperty = function (name, value) {
@@ -17678,6 +20384,7 @@ exports.UUID = exports.SizeAndUnit = exports.PaddingDefinition = exports.Spacing
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 var Enums = __nccwpck_require__(4926);
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 var GlobalSettings = /** @class */ (function () {
     function GlobalSettings() {
     }
@@ -17693,6 +20400,8 @@ var GlobalSettings = /** @class */ (function () {
     GlobalSettings.enableFallback = true;
     GlobalSettings.useWebkitLineClamp = true;
     GlobalSettings.allowMoreThanMaxActionsInOverflowMenu = false;
+    GlobalSettings.removePaddingFromContainersWithBackgroundImage = false;
+    GlobalSettings.resetInputsDirtyStateAfterActionExecution = true;
     GlobalSettings.applets = {
         logEnabled: true,
         logLevel: Enums.LogLevel.Error,
@@ -17722,11 +20431,13 @@ var StringWithSubstitutions = /** @class */ (function () {
         if (!referencedInputs) {
             throw new Error("The referencedInputs parameter cannot be null.");
         }
-        for (var _i = 0, inputs_1 = inputs; _i < inputs_1.length; _i++) {
-            var input = inputs_1[_i];
-            var matches = new RegExp("\\{{2}(" + input.id + ").value\\}{2}", "gi").exec(this._original);
-            if (matches != null && input.id) {
-                referencedInputs[input.id] = input;
+        if (this._original) {
+            for (var _i = 0, inputs_1 = inputs; _i < inputs_1.length; _i++) {
+                var input = inputs_1[_i];
+                var matches = new RegExp("\\{{2}(" + input.id + ").value\\}{2}", "gi").exec(this._original);
+                if (matches != null && input.id) {
+                    referencedInputs[input.id] = input;
+                }
             }
         }
     };
@@ -17735,10 +20446,10 @@ var StringWithSubstitutions = /** @class */ (function () {
         if (this._original) {
             var regEx = /\{{2}([a-z0-9_$@]+).value\}{2}/gi;
             var matches = void 0;
-            while ((matches = regEx.exec(this._original)) !== null) {
+            while ((matches = regEx.exec(this._original)) !== null && this._processed) {
                 for (var _i = 0, _a = Object.keys(inputs); _i < _a.length; _i++) {
                     var key = _a[_i];
-                    if (key.toLowerCase() == matches[1].toLowerCase()) {
+                    if (key.toLowerCase() === matches[1].toLowerCase()) {
                         var matchedInput = inputs[key];
                         var valueForReplace = "";
                         if (matchedInput.value) {
@@ -17831,8 +20542,8 @@ var SizeAndUnit = /** @class */ (function () {
             var expectedMatchCount = requireUnitSpecifier ? 3 : 2;
             if (matches && matches.length >= expectedMatchCount) {
                 result.physicalSize = parseInt(matches[1]);
-                if (matches.length == 3) {
-                    if (matches[2] == "px") {
+                if (matches.length === 3) {
+                    if (matches[2] === "px") {
                         result.unit = Enums.SizeUnit.Pixel;
                     }
                 }
@@ -17850,22 +20561,39 @@ exports.SizeAndUnit = SizeAndUnit;
  * @license MIT license
  * @link http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  **/
+/* eslint-disable @typescript-eslint/no-extraneous-class, @typescript-eslint/naming-convention, no-bitwise */
 var UUID = /** @class */ (function () {
     function UUID() {
     }
     UUID.generate = function () {
-        var d0 = Math.random() * 0xffffffff | 0;
-        var d1 = Math.random() * 0xffffffff | 0;
-        var d2 = Math.random() * 0xffffffff | 0;
-        var d3 = Math.random() * 0xffffffff | 0;
-        return UUID.lut[d0 & 0xff] + UUID.lut[d0 >> 8 & 0xff] + UUID.lut[d0 >> 16 & 0xff] + UUID.lut[d0 >> 24 & 0xff] + '-' +
-            UUID.lut[d1 & 0xff] + UUID.lut[d1 >> 8 & 0xff] + '-' + UUID.lut[d1 >> 16 & 0x0f | 0x40] + UUID.lut[d1 >> 24 & 0xff] + '-' +
-            UUID.lut[d2 & 0x3f | 0x80] + UUID.lut[d2 >> 8 & 0xff] + '-' + UUID.lut[d2 >> 16 & 0xff] + UUID.lut[d2 >> 24 & 0xff] +
-            UUID.lut[d3 & 0xff] + UUID.lut[d3 >> 8 & 0xff] + UUID.lut[d3 >> 16 & 0xff] + UUID.lut[d3 >> 24 & 0xff];
+        var d0 = (Math.random() * 0xffffffff) | 0;
+        var d1 = (Math.random() * 0xffffffff) | 0;
+        var d2 = (Math.random() * 0xffffffff) | 0;
+        var d3 = (Math.random() * 0xffffffff) | 0;
+        return (UUID.lut[d0 & 0xff] +
+            UUID.lut[(d0 >> 8) & 0xff] +
+            UUID.lut[(d0 >> 16) & 0xff] +
+            UUID.lut[(d0 >> 24) & 0xff] +
+            "-" +
+            UUID.lut[d1 & 0xff] +
+            UUID.lut[(d1 >> 8) & 0xff] +
+            "-" +
+            UUID.lut[((d1 >> 16) & 0x0f) | 0x40] +
+            UUID.lut[(d1 >> 24) & 0xff] +
+            "-" +
+            UUID.lut[(d2 & 0x3f) | 0x80] +
+            UUID.lut[(d2 >> 8) & 0xff] +
+            "-" +
+            UUID.lut[(d2 >> 16) & 0xff] +
+            UUID.lut[(d2 >> 24) & 0xff] +
+            UUID.lut[d3 & 0xff] +
+            UUID.lut[(d3 >> 8) & 0xff] +
+            UUID.lut[(d3 >> 16) & 0xff] +
+            UUID.lut[(d3 >> 24) & 0xff]);
     };
     UUID.initialize = function () {
         for (var i = 0; i < 256; i++) {
-            UUID.lut[i] = (i < 16 ? '0' : '') + i.toString(16);
+            UUID.lut[i] = (i < 16 ? "0" : "") + i.toString(16);
         }
     };
     UUID.lut = [];
@@ -17873,6 +20601,7 @@ var UUID = /** @class */ (function () {
 }());
 exports.UUID = UUID;
 UUID.initialize();
+/* eslint-enable @typescript-eslint/no-extraneous-class, @typescript-eslint/naming-convention, no-bitwise */
 //# sourceMappingURL=shared.js.map
 
 /***/ }),
@@ -17886,44 +20615,103 @@ UUID.initialize();
 // Licensed under the MIT License.
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Strings = void 0;
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 var Strings = /** @class */ (function () {
     function Strings() {
     }
     Strings.errors = {
-        unknownElementType: function (typeName) { return "Unknown element type \"" + typeName + "\". Fallback will be used if present."; },
-        unknownActionType: function (typeName) { return "Unknown action type \"" + typeName + "\". Fallback will be used if present."; },
-        elementTypeNotAllowed: function (typeName) { return "Element type \"" + typeName + "\" is not allowed in this context."; },
-        actionTypeNotAllowed: function (typeName) { return "Action type \"" + typeName + "\" is not allowed in this context."; },
-        invalidPropertyValue: function (value, propertyName) { return "Invalid value \"" + value + "\" for property \"" + propertyName + "\"."; },
-        showCardMustHaveCard: function () { return "\"An Action.ShowCard must have its \"card\" property set to a valid AdaptiveCard object."; },
-        invalidColumnWidth: function (invalidWidth) { return "Invalid column width \"" + invalidWidth + "\" - defaulting to \"auto\"."; },
-        invalidCardVersion: function (defaultingToVersion) { return "Invalid card version. Defaulting to \"" + defaultingToVersion + "\"."; },
-        invalidVersionString: function (versionString) { return "Invalid version string \"" + versionString + "\"."; },
-        propertyValueNotSupported: function (value, propertyName, supportedInVersion, versionUsed) { return "Value \"" + value + "\" for property \"" + propertyName + "\" is supported in version " + supportedInVersion + ", but you are using version " + versionUsed + "."; },
-        propertyNotSupported: function (propertyName, supportedInVersion, versionUsed) { return "Property \"" + propertyName + "\" is supported in version " + supportedInVersion + ", but you are using version " + versionUsed + "."; },
-        indexOutOfRange: function (index) { return "Index out of range (" + index + ")."; },
-        elementCannotBeUsedAsInline: function () { return "RichTextBlock.addInline: the specified card element cannot be used as a RichTextBlock inline."; },
-        inlineAlreadyParented: function () { return "RichTextBlock.addInline: the specified inline already belongs to another RichTextBlock."; },
+        unknownElementType: function (typeName) {
+            return "Unknown element type \"".concat(typeName, "\". Fallback will be used if present.");
+        },
+        unknownActionType: function (typeName) {
+            return "Unknown action type \"".concat(typeName, "\". Fallback will be used if present.");
+        },
+        elementTypeNotAllowed: function (typeName) {
+            return "Element type \"".concat(typeName, "\" is not allowed in this context.");
+        },
+        actionTypeNotAllowed: function (typeName) {
+            return "Action type \"".concat(typeName, "\" is not allowed in this context.");
+        },
+        invalidPropertyValue: function (value, propertyName) {
+            return "Invalid value \"".concat(value, "\" for property \"").concat(propertyName, "\".");
+        },
+        showCardMustHaveCard: function () {
+            return "\"An Action.ShowCard must have its \"card\" property set to a valid AdaptiveCard object.";
+        },
+        invalidColumnWidth: function (invalidWidth) {
+            return "Invalid column width \"".concat(invalidWidth, "\" - defaulting to \"auto\".");
+        },
+        invalidCardVersion: function (defaultingToVersion) {
+            return "Invalid card version. Defaulting to \"".concat(defaultingToVersion, "\".");
+        },
+        invalidVersionString: function (versionString) {
+            return "Invalid version string \"".concat(versionString, "\".");
+        },
+        propertyValueNotSupported: function (value, propertyName, supportedInVersion, versionUsed) {
+            return "Value \"".concat(value, "\" for property \"").concat(propertyName, "\" is supported in version ").concat(supportedInVersion, ", but you are using version ").concat(versionUsed, ".");
+        },
+        propertyNotSupported: function (propertyName, supportedInVersion, versionUsed) {
+            return "Property \"".concat(propertyName, "\" is supported in version ").concat(supportedInVersion, ", but you are using version ").concat(versionUsed, ".");
+        },
+        indexOutOfRange: function (index) { return "Index out of range (".concat(index, ")."); },
+        elementCannotBeUsedAsInline: function () {
+            return "RichTextBlock.addInline: the specified card element cannot be used as a RichTextBlock inline.";
+        },
+        inlineAlreadyParented: function () {
+            return "RichTextBlock.addInline: the specified inline already belongs to another RichTextBlock.";
+        },
         interactivityNotAllowed: function () { return "Interactivity is not allowed."; },
         inputsMustHaveUniqueId: function () { return "All inputs must have a unique Id."; },
-        choiceSetMustHaveAtLeastOneChoice: function () { return "An Input.ChoiceSet must have at least one choice defined."; },
-        choiceSetChoicesMustHaveTitleAndValue: function () { return "All choices in an Input.ChoiceSet must have their title and value properties set."; },
-        propertyMustBeSet: function (propertyName) { return "Property \"" + propertyName + "\" must be set."; },
-        actionHttpHeadersMustHaveNameAndValue: function () { return "All headers of an Action.Http must have their name and value properties set."; },
-        tooManyActions: function (maximumActions) { return "Maximum number of actions exceeded (" + maximumActions + ")."; },
+        choiceSetMustHaveAtLeastOneChoice: function () {
+            return "An Input.ChoiceSet must have at least one choice defined.";
+        },
+        choiceSetChoicesMustHaveTitleAndValue: function () {
+            return "All choices in an Input.ChoiceSet must have their title and value properties set.";
+        },
+        propertyMustBeSet: function (propertyName) { return "Property \"".concat(propertyName, "\" must be set."); },
+        actionHttpHeadersMustHaveNameAndValue: function () {
+            return "All headers of an Action.Http must have their name and value properties set.";
+        },
+        tooManyActions: function (maximumActions) {
+            return "Maximum number of actions exceeded (".concat(maximumActions, ").");
+        },
+        tooLittleTimeDelay: function (minAutoplayDelay) {
+            return "Autoplay Delay is too short (".concat(minAutoplayDelay, ").");
+        },
+        tooManyCarouselPages: function (maxCarouselPages) {
+            return "Maximum number of Carousel pages exceeded (".concat(maxCarouselPages, ").");
+        },
+        invalidInitialPageIndex: function (initialPageIndex) {
+            return "InitialPage for carousel is invalid (".concat(initialPageIndex, ").");
+        },
         columnAlreadyBelongsToAnotherSet: function () { return "This column already belongs to another ColumnSet."; },
-        invalidCardType: function () { return "Invalid or missing card type. Make sure the card's type property is set to \"AdaptiveCard\"."; },
-        unsupportedCardVersion: function (version, maxSupportedVersion) { return "The specified card version (" + version + ") is not supported. The maximum supported card version is " + maxSupportedVersion + "."; },
-        duplicateId: function (id) { return "Duplicate Id \"" + id + "\"."; },
-        markdownProcessingNotEnabled: function () { return "Markdown processing isn't enabled. Please see https://www.npmjs.com/package/adaptivecards#supporting-markdown"; },
-        processMarkdownEventRemoved: function () { return "The processMarkdown event has been removed. Please update your code and set onProcessMarkdown instead."; },
+        invalidCardType: function () {
+            return "Invalid or missing card type. Make sure the card's type property is set to \"AdaptiveCard\".";
+        },
+        unsupportedCardVersion: function (version, maxSupportedVersion) {
+            return "The specified card version (".concat(version, ") is not supported or still in preview. The latest released card version is ").concat(maxSupportedVersion, ".");
+        },
+        duplicateId: function (id) { return "Duplicate Id \"".concat(id, "\"."); },
+        markdownProcessingNotEnabled: function () {
+            return "Markdown processing isn't enabled. Please see https://www.npmjs.com/package/adaptivecards#supporting-markdown";
+        },
+        processMarkdownEventRemoved: function () {
+            return "The processMarkdown event has been removed. Please update your code and set onProcessMarkdown instead.";
+        },
         elementAlreadyParented: function () { return "The element already belongs to another container."; },
         actionAlreadyParented: function () { return "The action already belongs to another element."; },
-        elementTypeNotStandalone: function (typeName) { return "Elements of type " + typeName + " cannot be used as standalone elements."; }
+        elementTypeNotStandalone: function (typeName) {
+            return "Elements of type ".concat(typeName, " cannot be used as standalone elements.");
+        },
+        invalidInputLabelWidth: function () {
+            return "Invalid input label width. Defaulting to label width from host config.";
+        },
     };
     Strings.magicCodeInputCard = {
         tryAgain: function () { return "That didn't work... let's try again."; },
-        pleaseLogin: function () { return "Please login in the popup. You will obtain a magic code. Paste that code below and select \"Submit\""; },
+        pleaseLogin: function () {
+            return 'Please login in the popup. You will obtain a magic code. Paste that code below and select "Submit"';
+        },
         enterMagicCode: function () { return "Enter magic code"; },
         pleaseEnterMagicCodeYouReceived: function () { return "Please enter the magic code you received."; },
         submit: function () { return "Submit"; },
@@ -17937,13 +20725,22 @@ var Strings = /** @class */ (function () {
         refreshThisCard: function () { return "Refresh this card"; }
     };
     Strings.hints = {
-        dontUseWeightedAndStrecthedColumnsInSameSet: function () { return "It is not recommended to use weighted and stretched columns in the same ColumnSet, because in such a situation stretched columns will always get the minimum amount of space."; }
+        dontUseWeightedAndStrecthedColumnsInSameSet: function () {
+            return "It is not recommended to use weighted and stretched columns in the same ColumnSet, because in such a situation stretched columns will always get the minimum amount of space.";
+        }
     };
     Strings.defaults = {
         inlineActionTitle: function () { return "Inline Action"; },
         overflowButtonText: function () { return "..."; },
+        overflowButtonTooltip: function () { return "More options"; },
+        emptyElementText: function (elementType) { return "Empty ".concat(elementType); },
         mediaPlayerAriaLabel: function () { return "Media content"; },
-        mediaPlayerPlayMedia: function () { return "Play media"; }
+        mediaPlayerPlayMedia: function () { return "Play media"; },
+        youTubeVideoPlayer: function () { return "YouTube video player"; },
+        vimeoVideoPlayer: function () { return "Vimeo video player"; },
+        dailymotionVideoPlayer: function () { return "Dailymotion video player"; },
+        carouselNavigationPreviousTooltip: function () { return "Previous carousel page"; },
+        carouselNavigationNextTooltip: function () { return "Next carousel page"; }
     };
     return Strings;
 }());
@@ -18002,9 +20799,9 @@ var TableColumnDefinition = /** @class */ (function (_super) {
     };
     TableColumnDefinition.horizontalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "horizontalCellContentAlignment", enums_1.HorizontalAlignment);
     TableColumnDefinition.verticalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "verticalCellContentAlignment", enums_1.VerticalAlignment);
-    TableColumnDefinition.widthProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_5, "width", function (sender, property, source, context) {
-        var result = property.defaultValue;
-        var value = source[property.name];
+    TableColumnDefinition.widthProperty = new serialization_1.CustomProperty(serialization_1.Versions.v1_5, "width", function (sender, prop, source, context) {
+        var result = prop.defaultValue;
+        var value = source[prop.name];
         var invalidWidth = false;
         if (typeof value === "number" && !isNaN(value)) {
             result = new shared_1.SizeAndUnit(value, enums_1.SizeUnit.Weight);
@@ -18033,13 +20830,13 @@ var TableColumnDefinition = /** @class */ (function (_super) {
         }
     }, new shared_1.SizeAndUnit(1, enums_1.SizeUnit.Weight));
     __decorate([
-        serialization_1.property(TableColumnDefinition.horizontalCellContentAlignmentProperty)
+        (0, serialization_1.property)(TableColumnDefinition.horizontalCellContentAlignmentProperty)
     ], TableColumnDefinition.prototype, "horizontalCellContentAlignment", void 0);
     __decorate([
-        serialization_1.property(TableColumnDefinition.verticalCellContentAlignmentProperty)
+        (0, serialization_1.property)(TableColumnDefinition.verticalCellContentAlignmentProperty)
     ], TableColumnDefinition.prototype, "verticalCellContentAlignment", void 0);
     __decorate([
-        serialization_1.property(TableColumnDefinition.widthProperty)
+        (0, serialization_1.property)(TableColumnDefinition.widthProperty)
     ], TableColumnDefinition.prototype, "width", void 0);
     return TableColumnDefinition;
 }(serialization_1.SerializableObject));
@@ -18056,7 +20853,7 @@ var StylableContainer = /** @class */ (function (_super) {
         return context.parseCardObject(this, source, [], // Forbidden types not supported for elements for now
         !this.isDesignMode(), function (typeName) {
             return _this.createItemInstance(typeName);
-        }, function (typeName, errorType) {
+        }, function (typeName, _errorType) {
             context.logParseEvent(undefined, enums_1.ValidationEvent.ElementTypeNotAllowed, strings_1.Strings.errors.elementTypeNotAllowed(typeName));
         });
     };
@@ -18078,6 +20875,9 @@ var StylableContainer = /** @class */ (function (_super) {
             return true;
         }
         return false;
+    };
+    StylableContainer.prototype.internalIndexOf = function (item) {
+        return this._items.indexOf(item);
     };
     StylableContainer.prototype.internalParse = function (source, context) {
         _super.prototype.internalParse.call(this, source, context);
@@ -18130,7 +20930,7 @@ var TableCell = /** @class */ (function (_super) {
         if (this.renderedElement && this.getHasBorder()) {
             var styleDefinition = this.hostConfig.containerStyles.getStyleByName(this.parentRow.parentTable.gridStyle);
             if (styleDefinition.borderColor) {
-                var borderColor = utils_1.stringToCssColor(styleDefinition.borderColor);
+                var borderColor = (0, utils_1.stringToCssColor)(styleDefinition.borderColor);
                 if (borderColor) {
                     this.renderedElement.style.borderRight = "1px solid " + borderColor;
                     this.renderedElement.style.borderBottom = "1px solid " + borderColor;
@@ -18139,8 +20939,9 @@ var TableCell = /** @class */ (function (_super) {
         }
     };
     TableCell.prototype.getDefaultPadding = function () {
-        return this.getHasBackground() || this.getHasBorder() ?
-            new shared_1.PaddingDefinition(enums_1.Spacing.Small, enums_1.Spacing.Small, enums_1.Spacing.Small, enums_1.Spacing.Small) : _super.prototype.getDefaultPadding.call(this);
+        return this.getHasBackground() || this.getHasBorder()
+            ? new shared_1.PaddingDefinition(enums_1.Spacing.Small, enums_1.Spacing.Small, enums_1.Spacing.Small, enums_1.Spacing.Small)
+            : _super.prototype.getDefaultPadding.call(this);
     };
     TableCell.prototype.internalRender = function () {
         var cellElement = _super.prototype.internalRender.call(this);
@@ -18153,7 +20954,7 @@ var TableCell = /** @class */ (function (_super) {
         }
         return cellElement;
     };
-    TableCell.prototype.shouldSerialize = function (context) {
+    TableCell.prototype.shouldSerialize = function (_context) {
         return true;
     };
     TableCell.prototype.getJsonTypeName = function () {
@@ -18245,8 +21046,10 @@ var TableRow = /** @class */ (function (_super) {
         if (this.renderedElement) {
             var styleDefinition = this.hostConfig.containerStyles.getStyleByName(this.style, this.hostConfig.containerStyles.getStyleByName(this.defaultStyle));
             if (styleDefinition.backgroundColor) {
-                var bgColor = utils_1.stringToCssColor(styleDefinition.backgroundColor);
-                this.renderedElement.style.backgroundColor = bgColor;
+                var bgColor = (0, utils_1.stringToCssColor)(styleDefinition.backgroundColor);
+                if (bgColor) {
+                    this.renderedElement.style.backgroundColor = bgColor;
+                }
             }
         }
     };
@@ -18267,7 +21070,8 @@ var TableRow = /** @class */ (function (_super) {
             var cell = this.getItemAt(i);
             // Cheating a bit in order to keep cellType read-only
             cell["_columnIndex"] = i;
-            cell["_cellType"] = (this.parentTable.firstRowAsHeaders && isFirstRow) ? "header" : "data";
+            cell["_cellType"] =
+                this.parentTable.firstRowAsHeaders && isFirstRow ? "header" : "data";
             var renderedCell = cell.render();
             if (renderedCell) {
                 var column = this.parentTable.getColumnAt(i);
@@ -18285,7 +21089,7 @@ var TableRow = /** @class */ (function (_super) {
         }
         return rowElement.children.length > 0 ? rowElement : undefined;
     };
-    TableRow.prototype.shouldSerialize = function (context) {
+    TableRow.prototype.shouldSerialize = function (_context) {
         return true;
     };
     TableRow.prototype.addCell = function (cell) {
@@ -18296,6 +21100,9 @@ var TableRow = /** @class */ (function (_super) {
             return this.removeItem(this.getItemAt(columnIndex));
         }
         return false;
+    };
+    TableRow.prototype.indexOf = function (cardElement) {
+        return cardElement instanceof TableCell ? this.internalIndexOf(cardElement) : -1;
     };
     TableRow.prototype.ensureHasEnoughCells = function (cellCount) {
         while (this.getItemCount() < cellCount) {
@@ -18327,10 +21134,10 @@ var TableRow = /** @class */ (function (_super) {
     TableRow.horizontalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "horizontalCellContentAlignment", enums_1.HorizontalAlignment);
     TableRow.verticalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "verticalCellContentAlignment", enums_1.VerticalAlignment);
     __decorate([
-        serialization_1.property(TableRow.horizontalCellContentAlignmentProperty)
+        (0, serialization_1.property)(TableRow.horizontalCellContentAlignmentProperty)
     ], TableRow.prototype, "horizontalCellContentAlignment", void 0);
     __decorate([
-        serialization_1.property(TableRow.verticalCellContentAlignmentProperty)
+        (0, serialization_1.property)(TableRow.verticalCellContentAlignmentProperty)
     ], TableRow.prototype, "verticalCellContentAlignment", void 0);
     return TableRow;
 }(StylableContainer));
@@ -18395,7 +21202,7 @@ var Table = /** @class */ (function (_super) {
                     column.computedWidth = new shared_1.SizeAndUnit(column.width.physicalSize, enums_1.SizeUnit.Pixel);
                 }
                 else {
-                    column.computedWidth = new shared_1.SizeAndUnit(100 / totalWeights * column.width.physicalSize, enums_1.SizeUnit.Weight);
+                    column.computedWidth = new shared_1.SizeAndUnit((100 / totalWeights) * column.width.physicalSize, enums_1.SizeUnit.Weight);
                 }
             }
             var tableElement = document.createElement("div");
@@ -18405,7 +21212,7 @@ var Table = /** @class */ (function (_super) {
             if (this.showGridLines) {
                 var styleDefinition = this.hostConfig.containerStyles.getStyleByName(this.gridStyle);
                 if (styleDefinition.borderColor) {
-                    var borderColor = utils_1.stringToCssColor(styleDefinition.borderColor);
+                    var borderColor = (0, utils_1.stringToCssColor)(styleDefinition.borderColor);
                     if (borderColor) {
                         tableElement.style.borderTop = "1px solid " + borderColor;
                         tableElement.style.borderLeft = "1px solid " + borderColor;
@@ -18450,32 +21257,35 @@ var Table = /** @class */ (function (_super) {
         this.internalAddItem(row);
         row.ensureHasEnoughCells(this.getColumnCount());
     };
+    Table.prototype.indexOf = function (cardElement) {
+        return cardElement instanceof TableRow ? this.internalIndexOf(cardElement) : -1;
+    };
     Table.prototype.getJsonTypeName = function () {
         return "Table";
     };
-    Table.columnsProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_5, "columns", TableColumnDefinition);
+    Table._columnsProperty = new serialization_1.SerializableObjectCollectionProperty(serialization_1.Versions.v1_5, "columns", TableColumnDefinition);
     Table.firstRowAsHeadersProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_5, "firstRowAsHeaders", true);
     Table.showGridLinesProperty = new serialization_1.BoolProperty(serialization_1.Versions.v1_5, "showGridLines", true);
     Table.gridStyleProperty = new card_elements_1.ContainerStyleProperty(serialization_1.Versions.v1_5, "gridStyle");
     Table.horizontalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "horizontalCellContentAlignment", enums_1.HorizontalAlignment);
     Table.verticalCellContentAlignmentProperty = new serialization_1.EnumProperty(serialization_1.Versions.v1_5, "verticalCellContentAlignment", enums_1.VerticalAlignment);
     __decorate([
-        serialization_1.property(Table.columnsProperty)
+        (0, serialization_1.property)(Table._columnsProperty)
     ], Table.prototype, "_columns", void 0);
     __decorate([
-        serialization_1.property(Table.firstRowAsHeadersProperty)
+        (0, serialization_1.property)(Table.firstRowAsHeadersProperty)
     ], Table.prototype, "firstRowAsHeaders", void 0);
     __decorate([
-        serialization_1.property(Table.showGridLinesProperty)
+        (0, serialization_1.property)(Table.showGridLinesProperty)
     ], Table.prototype, "showGridLines", void 0);
     __decorate([
-        serialization_1.property(Table.gridStyleProperty)
+        (0, serialization_1.property)(Table.gridStyleProperty)
     ], Table.prototype, "gridStyle", null);
     __decorate([
-        serialization_1.property(Table.horizontalCellContentAlignmentProperty)
+        (0, serialization_1.property)(Table.horizontalCellContentAlignmentProperty)
     ], Table.prototype, "horizontalCellContentAlignment", void 0);
     __decorate([
-        serialization_1.property(Table.verticalCellContentAlignmentProperty)
+        (0, serialization_1.property)(Table.verticalCellContentAlignmentProperty)
     ], Table.prototype, "verticalCellContentAlignment", void 0);
     return Table;
 }(StylableContainer));
@@ -18520,7 +21330,6 @@ var AbstractTextFormatter = /** @class */ (function () {
             while ((matches = this._regularExpression.exec(input)) != null) {
                 result = result.replace(matches[0], this.internalFormat(lang, matches));
             }
-            ;
             return result;
         }
         else {
@@ -18536,9 +21345,14 @@ var DateFormatter = /** @class */ (function (_super) {
     }
     DateFormatter.prototype.internalFormat = function (lang, matches) {
         var date = new Date(Date.parse(matches[1]));
-        var format = matches[2] != undefined ? matches[2].toLowerCase() : "compact";
-        if (format != "compact") {
-            return date.toLocaleDateString(lang, { day: "numeric", weekday: format, month: format, year: "numeric" });
+        var format = matches[2] !== undefined ? matches[2].toLowerCase() : "compact";
+        if (format !== "compact") {
+            return date.toLocaleDateString(lang, {
+                day: "numeric",
+                weekday: format,
+                month: format,
+                year: "numeric"
+            });
         }
         else {
             return date.toLocaleDateString();
@@ -18553,7 +21367,7 @@ var TimeFormatter = /** @class */ (function (_super) {
     }
     TimeFormatter.prototype.internalFormat = function (lang, matches) {
         var date = new Date(Date.parse(matches[1]));
-        return date.toLocaleTimeString(lang, { hour: 'numeric', minute: '2-digit' });
+        return date.toLocaleTimeString(lang, { hour: "numeric", minute: "2-digit" });
     };
     return TimeFormatter;
 }(AbstractTextFormatter));
@@ -18579,8 +21393,9 @@ exports.formatText = formatText;
 
 "use strict";
 
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.clearElementChildren = exports.getScrollY = exports.getScrollX = exports.getFitStatus = exports.truncate = exports.stringToCssColor = exports.parseEnum = exports.getEnumValueByName = exports.parseBool = exports.parseNumber = exports.parseString = exports.appendChild = exports.generateUniqueId = exports.isMobileOS = exports.isInternetExplorer = void 0;
+exports.debounce = exports.addCancelSelectActionEventHandler = exports.clearElementChildren = exports.getScrollY = exports.getScrollX = exports.getFitStatus = exports.truncate = exports.truncateText = exports.stringToCssColor = exports.parseEnum = exports.getEnumValueByName = exports.parseBool = exports.parseNumber = exports.parseString = exports.appendChild = exports.generateUniqueId = exports.isMobileOS = exports.isInternetExplorer = void 0;
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 var Enums = __nccwpck_require__(4926);
@@ -18592,7 +21407,7 @@ function isInternetExplorer() {
 exports.isInternetExplorer = isInternetExplorer;
 function isMobileOS() {
     var userAgent = window.navigator.userAgent;
-    return !!userAgent.match(/Android/i) || !!userAgent.match(/iPad/i) || !!userAgent.match(/iPhone/i);
+    return (!!userAgent.match(/Android/i) || !!userAgent.match(/iPad/i) || !!userAgent.match(/iPhone/i));
 }
 exports.isMobileOS = isMobileOS;
 /**
@@ -18634,6 +21449,7 @@ function parseBool(value, defaultValue) {
 }
 exports.parseBool = parseBool;
 function getEnumValueByName(enumType, name) {
+    // eslint-disable-next-line guard-for-in
     for (var key in enumType) {
         var keyAsNumber = parseInt(key, 10);
         if (keyAsNumber >= 0) {
@@ -18669,18 +21485,15 @@ function stringToCssColor(color) {
     return color;
 }
 exports.stringToCssColor = stringToCssColor;
-function truncate(element, maxHeight, lineHeight) {
+function truncateWorker(element, maxHeight, fullText, truncateAt, lineHeight) {
     var fits = function () {
         // Allow a one pixel overflow to account for rounding differences
         // between browsers
         return maxHeight - element.scrollHeight >= -1.0;
     };
-    if (fits())
+    if (fits()) {
         return;
-    var fullText = element.innerHTML;
-    var truncateAt = function (idx) {
-        element.innerHTML = fullText.substring(0, idx) + '...';
-    };
+    }
     var breakableIndices = findBreakableIndices(fullText);
     var lo = 0;
     var hi = breakableIndices.length;
@@ -18688,7 +21501,7 @@ function truncate(element, maxHeight, lineHeight) {
     // Do a binary search for the longest string that fits
     while (lo < hi) {
         var mid = Math.floor((lo + hi) / 2);
-        truncateAt(breakableIndices[mid]);
+        truncateAt(fullText, breakableIndices[mid]);
         if (fits()) {
             bestBreakIdx = breakableIndices[mid];
             lo = mid + 1;
@@ -18697,13 +21510,13 @@ function truncate(element, maxHeight, lineHeight) {
             hi = mid;
         }
     }
-    truncateAt(bestBreakIdx);
+    truncateAt(fullText, bestBreakIdx);
     // If we have extra room, try to expand the string letter by letter
     // (covers the case where we have to break in the middle of a long word)
     if (lineHeight && maxHeight - element.scrollHeight >= lineHeight - 1.0) {
         var idx = findNextCharacter(fullText, bestBreakIdx);
         while (idx < fullText.length) {
-            truncateAt(idx);
+            truncateAt(fullText, idx);
             if (fits()) {
                 bestBreakIdx = idx;
                 idx = findNextCharacter(fullText, idx);
@@ -18712,15 +21525,39 @@ function truncate(element, maxHeight, lineHeight) {
                 break;
             }
         }
-        truncateAt(bestBreakIdx);
+        truncateAt(fullText, bestBreakIdx);
     }
+}
+function truncateText(element, maxHeight, lineHeight) {
+    truncateWorker(element, maxHeight, element.innerText, function (text, idx) {
+        element.innerText = text.substring(0, idx) + "...";
+    }, lineHeight);
+}
+exports.truncateText = truncateText;
+/**
+ * {@link truncate} has been deprecated and is no longer in use internally. This policy passes
+ * content through as it always has, which is _supposed_ to be dealing with text only (see {@link
+ * TextBlock.truncateIfSupported}), but had a bug where it might actually pass through an element
+ * for which innerHTML yielded actual HTML (since fixed).
+ */
+var ttDeprecatedPolicy = (typeof window === 'undefined') ? undefined : (_a = window.trustedTypes) === null || _a === void 0 ? void 0 : _a.createPolicy("adaptivecards#deprecatedExportedFunctionPolicy", {
+    createHTML: function (value) { return value; }
+});
+/** @deprecated Use {@link truncateText} instead. */
+function truncate(element, maxHeight, lineHeight) {
+    truncateWorker(element, maxHeight, element.innerHTML, function (text, idx) {
+        var _a;
+        var truncatedString = text.substring(0, idx) + "...";
+        var truncatedHTML = (_a = ttDeprecatedPolicy === null || ttDeprecatedPolicy === void 0 ? void 0 : ttDeprecatedPolicy.createHTML(truncatedString)) !== null && _a !== void 0 ? _a : truncatedString;
+        element.innerHTML = truncatedHTML;
+    }, lineHeight);
 }
 exports.truncate = truncate;
 function findBreakableIndices(html) {
     var results = [];
     var idx = findNextCharacter(html, -1);
     while (idx < html.length) {
-        if (html[idx] == ' ') {
+        if (html[idx] === " ") {
             results.push(idx);
         }
         idx = findNextCharacter(html, idx);
@@ -18731,9 +21568,10 @@ function findNextCharacter(html, currIdx) {
     currIdx += 1;
     // If we found the start of an HTML tag, keep advancing until we get
     // past it, so we don't end up truncating in the middle of the tag
-    while (currIdx < html.length && html[currIdx] == '<') {
-        while (currIdx < html.length && html[currIdx++] != '>')
-            ;
+    while (currIdx < html.length && html[currIdx] === "<") {
+        while (currIdx < html.length && html[currIdx++] !== ">") {
+            continue;
+        }
     }
     return currIdx;
 }
@@ -18765,6 +21603,30 @@ function clearElementChildren(element) {
     }
 }
 exports.clearElementChildren = clearElementChildren;
+function addCancelSelectActionEventHandler(element) {
+    element.onclick = function (e) {
+        e.preventDefault();
+        e.cancelBubble = true;
+    };
+}
+exports.addCancelSelectActionEventHandler = addCancelSelectActionEventHandler;
+function debounce(fn, delay) {
+    var timer;
+    function debouncedFn() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(function () {
+            fn.apply(void 0, args);
+        }, delay);
+    }
+    return debouncedFn;
+}
+exports.debounce = debounce;
 //# sourceMappingURL=utils.js.map
 
 /***/ }),
@@ -68055,6 +70917,14 @@ function wrappy (fn, cb) {
     return ret
   }
 }
+
+
+/***/ }),
+
+/***/ 1602:
+/***/ ((module) => {
+
+module.exports = eval("require")("swiper");
 
 
 /***/ }),

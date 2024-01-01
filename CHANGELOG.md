@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.81](https://github.com/kunalnagarco/action-cve/compare/v1.7.80...v1.7.81) (2024-01-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency adaptivecards to v2.11.3 ([#142](https://github.com/kunalnagarco/action-cve/issues/142)) ([1c1dd29](https://github.com/kunalnagarco/action-cve/commit/1c1dd29e8bddc36fa659b6c1dd10525b698db262))
+
 ### [1.7.80](https://github.com/kunalnagarco/action-cve/compare/v1.7.79...v1.7.80) (2024-01-01)
 
 

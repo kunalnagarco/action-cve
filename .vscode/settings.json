@@ -1,9 +1,9 @@
 {
-	"eslint.enable": true,
-	"editor.tabSize": 2,
-	"editor.codeActionsOnSave": {
-	  "source.fixAll.eslint": true
-	},
-	"editor.rulers": [80],
-	"files.insertFinalNewline": true
+  "eslint.enable": true,
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.rulers": [80],
+  "files.insertFinalNewline": true
 }

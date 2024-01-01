@@ -20,7 +20,7 @@
     "url": "git+https://github.com/kunalnagarco/action-cve.git"
   },
   "license": "MIT",
-  "author": "Kunal Nagar <knlnagar@gmail.com>",
+  "author": "Kunal Nagar <2741371+kunalnagar@users.noreply.github.com>",
   "main": "lib/main.js",
   "scripts": {
     "pre-commit": "lint-staged",
@@ -30,7 +30,7 @@
     "lint": "eslint --fix src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
+    "all": "yarn build && yarn format && yarn lint && yarn package && yarn test",
     "release": "semantic-release"
   },
   "lint-staged": {
@@ -38,9 +38,9 @@
       "sort-package-json"
     ],
     "src/**/*.{ts}": [
-      "npm run lint",
-      "npm run format",
-      "npm run format-check"
+      "yarn lint",
+      "yarn format",
+      "yarn format-check"
     ]
   },
   "dependencies": {
@@ -53,7 +53,7 @@
     "nodemailer": "6.7.8"
   },
   "devDependencies": {
-    "@kunalnagarco/eslint-config": "^0.2.1",
+    "@kunalnagarco/eslint-config": "^0.2.7",
     "@octokit/graphql-schema": "10.74.2",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/commit-analyzer": "9.0.2",
@@ -67,14 +67,18 @@
     "@types/nodemailer": "6.4.5",
     "@vercel/ncc": "0.38.1",
     "conventional-changelog-conventionalcommits": "4.6.3",
-    "eslint-plugin-github": "4.10.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-react-app": "^7.0.1",
     "husky": "7.0.4",
     "jest": "27.5.1",
     "jest-circus": "27.5.1",
     "js-yaml": "4.1.0",
     "lint-staged": "12.5.0",
+    "prettier": "^3.1.1",
     "semantic-release": "19.0.5",
     "sort-package-json": "1.57.0",
+    "swiper": "^11.0.5",
     "ts-jest": "27.1.5",
     "typescript": "4.5.5"
   }

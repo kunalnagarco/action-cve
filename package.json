@@ -48,7 +48,7 @@
     "@actions/github": "5.1.1",
     "@pagerduty/pdjs": "2.2.4",
     "@slack/webhook": "6.1.0",
-    "adaptivecards": "2.10.0",
+    "adaptivecards": "2.11.3",
     "node-fetch": "2.6.11",
     "nodemailer": "6.7.8"
   },

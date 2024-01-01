@@ -1,5 +1,5 @@
 {
-  "extends": ["@kunalnagarco"],
+  "plugins": ["github"],
   "parserOptions": {
     "ecmaVersion": 9,
     "sourceType": "module",

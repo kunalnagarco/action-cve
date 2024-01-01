@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.7.80](https://github.com/kunalnagarco/action-cve/compare/v1.7.79...v1.7.80) (2024-01-01)
+
+
+### Chores
+
+* **deps:** update dependency @slack/types to v2.11.0 ([0132777](https://github.com/kunalnagarco/action-cve/commit/013277792a34f194a4f18db2f30ace824f978f56))
+
 ### [1.7.79](https://github.com/kunalnagarco/action-cve/compare/v1.7.78...v1.7.79) (2023-12-25)
 
 

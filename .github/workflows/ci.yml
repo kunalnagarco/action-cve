@@ -27,7 +27,7 @@ jobs:
           # zenduty_service_id: ${{ secrets.ZENDUTY_SERVICE_ID }}
           # zenduty_escalation_policy_id: ${{ secrets.ZENDUTY_ESCALATION_POLICY_ID }}
           email_from: ${{ secrets.EMAIL_FROM }}
-          # email_list: ${{ secrets.EMAIL_BCC_LIST }}
+          email_list: ${{ secrets.EMAIL_BCC_LIST }}
           email_transport_smtp_user: ${{ secrets.EMAIL_TRANSPORT_SMTP_USER }}
           email_transport_smtp_password: ${{ secrets.EMAIL_TRANSPORT_SMTP_PASSWORD }}
         env:

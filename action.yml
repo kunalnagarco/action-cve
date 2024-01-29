@@ -32,6 +32,8 @@ inputs:
     description: 'SMTP user'
   email_transport_smtp_password:
     description: 'SMTP password'
+  severities:
+    description: "List of severity to filter vulnerability alerts: LOW | MODERATE | HIGH | CRITICAL"
   count:
     description: 'Number of vulnerability alerts to send'
     default: 20

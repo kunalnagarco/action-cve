@@ -1,4 +1,4 @@
-import { getInput, setFailed } from '@actions/core'
+import { getInput, getMultilineInput, setFailed } from '@actions/core'
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -9,6 +9,8 @@ import {
 } from './destinations'
 import { context } from '@actions/github'
 import { fetchAlerts } from './fetch-alerts'
+import { filterAlertsByAdvisorySeverity } from './filters'
+import { parseAdvisorySeverities } from './entities'
 
 async function run(): Promise<void> {
   try {
@@ -29,22 +31,24 @@ async function run(): Promise<void> {
     const emailTransportSmtpUser = getInput('email_transport_smtp_user')
     const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
     const count = parseInt(getInput('count'))
+    const severities = parseAdvisorySeverities(getMultilineInput('severities'))
     const owner = context.repo.owner
     const repo = context.repo.repo
     const alerts = await fetchAlerts(token, repo, owner, count)
-    if (alerts.length > 0) {
+    const filteredAlerts = filterAlertsByAdvisorySeverity(alerts, severities)
+    if (filteredAlerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
-        await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)
+        await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, filteredAlerts)
       }
       if (slackWebhookUrl) {
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {
-          await sendAlertsToSlack(slackWebhookUrl, alerts)
+          await sendAlertsToSlack(slackWebhookUrl, filteredAlerts)
         }
       }
       if (pagerDutyIntegrationKey) {
-        await sendAlertsToPagerDuty(pagerDutyIntegrationKey, alerts)
+        await sendAlertsToPagerDuty(pagerDutyIntegrationKey, filteredAlerts)
       }
       if (zenDutyApiKey) {
         if (zenDutyServiceId && zenDutyEscalationPolicyId) {
@@ -52,7 +56,7 @@ async function run(): Promise<void> {
             zenDutyApiKey,
             zenDutyServiceId,
             zenDutyEscalationPolicyId,
-            alerts,
+            filteredAlerts,
           )
         } else {
           setFailed(
@@ -75,7 +79,7 @@ async function run(): Promise<void> {
           }
           sendAlertsToEmailSmtp(
             emailTransportSmtpConfig,
-            alerts,
+            filteredAlerts,
             emailList,
             emailFrom,
             emailSubject,

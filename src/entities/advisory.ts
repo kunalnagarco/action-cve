@@ -35,7 +35,9 @@ export interface Advisory {
   withdrawnAt?: string
 }
 
-type AdvisorySeverity = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+export type AdvisorySeverity = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+
+const advisorySeverityValues = ['LOW', 'MODERATE', 'HIGH', 'CRITICAL']
 
 export const toAdvisory = (securityAdvisory: SecurityAdvisory): Advisory => ({
   cvssScore: securityAdvisory.cvss.score,
@@ -47,3 +49,16 @@ export const toAdvisory = (securityAdvisory: SecurityAdvisory): Advisory => ({
   updatedAt: securityAdvisory.updatedAt,
   withdrawnAt: securityAdvisory.withdrawnAt,
 })
+
+const isAdvisorySeverity = (value: unknown): value is AdvisorySeverity =>
+  advisorySeverityValues.includes(value as AdvisorySeverity)
+
+const parseAdvisorySeverity = (
+  securityAdvisory: string,
+): AdvisorySeverity | null =>
+  isAdvisorySeverity(securityAdvisory) ? securityAdvisory : null
+
+export const parseAdvisorySeverities = (values: string[]): AdvisorySeverity[] =>
+  values
+    .map(parseAdvisorySeverity)
+    .filter((v): v is AdvisorySeverity => v !== null)

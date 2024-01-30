@@ -396,7 +396,8 @@ exports.sendAlertsToZenduty = sendAlertsToZenduty;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toAdvisory = void 0;
+exports.parseAdvisorySeverities = exports.toAdvisory = void 0;
+const advisorySeverityValues = ['LOW', 'MODERATE', 'HIGH', 'CRITICAL'];
 const toAdvisory = (securityAdvisory) => ({
     cvssScore: securityAdvisory.cvss.score,
     severity: securityAdvisory.severity,
@@ -408,6 +409,12 @@ const toAdvisory = (securityAdvisory) => ({
     withdrawnAt: securityAdvisory.withdrawnAt,
 });
 exports.toAdvisory = toAdvisory;
+const isAdvisorySeverity = (value) => advisorySeverityValues.includes(value);
+const parseAdvisorySeverity = (securityAdvisory) => isAdvisorySeverity(securityAdvisory) ? securityAdvisory : null;
+const parseAdvisorySeverities = (values) => values
+    .map(parseAdvisorySeverity)
+    .filter((v) => v !== null);
+exports.parseAdvisorySeverities = parseAdvisorySeverities;
 
 
 /***/ }),
@@ -599,6 +606,26 @@ exports.fetchAlerts = fetchAlerts;
 
 /***/ }),
 
+/***/ 5939:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.filterAlertsByAdvisorySeverity = void 0;
+const filterAlertsByAdvisorySeverity = (alerts, severities) => {
+    if (severities.length === 0) {
+        return alerts;
+    }
+    return alerts.filter((alert) => alert.advisory !== undefined
+        ? severities.includes(alert.advisory.severity)
+        : false);
+};
+exports.filterAlertsByAdvisorySeverity = filterAlertsByAdvisorySeverity;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -618,6 +645,8 @@ const core_1 = __nccwpck_require__(2186);
 const destinations_1 = __nccwpck_require__(8395);
 const github_1 = __nccwpck_require__(5438);
 const fetch_alerts_1 = __nccwpck_require__(9028);
+const filters_1 = __nccwpck_require__(5939);
+const entities_1 = __nccwpck_require__(7604);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -636,27 +665,29 @@ function run() {
             const emailTransportSmtpUser = (0, core_1.getInput)('email_transport_smtp_user');
             const emailTransportSmtpPassword = (0, core_1.getInput)('email_transport_smtp_password');
             const count = parseInt((0, core_1.getInput)('count'));
+            const severities = (0, entities_1.parseAdvisorySeverities)((0, core_1.getMultilineInput)('severities'));
             const owner = github_1.context.repo.owner;
             const repo = github_1.context.repo.repo;
             const alerts = yield (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, count);
-            if (alerts.length > 0) {
+            const filteredAlerts = (0, filters_1.filterAlertsByAdvisorySeverity)(alerts, severities);
+            if (filteredAlerts.length > 0) {
                 if (microsoftTeamsWebhookUrl) {
-                    yield (0, destinations_1.sendAlertsToMicrosoftTeams)(microsoftTeamsWebhookUrl, alerts);
+                    yield (0, destinations_1.sendAlertsToMicrosoftTeams)(microsoftTeamsWebhookUrl, filteredAlerts);
                 }
                 if (slackWebhookUrl) {
                     if (!(0, destinations_1.validateSlackWebhookUrl)(slackWebhookUrl)) {
                         (0, core_1.setFailed)(new Error('Invalid Slack Webhook URL'));
                     }
                     else {
-                        yield (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, alerts);
+                        yield (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, filteredAlerts);
                     }
                 }
                 if (pagerDutyIntegrationKey) {
-                    yield (0, destinations_1.sendAlertsToPagerDuty)(pagerDutyIntegrationKey, alerts);
+                    yield (0, destinations_1.sendAlertsToPagerDuty)(pagerDutyIntegrationKey, filteredAlerts);
                 }
                 if (zenDutyApiKey) {
                     if (zenDutyServiceId && zenDutyEscalationPolicyId) {
-                        yield (0, destinations_1.sendAlertsToZenduty)(zenDutyApiKey, zenDutyServiceId, zenDutyEscalationPolicyId, alerts);
+                        yield (0, destinations_1.sendAlertsToZenduty)(zenDutyApiKey, zenDutyServiceId, zenDutyEscalationPolicyId, filteredAlerts);
                     }
                     else {
                         (0, core_1.setFailed)(new Error('Check your Zenduty Service ID and Escalation Policy ID'));
@@ -674,7 +705,7 @@ function run() {
                                 pass: emailTransportSmtpPassword,
                             },
                         };
-                        (0, destinations_1.sendAlertsToEmailSmtp)(emailTransportSmtpConfig, alerts, emailList, emailFrom, emailSubject);
+                        (0, destinations_1.sendAlertsToEmailSmtp)(emailTransportSmtpConfig, filteredAlerts, emailList, emailFrom, emailSubject);
                     }
                     else {
                         (0, core_1.setFailed)(new Error(`Invalid SMTP config. Please check the wiki for more info: ${emailWikiLink}`));

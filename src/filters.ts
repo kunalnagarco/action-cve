@@ -10,6 +10,6 @@ export const filterAlertsByAdvisorySeverity = (
   return alerts.filter((alert) =>
     alert.advisory !== undefined
       ? severities.includes(alert.advisory.severity)
-      : true,
+      : false,
   );
 };

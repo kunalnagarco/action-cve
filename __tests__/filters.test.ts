@@ -59,11 +59,11 @@ describe('filterAlertsByAdvisorySeverity', () => {
     expect(filterAlertsByAdvisorySeverity(alerts, severities)).toEqual(expected)
   })
 
-  test("should not filter alerts when alert doesn't have severity", () => {
+  test("should filter out alerts when alert doesn't have severity", () => {
     const severities: AdvisorySeverity[] = ['CRITICAL']
     const alertsWithoutAdvisory = createAlertWithoutAdvisory()
 
-    const expected = [alertsWithoutAdvisory]
+    const expected: Alert[] = []
 
     expect(
       filterAlertsByAdvisorySeverity([alertsWithoutAdvisory], severities),

@@ -33684,7 +33684,7 @@ module.exports = RelaxedBody;
 "use strict";
 
 
-const punycode = __nccwpck_require__(5477);
+const punycode = __nccwpck_require__(4317);
 const mimeFuncs = __nccwpck_require__(994);
 const crypto = __nccwpck_require__(6113);
 
@@ -34105,6 +34105,7 @@ const zlib = __nccwpck_require__(9796);
 const PassThrough = (__nccwpck_require__(2781).PassThrough);
 const Cookies = __nccwpck_require__(322);
 const packageData = __nccwpck_require__(4129);
+const net = __nccwpck_require__(1808);
 
 const MAX_REDIRECTS = 5;
 
@@ -34227,6 +34228,10 @@ function nmfetch(url, options) {
         Object.keys(options.tls).forEach(key => {
             reqOptions[key] = options.tls[key];
         });
+    }
+
+    if (parsed.protocol === 'https:' && parsed.hostname && parsed.hostname !== reqOptions.host && !net.isIP(parsed.hostname) && !reqOptions.servername) {
+        reqOptions.servername = parsed.hostname;
     }
 
     try {
@@ -34556,9 +34561,13 @@ class MailComposer {
                 attachment = this._processDataUrl(attachment);
             }
 
+            let contentType = attachment.contentType || mimeFuncs.detectMimeType(attachment.filename || attachment.path || attachment.href || 'bin');
+            let isImage = /^image\//i.test(contentType);
+            let contentDisposition = attachment.contentDisposition || (isMessageNode || (isImage && attachment.cid) ? 'inline' : 'attachment');
+
             data = {
-                contentType: attachment.contentType || mimeFuncs.detectMimeType(attachment.filename || attachment.path || attachment.href || 'bin'),
-                contentDisposition: attachment.contentDisposition || (isMessageNode ? 'inline' : 'attachment'),
+                contentType,
+                contentDisposition,
                 contentTransferEncoding: 'contentTransferEncoding' in attachment ? attachment.contentTransferEncoding : 'base64'
             };
 
@@ -34971,7 +34980,10 @@ class MailComposer {
         }
 
         if (!/^text\//i.test(element.contentType) || element.contentDisposition) {
-            node.setHeader('Content-Disposition', element.contentDisposition || (element.cid ? 'inline' : 'attachment'));
+            node.setHeader(
+                'Content-Disposition',
+                element.contentDisposition || (element.cid && /^image\//i.test(element.contentType) ? 'inline' : 'attachment')
+            );
         }
 
         if (typeof element.content === 'string' && !['utf8', 'usascii', 'ascii'].includes(encoding)) {
@@ -34995,7 +35007,7 @@ class MailComposer {
      * @return {Object} Parsed element
      */
     _processDataUrl(element) {
-        let parts = (element.path || element.href).match(/^data:((?:[^;]*;)*(?:[^,]*)),(.*)$/i);
+        let parts = (element.path || element.href).match(/^data:((?:[^;]*;){0,20}(?:[^,]*)),(.*)$/i);
         if (!parts) {
             return element;
         }
@@ -35168,7 +35180,7 @@ class Mail extends EventEmitter {
      * @param {Object} data E-data description
      * @param {Function?} callback Callback to run once the sending succeeded or failed
      */
-    sendMail(data, callback) {
+    sendMail(data, callback = null) {
         let promise;
 
         if (!callback) {
@@ -35426,21 +35438,23 @@ class Mail extends EventEmitter {
                 return callback(err);
             }
             let cidCounter = 0;
-            html = (html || '').toString().replace(/(<img\b[^>]* src\s*=[\s"']*)(data:([^;]+);[^"'>\s]+)/gi, (match, prefix, dataUri, mimeType) => {
-                let cid = crypto.randomBytes(10).toString('hex') + '@localhost';
-                if (!mail.data.attachments) {
-                    mail.data.attachments = [];
-                }
-                if (!Array.isArray(mail.data.attachments)) {
-                    mail.data.attachments = [].concat(mail.data.attachments || []);
-                }
-                mail.data.attachments.push({
-                    path: dataUri,
-                    cid,
-                    filename: 'image-' + ++cidCounter + '.' + mimeTypes.detectExtension(mimeType)
+            html = (html || '')
+                .toString()
+                .replace(/(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi, (match, prefix, dataUri, mimeType) => {
+                    let cid = crypto.randomBytes(10).toString('hex') + '@localhost';
+                    if (!mail.data.attachments) {
+                        mail.data.attachments = [];
+                    }
+                    if (!Array.isArray(mail.data.attachments)) {
+                        mail.data.attachments = [].concat(mail.data.attachments || []);
+                    }
+                    mail.data.attachments.push({
+                        path: dataUri,
+                        cid,
+                        filename: 'image-' + ++cidCounter + '.' + mimeTypes.detectExtension(mimeType)
+                    });
+                    return prefix + 'cid:' + cid;
                 });
-                return prefix + 'cid:' + cid;
-            });
             mail.data.html = html;
             callback();
         });
@@ -35873,6 +35887,12 @@ module.exports = {
                 let lpart = '';
                 for (let i = 0, len = encodedStr.length; i < len; i++) {
                     let chr = encodedStr.charAt(i);
+
+                    if (/[\ud83c\ud83d\ud83e]/.test(chr) && i < len - 1) {
+                        // composite emoji byte, so add the next byte as well
+                        chr += encodedStr.charAt(++i);
+                    }
+
                     // check if we can add this character to the existing string
                     // without breaking byte length limit
                     if (Buffer.byteLength(lpart + chr) <= maxLength || i === 0) {
@@ -38530,7 +38550,7 @@ module.exports = {
 
 const crypto = __nccwpck_require__(6113);
 const fs = __nccwpck_require__(7147);
-const punycode = __nccwpck_require__(5477);
+const punycode = __nccwpck_require__(4317);
 const PassThrough = (__nccwpck_require__(2781).PassThrough);
 const shared = __nccwpck_require__(2673);
 
@@ -39476,7 +39496,15 @@ class MimeNode {
         if (content._resolvedValue) {
             // pass string or buffer content as a stream
             contentStream = new PassThrough();
-            setImmediate(() => contentStream.end(content._resolvedValue));
+
+            setImmediate(() => {
+                try {
+                    contentStream.end(content._resolvedValue);
+                } catch (err) {
+                    contentStream.emit('error', err);
+                }
+            });
+
             return contentStream;
         } else if (typeof content.pipe === 'function') {
             // assume as stream
@@ -39500,7 +39528,14 @@ class MimeNode {
         } else {
             // pass string or buffer content as a stream
             contentStream = new PassThrough();
-            setImmediate(() => contentStream.end(content || ''));
+
+            setImmediate(() => {
+                try {
+                    contentStream.end(content || '');
+                } catch (err) {
+                    contentStream.emit('error', err);
+                }
+            });
             return contentStream;
         }
     }
@@ -40117,6 +40152,474 @@ module.exports.getTestMessageUrl = function (info) {
 
     return false;
 };
+
+
+/***/ }),
+
+/***/ 4317:
+/***/ ((module) => {
+
+"use strict";
+/*
+
+Copied from https://github.com/mathiasbynens/punycode.js/blob/ef3505c8abb5143a00d53ce59077c9f7f4b2ac47/punycode.js
+
+Copyright Mathias Bynens <https://mathiasbynens.be/>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+/* eslint callback-return: 0, no-bitwise: 0, eqeqeq: 0, prefer-arrow-callback: 0, object-shorthand: 0 */
+
+
+
+/** Highest positive signed 32-bit float value */
+const maxInt = 2147483647; // aka. 0x7FFFFFFF or 2^31-1
+
+/** Bootstring parameters */
+const base = 36;
+const tMin = 1;
+const tMax = 26;
+const skew = 38;
+const damp = 700;
+const initialBias = 72;
+const initialN = 128; // 0x80
+const delimiter = '-'; // '\x2D'
+
+/** Regular expressions */
+const regexPunycode = /^xn--/;
+const regexNonASCII = /[^\0-\x7F]/; // Note: U+007F DEL is excluded too.
+const regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g; // RFC 3490 separators
+
+/** Error messages */
+const errors = {
+    overflow: 'Overflow: input needs wider integers to process',
+    'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+    'invalid-input': 'Invalid input'
+};
+
+/** Convenience shortcuts */
+const baseMinusTMin = base - tMin;
+const floor = Math.floor;
+const stringFromCharCode = String.fromCharCode;
+
+/*--------------------------------------------------------------------------*/
+
+/**
+ * A generic error utility function.
+ * @private
+ * @param {String} type The error type.
+ * @returns {Error} Throws a `RangeError` with the applicable error message.
+ */
+function error(type) {
+    throw new RangeError(errors[type]);
+}
+
+/**
+ * A generic `Array#map` utility function.
+ * @private
+ * @param {Array} array The array to iterate over.
+ * @param {Function} callback The function that gets called for every array
+ * item.
+ * @returns {Array} A new array of values returned by the callback function.
+ */
+function map(array, callback) {
+    const result = [];
+    let length = array.length;
+    while (length--) {
+        result[length] = callback(array[length]);
+    }
+    return result;
+}
+
+/**
+ * A simple `Array#map`-like wrapper to work with domain name strings or email
+ * addresses.
+ * @private
+ * @param {String} domain The domain name or email address.
+ * @param {Function} callback The function that gets called for every
+ * character.
+ * @returns {String} A new string of characters returned by the callback
+ * function.
+ */
+function mapDomain(domain, callback) {
+    const parts = domain.split('@');
+    let result = '';
+    if (parts.length > 1) {
+        // In email addresses, only the domain name should be punycoded. Leave
+        // the local part (i.e. everything up to `@`) intact.
+        result = parts[0] + '@';
+        domain = parts[1];
+    }
+    // Avoid `split(regex)` for IE8 compatibility. See #17.
+    domain = domain.replace(regexSeparators, '\x2E');
+    const labels = domain.split('.');
+    const encoded = map(labels, callback).join('.');
+    return result + encoded;
+}
+
+/**
+ * Creates an array containing the numeric code points of each Unicode
+ * character in the string. While JavaScript uses UCS-2 internally,
+ * this function will convert a pair of surrogate halves (each of which
+ * UCS-2 exposes as separate characters) into a single code point,
+ * matching UTF-16.
+ * @see `punycode.ucs2.encode`
+ * @see <https://mathiasbynens.be/notes/javascript-encoding>
+ * @memberOf punycode.ucs2
+ * @name decode
+ * @param {String} string The Unicode input string (UCS-2).
+ * @returns {Array} The new array of code points.
+ */
+function ucs2decode(string) {
+    const output = [];
+    let counter = 0;
+    const length = string.length;
+    while (counter < length) {
+        const value = string.charCodeAt(counter++);
+        if (value >= 0xd800 && value <= 0xdbff && counter < length) {
+            // It's a high surrogate, and there is a next character.
+            const extra = string.charCodeAt(counter++);
+            if ((extra & 0xfc00) == 0xdc00) {
+                // Low surrogate.
+                output.push(((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000);
+            } else {
+                // It's an unmatched surrogate; only append this code unit, in case the
+                // next code unit is the high surrogate of a surrogate pair.
+                output.push(value);
+                counter--;
+            }
+        } else {
+            output.push(value);
+        }
+    }
+    return output;
+}
+
+/**
+ * Creates a string based on an array of numeric code points.
+ * @see `punycode.ucs2.decode`
+ * @memberOf punycode.ucs2
+ * @name encode
+ * @param {Array} codePoints The array of numeric code points.
+ * @returns {String} The new Unicode string (UCS-2).
+ */
+const ucs2encode = codePoints => String.fromCodePoint(...codePoints);
+
+/**
+ * Converts a basic code point into a digit/integer.
+ * @see `digitToBasic()`
+ * @private
+ * @param {Number} codePoint The basic numeric code point value.
+ * @returns {Number} The numeric value of a basic code point (for use in
+ * representing integers) in the range `0` to `base - 1`, or `base` if
+ * the code point does not represent a value.
+ */
+const basicToDigit = function (codePoint) {
+    if (codePoint >= 0x30 && codePoint < 0x3a) {
+        return 26 + (codePoint - 0x30);
+    }
+    if (codePoint >= 0x41 && codePoint < 0x5b) {
+        return codePoint - 0x41;
+    }
+    if (codePoint >= 0x61 && codePoint < 0x7b) {
+        return codePoint - 0x61;
+    }
+    return base;
+};
+
+/**
+ * Converts a digit/integer into a basic code point.
+ * @see `basicToDigit()`
+ * @private
+ * @param {Number} digit The numeric value of a basic code point.
+ * @returns {Number} The basic code point whose value (when used for
+ * representing integers) is `digit`, which needs to be in the range
+ * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+ * used; else, the lowercase form is used. The behavior is undefined
+ * if `flag` is non-zero and `digit` has no uppercase form.
+ */
+const digitToBasic = function (digit, flag) {
+    //  0..25 map to ASCII a..z or A..Z
+    // 26..35 map to ASCII 0..9
+    return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+};
+
+/**
+ * Bias adaptation function as per section 3.4 of RFC 3492.
+ * https://tools.ietf.org/html/rfc3492#section-3.4
+ * @private
+ */
+const adapt = function (delta, numPoints, firstTime) {
+    let k = 0;
+    delta = firstTime ? floor(delta / damp) : delta >> 1;
+    delta += floor(delta / numPoints);
+    for (; /* no initialization */ delta > (baseMinusTMin * tMax) >> 1; k += base) {
+        delta = floor(delta / baseMinusTMin);
+    }
+    return floor(k + ((baseMinusTMin + 1) * delta) / (delta + skew));
+};
+
+/**
+ * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+ * symbols.
+ * @memberOf punycode
+ * @param {String} input The Punycode string of ASCII-only symbols.
+ * @returns {String} The resulting string of Unicode symbols.
+ */
+const decode = function (input) {
+    // Don't use UCS-2.
+    const output = [];
+    const inputLength = input.length;
+    let i = 0;
+    let n = initialN;
+    let bias = initialBias;
+
+    // Handle the basic code points: let `basic` be the number of input code
+    // points before the last delimiter, or `0` if there is none, then copy
+    // the first basic code points to the output.
+
+    let basic = input.lastIndexOf(delimiter);
+    if (basic < 0) {
+        basic = 0;
+    }
+
+    for (let j = 0; j < basic; ++j) {
+        // if it's not a basic code point
+        if (input.charCodeAt(j) >= 0x80) {
+            error('not-basic');
+        }
+        output.push(input.charCodeAt(j));
+    }
+
+    // Main decoding loop: start just after the last delimiter if any basic code
+    // points were copied; start at the beginning otherwise.
+
+    for (let index = basic > 0 ? basic + 1 : 0; index < inputLength /* no final expression */; ) {
+        // `index` is the index of the next character to be consumed.
+        // Decode a generalized variable-length integer into `delta`,
+        // which gets added to `i`. The overflow checking is easier
+        // if we increase `i` as we go, then subtract off its starting
+        // value at the end to obtain `delta`.
+        const oldi = i;
+        for (let w = 1, k = base /* no condition */; ; k += base) {
+            if (index >= inputLength) {
+                error('invalid-input');
+            }
+
+            const digit = basicToDigit(input.charCodeAt(index++));
+
+            if (digit >= base) {
+                error('invalid-input');
+            }
+            if (digit > floor((maxInt - i) / w)) {
+                error('overflow');
+            }
+
+            i += digit * w;
+            const t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+
+            if (digit < t) {
+                break;
+            }
+
+            const baseMinusT = base - t;
+            if (w > floor(maxInt / baseMinusT)) {
+                error('overflow');
+            }
+
+            w *= baseMinusT;
+        }
+
+        const out = output.length + 1;
+        bias = adapt(i - oldi, out, oldi == 0);
+
+        // `i` was supposed to wrap around from `out` to `0`,
+        // incrementing `n` each time, so we'll fix that now:
+        if (floor(i / out) > maxInt - n) {
+            error('overflow');
+        }
+
+        n += floor(i / out);
+        i %= out;
+
+        // Insert `n` at position `i` of the output.
+        output.splice(i++, 0, n);
+    }
+
+    return String.fromCodePoint(...output);
+};
+
+/**
+ * Converts a string of Unicode symbols (e.g. a domain name label) to a
+ * Punycode string of ASCII-only symbols.
+ * @memberOf punycode
+ * @param {String} input The string of Unicode symbols.
+ * @returns {String} The resulting Punycode string of ASCII-only symbols.
+ */
+const encode = function (input) {
+    const output = [];
+
+    // Convert the input in UCS-2 to an array of Unicode code points.
+    input = ucs2decode(input);
+
+    // Cache the length.
+    const inputLength = input.length;
+
+    // Initialize the state.
+    let n = initialN;
+    let delta = 0;
+    let bias = initialBias;
+
+    // Handle the basic code points.
+    for (const currentValue of input) {
+        if (currentValue < 0x80) {
+            output.push(stringFromCharCode(currentValue));
+        }
+    }
+
+    const basicLength = output.length;
+    let handledCPCount = basicLength;
+
+    // `handledCPCount` is the number of code points that have been handled;
+    // `basicLength` is the number of basic code points.
+
+    // Finish the basic string with a delimiter unless it's empty.
+    if (basicLength) {
+        output.push(delimiter);
+    }
+
+    // Main encoding loop:
+    while (handledCPCount < inputLength) {
+        // All non-basic code points < n have been handled already. Find the next
+        // larger one:
+        let m = maxInt;
+        for (const currentValue of input) {
+            if (currentValue >= n && currentValue < m) {
+                m = currentValue;
+            }
+        }
+
+        // Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+        // but guard against overflow.
+        const handledCPCountPlusOne = handledCPCount + 1;
+        if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+            error('overflow');
+        }
+
+        delta += (m - n) * handledCPCountPlusOne;
+        n = m;
+
+        for (const currentValue of input) {
+            if (currentValue < n && ++delta > maxInt) {
+                error('overflow');
+            }
+            if (currentValue === n) {
+                // Represent delta as a generalized variable-length integer.
+                let q = delta;
+                for (let k = base /* no condition */; ; k += base) {
+                    const t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+                    if (q < t) {
+                        break;
+                    }
+                    const qMinusT = q - t;
+                    const baseMinusT = base - t;
+                    output.push(stringFromCharCode(digitToBasic(t + (qMinusT % baseMinusT), 0)));
+                    q = floor(qMinusT / baseMinusT);
+                }
+
+                output.push(stringFromCharCode(digitToBasic(q, 0)));
+                bias = adapt(delta, handledCPCountPlusOne, handledCPCount === basicLength);
+                delta = 0;
+                ++handledCPCount;
+            }
+        }
+
+        ++delta;
+        ++n;
+    }
+    return output.join('');
+};
+
+/**
+ * Converts a Punycode string representing a domain name or an email address
+ * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
+ * it doesn't matter if you call it on a string that has already been
+ * converted to Unicode.
+ * @memberOf punycode
+ * @param {String} input The Punycoded domain name or email address to
+ * convert to Unicode.
+ * @returns {String} The Unicode representation of the given Punycode
+ * string.
+ */
+const toUnicode = function (input) {
+    return mapDomain(input, function (string) {
+        return regexPunycode.test(string) ? decode(string.slice(4).toLowerCase()) : string;
+    });
+};
+
+/**
+ * Converts a Unicode string representing a domain name or an email address to
+ * Punycode. Only the non-ASCII parts of the domain name will be converted,
+ * i.e. it doesn't matter if you call it with a domain that's already in
+ * ASCII.
+ * @memberOf punycode
+ * @param {String} input The domain name or email address to convert, as a
+ * Unicode string.
+ * @returns {String} The Punycode representation of the given domain name or
+ * email address.
+ */
+const toASCII = function (input) {
+    return mapDomain(input, function (string) {
+        return regexNonASCII.test(string) ? 'xn--' + encode(string) : string;
+    });
+};
+
+/*--------------------------------------------------------------------------*/
+
+/** Define the public API */
+const punycode = {
+    /**
+     * A string representing the current Punycode.js version number.
+     * @memberOf punycode
+     * @type String
+     */
+    version: '2.3.1',
+    /**
+     * An object of methods to convert from JavaScript's internal character
+     * representation (UCS-2) to Unicode code points, and back.
+     * @see <https://mathiasbynens.be/notes/javascript-encoding>
+     * @memberOf punycode
+     * @type Object
+     */
+    ucs2: {
+        decode: ucs2decode,
+        encode: ucs2encode
+    },
+    decode: decode,
+    encode: encode,
+    toASCII: toASCII,
+    toUnicode: toUnicode
+};
+
+module.exports = punycode;
 
 
 /***/ }),
@@ -40977,7 +41480,8 @@ const resolver = (family, hostname, options, callback) => {
         return callback(null, []);
     }
 
-    dns['resolve' + family](hostname, (err, addresses) => {
+    const resolver = dns.Resolver ? new dns.Resolver(options) : dns;
+    resolver['resolve' + family](hostname, (err, addresses) => {
         if (err) {
             switch (err.code) {
                 case dns.NODATA:
@@ -40985,6 +41489,7 @@ const resolver = (family, hostname, options, callback) => {
                 case dns.NOTIMP:
                 case dns.SERVFAIL:
                 case dns.CONNREFUSED:
+                case dns.REFUSED:
                 case 'EAI_AGAIN':
                     return callback(null, []);
             }
@@ -41143,8 +41648,7 @@ module.exports.resolveHostname = (options, callback) => {
 
                     if (addresses && addresses.length && !address) {
                         // there are addresses but none can be used
-                        let err = new Error(`Can not use IPv${addresses[0].family} addresses with current network`);
-                        return callback(err);
+                        console.warn(`Failed to resolve IPv${addresses[0].family} addresses with current network`);
                     }
 
                     if (!address && cached) {
@@ -41855,6 +42359,7 @@ const shared = __nccwpck_require__(2673);
 const CONNECTION_TIMEOUT = 2 * 60 * 1000; // how much to wait for the connection to be established
 const SOCKET_TIMEOUT = 10 * 60 * 1000; // how much to wait for socket inactivity before disconnecting the client
 const GREETING_TIMEOUT = 30 * 1000; // how much to wait after connection is established but SMTP greeting is not receieved
+const DNS_TIMEOUT = 30 * 1000; // how much to wait for resolveHostname
 
 /**
  * Generates a SMTP connection object
@@ -41871,6 +42376,7 @@ const GREETING_TIMEOUT = 30 * 1000; // how much to wait after connection is esta
  *  * **greetingTimeout** - Time to wait in ms until greeting message is received from the server (defaults to 10000)
  *  * **connectionTimeout** - how many milliseconds to wait for the connection to establish
  *  * **socketTimeout** - Time of inactivity until the connection is closed (defaults to 1 hour)
+ *  * **dnsTimeout** - Time to wait in ms for the DNS requests to be resolved (defaults to 30 seconds)
  *  * **lmtp** - if true, uses LMTP instead of SMTP protocol
  *  * **logger** - bunyan compatible logger interface
  *  * **debug** - if true pass SMTP traffic to the logger
@@ -42061,7 +42567,8 @@ class SMTPConnection extends EventEmitter {
         let opts = {
             port: this.port,
             host: this.host,
-            allowInternalNetworkInterfaces: this.allowInternalNetworkInterfaces
+            allowInternalNetworkInterfaces: this.allowInternalNetworkInterfaces,
+            timeout: this.options.dnsTimeout || DNS_TIMEOUT
         };
 
         if (this.options.localAddress) {
@@ -42272,7 +42779,7 @@ class SMTPConnection extends EventEmitter {
         }
 
         if (this._authMethod !== 'XOAUTH2' && (!this._auth.credentials || !this._auth.credentials.user || !this._auth.credentials.pass)) {
-            if (this._auth.user && this._auth.pass) {
+            if ((this._auth.user && this._auth.pass) || this.customAuth.has(this._authMethod)) {
                 this._auth.credentials = {
                     user: this._auth.user,
                     pass: this._auth.pass,
@@ -42655,6 +43162,20 @@ class SMTPConnection extends EventEmitter {
      * @event
      */
     _onClose() {
+        let serverResponse = false;
+
+        if (this._remainder && this._remainder.trim()) {
+            if (this.options.debug || this.options.transactionLog) {
+                this.logger.debug(
+                    {
+                        tnx: 'server'
+                    },
+                    this._remainder.replace(/\r?\n$/, '')
+                );
+            }
+            this.lastServerResponse = serverResponse = this._remainder.trim();
+        }
+
         this.logger.info(
             {
                 tnx: 'network'
@@ -42663,9 +43184,11 @@ class SMTPConnection extends EventEmitter {
         );
 
         if (this.upgrading && !this._destroyed) {
-            return this._onError(new Error('Connection closed unexpectedly'), 'ETLS', false, 'CONN');
+            return this._onError(new Error('Connection closed unexpectedly'), 'ETLS', serverResponse, 'CONN');
         } else if (![this._actionGreeting, this.close].includes(this._responseActions[0]) && !this._destroyed) {
-            return this._onError(new Error('Connection closed unexpectedly'), 'ECONNECTION', false, 'CONN');
+            return this._onError(new Error('Connection closed unexpectedly'), 'ECONNECTION', serverResponse, 'CONN');
+        } else if (/^[45]\d{2}\b/.test(serverResponse)) {
+            return this._onError(new Error('Connection closed unexpectedly'), 'ECONNECTION', serverResponse, 'CONN');
         }
 
         this._destroy();
@@ -42782,14 +43305,14 @@ class SMTPConnection extends EventEmitter {
 
         if (!str.trim()) {
             // skip unexpected empty lines
-            setImmediate(() => this._processResponse(true));
+            setImmediate(() => this._processResponse());
         }
 
         let action = this._responseActions.shift();
 
         if (typeof action === 'function') {
             action.call(this, str);
-            setImmediate(() => this._processResponse(true));
+            setImmediate(() => this._processResponse());
         } else {
             return this._onError(new Error('Unexpected Response'), 'EPROTOCOL', str, 'CONN');
         }
@@ -43101,6 +43624,12 @@ class SMTPConnection extends EventEmitter {
             this._sendCommand('HELO ' + this.name);
             return;
         }
+
+        this._ehloLines = str
+            .split(/\r?\n/)
+            .map(line => line.replace(/^\d+[ -]/, '').trim())
+            .filter(line => line)
+            .slice(1);
 
         // Detect if the server supports STARTTLS
         if (!this.secure && !this.options.ignoreTLS && (/[ -]STARTTLS\b/im.test(str) || this.options.requireTLS)) {
@@ -43498,6 +44027,10 @@ class SMTPConnection extends EventEmitter {
             accepted: this._envelope.accepted,
             rejected: this._envelope.rejected
         };
+
+        if (this._ehloLines && this._ehloLines.length) {
+            response.ehlo = this._ehloLines;
+        }
 
         if (this._envelope.rejectedErrors.length) {
             response.rejectedErrors = this._envelope.rejectedErrors;
@@ -77232,7 +77765,7 @@ module.exports = JSON.parse('[["0","\\u0000",128],["a1","｡",62],["8140","　�
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":true},"163":{"host":"smtp.163.com","port":465,"secure":true},"1und1":{"host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"AOL":{"domains":["aol.com"],"host":"smtp.aol.com","port":587},"Bluewin":{"host":"smtpauths.bluewin.ch","domains":["bluewin.ch"],"port":465},"DebugMail":{"host":"debugmail.io","port":25},"DynectEmail":{"aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"Ethereal":{"aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"GandiMail":{"aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"Godaddy":{"host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"host":"mail.hot.ee"},"Hotmail":{"aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"mail.ee":{"host":"smtp.mail.ee"},"Mail.ru":{"host":"smtp.mail.ru","port":465,"secure":true},"Maildev":{"port":1025,"ignoreTLS":true},"Mailgun":{"host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"host":"in.mailjet.com","port":587},"Mailosaur":{"host":"mailosaur.io","port":25},"Mailtrap":{"host":"smtp.mailtrap.io","port":2525},"Mandrill":{"host":"smtp.mandrillapp.com","port":587},"Naver":{"host":"smtp.naver.com","port":587},"One":{"host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"host":"smtp.office365.com","port":587,"secure":false},"OhMySMTP":{"host":"smtp.ohmysmtp.com","port":587,"secure":false},"Postmark":{"aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"qiye.aliyun":{"host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"SendCloud":{"host":"smtp.sendcloud.net","port":2525},"SendGrid":{"host":"smtp.sendgrid.net","port":587},"SendinBlue":{"host":"smtp-relay.sendinblue.com","port":587},"SendPulse":{"host":"smtp-pulse.com","port":465,"secure":true},"SES":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"Sparkpost":{"aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"host":"smtp.tipimail.com","port":587},"Yahoo":{"domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zoho":{"host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
+module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":true},"163":{"host":"smtp.163.com","port":465,"secure":true},"1und1":{"host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"Aliyun":{"domains":["aliyun.com"],"host":"smtp.aliyun.com","port":465,"secure":true},"AOL":{"domains":["aol.com"],"host":"smtp.aol.com","port":587},"Bluewin":{"host":"smtpauths.bluewin.ch","domains":["bluewin.ch"],"port":465},"DebugMail":{"host":"debugmail.io","port":25},"DynectEmail":{"aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"Ethereal":{"aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"Forward Email":{"aliases":["FE","ForwardEmail"],"domains":["forwardemail.net"],"host":"smtp.forwardemail.net","port":465,"secure":true},"GandiMail":{"aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"Godaddy":{"host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"host":"mail.hot.ee"},"Hotmail":{"aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"mail.ee":{"host":"smtp.mail.ee"},"Mail.ru":{"host":"smtp.mail.ru","port":465,"secure":true},"Mailcatch.app":{"host":"sandbox-smtp.mailcatch.app","port":2525},"Maildev":{"port":1025,"ignoreTLS":true},"Mailgun":{"host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"host":"in.mailjet.com","port":587},"Mailosaur":{"host":"mailosaur.io","port":25},"Mailtrap":{"host":"smtp.mailtrap.io","port":2525},"Mandrill":{"host":"smtp.mandrillapp.com","port":587},"Naver":{"host":"smtp.naver.com","port":587},"One":{"host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"host":"smtp.office365.com","port":587,"secure":false},"OhMySMTP":{"host":"smtp.ohmysmtp.com","port":587,"secure":false},"Postmark":{"aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"qiye.aliyun":{"host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"SendCloud":{"host":"smtp.sendcloud.net","port":2525},"SendGrid":{"host":"smtp.sendgrid.net","port":587},"SendinBlue":{"aliases":["Brevo"],"host":"smtp-relay.brevo.com","port":587},"SendPulse":{"host":"smtp-pulse.com","port":465,"secure":true},"SES":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTH-1":{"host":"email-smtp.ap-south-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-1":{"host":"email-smtp.ap-northeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-2":{"host":"email-smtp.ap-northeast-2.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-3":{"host":"email-smtp.ap-northeast-3.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-1":{"host":"email-smtp.ap-southeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-2":{"host":"email-smtp.ap-southeast-2.amazonaws.com","port":465,"secure":true},"Sparkpost":{"aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"host":"smtp.tipimail.com","port":587},"Yahoo":{"domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zoho":{"host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
 
 /***/ }),
 
@@ -77240,7 +77773,7 @@ module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":t
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"nodemailer","version":"6.7.8","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"grunt --trace-warnings"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.145.0","aws-sdk":"2.1193.0","bunyan":"1.8.15","chai":"4.3.6","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"8.5.0","grunt":"1.5.3","grunt-cli":"1.4.3","grunt-eslint":"24.0.0","grunt-mocha-test":"0.13.3","libbase64":"1.2.1","libmime":"5.1.0","libqp":"1.1.0","mocha":"10.0.0","nodemailer-ntlm-auth":"1.0.3","proxy":"1.0.2","proxy-test-server":"1.0.0","sinon":"14.0.0","smtp-server":"3.11.0"},"engines":{"node":">=6.0.0"}}');
+module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.9","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.484.0","bunyan":"1.8.15","c8":"8.0.1","eslint":"8.56.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.2.1","libmime":"5.2.1","libqp":"2.0.1","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.0"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

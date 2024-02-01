@@ -50,7 +50,7 @@
     "@slack/webhook": "6.1.0",
     "adaptivecards": "2.11.3",
     "node-fetch": "2.6.11",
-    "nodemailer": "6.7.8"
+    "nodemailer": "6.9.9"
   },
   "devDependencies": {
     "@kunalnagarco/eslint-config": "^0.2.7",

@@ -2,12 +2,7 @@
 
 ## @kunalnagarco/action-cve
 
-A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources:
-
-- Microsoft Teams
-- Slack
-- PagerDuty
-- Zenduty
+A [GitHub action](https://github.com/features/actions) that sends Dependabot Vulnerability Alerts to multiple sources.
 
 **For more info and getting started, check out the [Wiki](https://github.com/kunalnagarco/action-cve/wiki).**
 

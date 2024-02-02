@@ -1,74 +1,31 @@
-import { Alert, toAlert, isActiveAlert } from './entities'
-import { Repository } from '@octokit/graphql-schema'
-import { getOctokit } from '@actions/github'
+import fetch from 'node-fetch'
+import { Octokit } from '@octokit/rest'
+
+import { Alert, isActiveAlert, toAlert } from './entities'
 
 export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
   repositoryName: string,
   repositoryOwner: string,
+  severity: string,
   count: number,
 ): Promise<Alert[] | []> => {
-  const octokit = getOctokit(gitHubPersonalAccessToken)
-  const { repository } = await octokit.graphql<{
-    repository: Repository
-  }>(`
-    query {
-      repository(owner:"${repositoryOwner}" name:"${repositoryName}") {
-        vulnerabilityAlerts(last: ${count}) {
-          edges {
-            node {
-              id
-              dismissedAt
-              fixedAt
-              repository {
-                name
-                owner {
-                  login
-                }
-              }
-              securityAdvisory {
-                id
-                description
-                cvss {
-                  score
-                  vectorString
-                }
-                permalink
-                severity
-                summary
-              }
-              securityVulnerability {
-                firstPatchedVersion {
-                  identifier
-                }
-                package {
-                  ecosystem
-                  name
-                }
-                vulnerableVersionRange
-                advisory {
-                  cvss {
-                    score
-                    vectorString
-                  }
-                  summary
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `)
-  const gitHubAlerts = repository.vulnerabilityAlerts?.edges
-  if (gitHubAlerts) {
-    const alerts: Alert[] = []
-    for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node && isActiveAlert(gitHubAlert.node)) {
-        alerts.push(toAlert(gitHubAlert.node))
-      }
-    }
-    return alerts
-  }
-  return []
+  const octokit = new Octokit({
+    auth: gitHubPersonalAccessToken,
+    request: {
+      fetch,
+    },
+  })
+  const response = await octokit.dependabot.listAlertsForRepo({
+    owner: repositoryOwner,
+    repo: repositoryName,
+    severity,
+    per_page: count,
+  })
+  const alerts: Alert[] = response.data
+    .filter((dependabotAlert) => isActiveAlert(dependabotAlert))
+    .map((dependabotAlert) =>
+      toAlert(dependabotAlert, repositoryName, repositoryOwner),
+    )
+  return alerts
 }

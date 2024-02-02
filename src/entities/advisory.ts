@@ -1,4 +1,6 @@
-import { SecurityAdvisory } from '@octokit/graphql-schema'
+import { DependabotAlert } from './alert'
+
+type SecurityAdvisory = DependabotAlert['security_advisory']
 
 export interface Advisory {
   /**
@@ -35,15 +37,16 @@ export interface Advisory {
   withdrawnAt?: string
 }
 
-type AdvisorySeverity = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+type AdvisorySeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 
 export const toAdvisory = (securityAdvisory: SecurityAdvisory): Advisory => ({
-  cvssScore: securityAdvisory.cvss.score,
-  severity: securityAdvisory.severity,
+  cvssScore: securityAdvisory.cvss?.score || 0,
+  severity:
+    (securityAdvisory.severity?.toUpperCase() as AdvisorySeverity) || 'LOW',
   summary: securityAdvisory.summary,
-  description: securityAdvisory.description,
-  url: securityAdvisory.permalink,
-  publishedAt: securityAdvisory.publishedAt,
-  updatedAt: securityAdvisory.updatedAt,
-  withdrawnAt: securityAdvisory.withdrawnAt,
+  description: securityAdvisory.description || '',
+  url: securityAdvisory.references[0].url,
+  publishedAt: securityAdvisory.published_at || '',
+  updatedAt: securityAdvisory.updated_at || '',
+  withdrawnAt: securityAdvisory.withdrawn_at || '',
 })

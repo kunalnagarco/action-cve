@@ -15,16 +15,13 @@ export const fetchAlerts = async (
       fetch,
     },
   })
-  const dependabotAlerts = await octokit.paginate(
-    octokit.dependabot.listAlertsForRepo,
-    {
-      owner: repositoryOwner,
-      repo: repositoryName,
-      first: count,
-    },
-  )
+  const response = await octokit.dependabot.listAlertsForRepo({
+    owner: repositoryOwner,
+    repo: repositoryName,
+    per_page: count,
+  })
   const alerts: Alert[] = []
-  for (const dependabotAlert of dependabotAlerts) {
+  for (const dependabotAlert of response.data) {
     if (isActiveAlert(dependabotAlert)) {
       alerts.push(toAlert(dependabotAlert, repositoryName, repositoryOwner))
     }

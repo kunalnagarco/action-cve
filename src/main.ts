@@ -30,8 +30,10 @@ async function run(): Promise<void> {
     const emailTransportSmtpUser = getInput('email_transport_smtp_user')
     const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
     const count = parseInt(getInput('count'))
-    const owner = context.repo.owner
-    const repo = context.repo.repo
+    // const owner = context.repo.owner
+    // const repo = context.repo.repo
+    const owner = 'kunalnagar'
+    const repo = 'cve-base'
     const alerts = await fetchAlerts(token, repo, owner, count)
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {

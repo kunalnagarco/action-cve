@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { Octokit } from '@octokit/rest'
 
 import { Alert, isActiveAlert, toAlert } from './entities'
@@ -10,6 +11,9 @@ export const fetchAlerts = async (
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
     auth: gitHubPersonalAccessToken,
+    request: {
+      fetch,
+    },
   })
   const dependabotAlerts = await octokit.paginate(
     octokit.dependabot.listAlertsForRepo,

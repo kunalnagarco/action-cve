@@ -1,4 +1,6 @@
 import { getInput, setFailed } from '@actions/core'
+import { context } from '@actions/github'
+
 import {
   sendAlertsToMicrosoftTeams,
   sendAlertsToPagerDuty,
@@ -7,7 +9,6 @@ import {
   sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
-import { context } from '@actions/github'
 import { fetchAlerts } from './fetch-alerts'
 
 async function run(): Promise<void> {

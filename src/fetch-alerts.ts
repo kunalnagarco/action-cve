@@ -1,6 +1,6 @@
-import { Alert, toAlert, isActiveAlert } from './entities'
-import { Repository } from '@octokit/graphql-schema'
-import { getOctokit } from '@actions/github'
+import { Octokit } from '@octokit/rest'
+
+import { Alert, isActiveAlert, toAlert } from './entities'
 
 export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
@@ -8,67 +8,22 @@ export const fetchAlerts = async (
   repositoryOwner: string,
   count: number,
 ): Promise<Alert[] | []> => {
-  const octokit = getOctokit(gitHubPersonalAccessToken)
-  const { repository } = await octokit.graphql<{
-    repository: Repository
-  }>(`
-    query {
-      repository(owner:"${repositoryOwner}" name:"${repositoryName}") {
-        vulnerabilityAlerts(last: ${count}) {
-          edges {
-            node {
-              id
-              dismissedAt
-              fixedAt
-              repository {
-                name
-                owner {
-                  login
-                }
-              }
-              securityAdvisory {
-                id
-                description
-                cvss {
-                  score
-                  vectorString
-                }
-                permalink
-                severity
-                summary
-              }
-              securityVulnerability {
-                firstPatchedVersion {
-                  identifier
-                }
-                package {
-                  ecosystem
-                  name
-                }
-                vulnerableVersionRange
-                advisory {
-                  cvss {
-                    score
-                    vectorString
-                  }
-                  summary
-                }
-              }
-            }
-          }
-        }
-      }
+  const octokit = new Octokit({
+    auth: gitHubPersonalAccessToken,
+  })
+  const dependabotAlerts = await octokit.paginate(
+    octokit.dependabot.listAlertsForRepo,
+    {
+      owner: repositoryOwner,
+      repo: repositoryName,
+      first: count,
+    },
+  )
+  const alerts: Alert[] = []
+  for (const dependabotAlert of dependabotAlerts) {
+    if (isActiveAlert(dependabotAlert)) {
+      alerts.push(toAlert(dependabotAlert, repositoryName, repositoryOwner))
     }
-  `)
-  const gitHubAlerts = repository.vulnerabilityAlerts?.edges
-  if (gitHubAlerts) {
-    const alerts: Alert[] = []
-    for (const gitHubAlert of gitHubAlerts) {
-      if (gitHubAlert && gitHubAlert.node && isActiveAlert(gitHubAlert.node)) {
-        alerts.push(toAlert(gitHubAlert.node))
-      }
-    }
-    return alerts
   }
-  return []
+  return alerts
 }

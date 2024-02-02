@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/kunalnagarco/action-cve/compare/v1.8.5...v1.9.0) (2024-02-02)
+
+
+### Features
+
+* Filter alerts by severity ([#151](https://github.com/kunalnagarco/action-cve/issues/151)) ([73e22d9](https://github.com/kunalnagarco/action-cve/commit/73e22d9230e18880377fdd786272d410ca1ea274))
+
 ### [1.8.5](https://github.com/kunalnagarco/action-cve/compare/v1.8.4...v1.8.5) (2024-02-01)
 
 

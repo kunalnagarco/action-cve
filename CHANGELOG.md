@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.9.1](https://github.com/kunalnagarco/action-cve/compare/v1.9.0...v1.9.1) (2024-02-02)
+
+
+### Chores
+
+* Update action.yml ([ad63c90](https://github.com/kunalnagarco/action-cve/commit/ad63c90db46ddf900d7945319440ae6514f0b55e))
+
 ## [1.9.0](https://github.com/kunalnagarco/action-cve/compare/v1.8.5...v1.9.0) (2024-02-02)
 
 

@@ -22,11 +22,10 @@ export const fetchAlerts = async (
     severity,
     per_page: count,
   })
-  const alerts: Alert[] = []
-  for (const dependabotAlert of response.data) {
-    if (isActiveAlert(dependabotAlert)) {
-      alerts.push(toAlert(dependabotAlert, repositoryName, repositoryOwner))
-    }
-  }
+  const alerts: Alert[] = response.data
+    .filter((dependabotAlert) => isActiveAlert(dependabotAlert))
+    .map((dependabotAlert) =>
+      toAlert(dependabotAlert, repositoryName, repositoryOwner),
+    )
   return alerts
 }

@@ -7,6 +7,7 @@ export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
   repositoryName: string,
   repositoryOwner: string,
+  severity: string,
   count: number,
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
@@ -18,6 +19,7 @@ export const fetchAlerts = async (
   const response = await octokit.dependabot.listAlertsForRepo({
     owner: repositoryOwner,
     repo: repositoryName,
+    severity,
     per_page: count,
   })
   const alerts: Alert[] = []

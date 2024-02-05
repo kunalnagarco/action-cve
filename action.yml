@@ -41,5 +41,5 @@ branding:
   icon: 'alert-octagon'
   color: 'red'
 runs:
-  using: 'node12'
+  using: 'node20'
   main: 'dist/index.js'

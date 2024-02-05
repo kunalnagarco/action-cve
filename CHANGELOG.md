@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.9.2](https://github.com/kunalnagarco/action-cve/compare/v1.9.1...v1.9.2) (2024-02-05)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node-fetch to v2.7.0 ([#146](https://github.com/kunalnagarco/action-cve/issues/146)) ([a257411](https://github.com/kunalnagarco/action-cve/commit/a2574119b77532a89cef8bd0720f72145a4e9fde))
+
+
+### Chores
+
+* **deps:** lock file maintenance ([5c91367](https://github.com/kunalnagarco/action-cve/commit/5c9136741834b6d28f8b1eb0f181f7b5b7ea13cd))
+* **deps:** update dependency conventional-changelog-conventionalcommits to v7 ([#149](https://github.com/kunalnagarco/action-cve/issues/149)) ([b4f950a](https://github.com/kunalnagarco/action-cve/commit/b4f950a2cd6e65890a253b0fd372f6f278cdcbd1))
+* Upgrade dependencies ([#153](https://github.com/kunalnagarco/action-cve/issues/153)) ([32ee80d](https://github.com/kunalnagarco/action-cve/commit/32ee80dc29439d073dcbcd2baadc6a12efdcfa15))
+
 ### [1.9.1](https://github.com/kunalnagarco/action-cve/compare/v1.9.0...v1.9.1) (2024-02-02)
 
 

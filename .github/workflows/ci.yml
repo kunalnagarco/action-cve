@@ -3,7 +3,7 @@ name: 'Continuous Integration'
 on: push
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,7 +12,7 @@ jobs:
           node-version: 20
           cache: 'yarn'
       - name: Install dependencies
-        run: yarn install
+        run: yarn ci
       - name: Build
         run: yarn all
       - name: Run action

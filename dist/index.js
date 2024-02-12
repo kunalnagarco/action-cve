@@ -5017,7 +5017,7 @@ var import_endpoint = __nccwpck_require__(2040);
 var import_universal_user_agent = __nccwpck_require__(5030);
 
 // pkg/dist-src/version.js
-var VERSION = "8.1.6";
+var VERSION = "8.2.0";
 
 // pkg/dist-src/is-plain-object.js
 function isPlainObject(value) {
@@ -5161,11 +5161,17 @@ async function getResponseData(response) {
 function toErrorMessage(data) {
   if (typeof data === "string")
     return data;
+  let suffix;
+  if ("documentation_url" in data) {
+    suffix = ` - ${data.documentation_url}`;
+  } else {
+    suffix = "";
+  }
   if ("message" in data) {
     if (Array.isArray(data.errors)) {
-      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}`;
+      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
     }
-    return data.message;
+    return `${data.message}${suffix}`;
   }
   return `Unknown error: ${JSON.stringify(data)}`;
 }
@@ -6180,7 +6186,7 @@ var import_endpoint = __nccwpck_require__(9723);
 var import_universal_user_agent = __nccwpck_require__(5030);
 
 // pkg/dist-src/version.js
-var VERSION = "8.1.6";
+var VERSION = "8.2.0";
 
 // pkg/dist-src/is-plain-object.js
 function isPlainObject(value) {
@@ -6324,11 +6330,17 @@ async function getResponseData(response) {
 function toErrorMessage(data) {
   if (typeof data === "string")
     return data;
+  let suffix;
+  if ("documentation_url" in data) {
+    suffix = ` - ${data.documentation_url}`;
+  } else {
+    suffix = "";
+  }
   if ("message" in data) {
     if (Array.isArray(data.errors)) {
-      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}`;
+      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
     }
-    return data.message;
+    return `${data.message}${suffix}`;
   }
   return `Unknown error: ${JSON.stringify(data)}`;
 }
@@ -58497,6 +58509,9 @@ function httpRedirectFetch (fetchParams, response) {
     // https://fetch.spec.whatwg.org/#cors-non-wildcard-request-header-name
     request.headersList.delete('authorization')
 
+    // https://fetch.spec.whatwg.org/#authentication-entries
+    request.headersList.delete('proxy-authorization', true)
+
     // "Cookie" and "Host" are forbidden request-headers, which undici doesn't implement.
     request.headersList.delete('cookie')
     request.headersList.delete('host')
@@ -78018,6 +78033,9 @@ function elementOuterSize(el, size, includeMargins) {
   }
   return el.offsetWidth;
 }
+function makeElementsArray(el) {
+  return (Array.isArray(el) ? el : [el]).filter(e => !!e);
+}
 
 
 
@@ -78097,6 +78115,7 @@ function getDevice(overrides) {
 let browser;
 function calcBrowser() {
   const window = ssr_window_esm_getWindow();
+  const device = getDevice();
   let needPerspectiveFix = false;
   function isSafari() {
     const ua = window.navigator.userAgent.toLowerCase();
@@ -78109,10 +78128,14 @@ function calcBrowser() {
       needPerspectiveFix = major < 16 || major === 16 && minor < 2;
     }
   }
+  const isWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(window.navigator.userAgent);
+  const isSafariBrowser = isSafari();
+  const need3dFix = isSafariBrowser || isWebView && device.ios;
   return {
-    isSafari: needPerspectiveFix || isSafari(),
+    isSafari: needPerspectiveFix || isSafariBrowser,
     needPerspectiveFix,
-    isWebView: /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(window.navigator.userAgent)
+    need3dFix,
+    isWebView
   };
 }
 function getBrowser() {
@@ -79418,7 +79441,7 @@ function slideTo(index, speed, runCallbacks, internal, initial) {
     wrapperEl,
     enabled
   } = swiper;
-  if (swiper.animating && params.preventInteractionOnTransition || !enabled && !internal && !initial) {
+  if (swiper.animating && params.preventInteractionOnTransition || !enabled && !internal && !initial || swiper.destroyed) {
     return false;
   }
   const skip = Math.min(swiper.params.slidesPerGroupSkip, slideIndex);
@@ -79558,6 +79581,7 @@ function slideToLoop(index, speed, runCallbacks, internal) {
     index = indexAsNumber;
   }
   const swiper = this;
+  if (swiper.destroyed) return;
   const gridEnabled = swiper.grid && swiper.params.grid && swiper.params.grid.rows > 1;
   let newIndex = index;
   if (swiper.params.loop) {
@@ -79626,7 +79650,7 @@ function slideNext(speed, runCallbacks, internal) {
     params,
     animating
   } = swiper;
-  if (!enabled) return swiper;
+  if (!enabled || swiper.destroyed) return swiper;
   let perGroup = params.slidesPerGroup;
   if (params.slidesPerView === 'auto' && params.slidesPerGroup === 1 && params.slidesPerGroupAuto) {
     perGroup = Math.max(swiper.slidesPerViewDynamic('current', true), 1);
@@ -79670,7 +79694,7 @@ function slidePrev(speed, runCallbacks, internal) {
     enabled,
     animating
   } = swiper;
-  if (!enabled) return swiper;
+  if (!enabled || swiper.destroyed) return swiper;
   const isVirtual = swiper.virtual && params.virtual.enabled;
   if (params.loop) {
     if (animating && !isVirtual && params.loopPreventsSliding) return false;
@@ -79730,6 +79754,7 @@ function slideReset(speed, runCallbacks, internal) {
     runCallbacks = true;
   }
   const swiper = this;
+  if (swiper.destroyed) return;
   return swiper.slideTo(swiper.activeIndex, speed, runCallbacks, internal);
 }
 
@@ -79745,6 +79770,7 @@ function slideToClosest(speed, runCallbacks, internal, threshold) {
     threshold = 0.5;
   }
   const swiper = this;
+  if (swiper.destroyed) return;
   let index = swiper.activeIndex;
   const skip = Math.min(swiper.params.slidesPerGroupSkip, index);
   const snapIndex = skip + Math.floor((index - skip) / swiper.params.slidesPerGroup);
@@ -79773,6 +79799,7 @@ function slideToClosest(speed, runCallbacks, internal, threshold) {
 
 function slideToClickedSlide() {
   const swiper = this;
+  if (swiper.destroyed) return;
   const {
     params,
     slidesEl
@@ -81129,6 +81156,7 @@ var defaults = {
   init: true,
   direction: 'horizontal',
   oneWayMovement: false,
+  swiperElementNodeName: 'SWIPER-CONTAINER',
   touchEventsTarget: 'wrapper',
   initialSlide: 0,
   speed: 300,
@@ -81569,11 +81597,11 @@ class Swiper {
     let spv = 1;
     if (typeof params.slidesPerView === 'number') return params.slidesPerView;
     if (params.centeredSlides) {
-      let slideSize = slides[activeIndex] ? slides[activeIndex].swiperSlideSize : 0;
+      let slideSize = slides[activeIndex] ? Math.ceil(slides[activeIndex].swiperSlideSize) : 0;
       let breakLoop;
       for (let i = activeIndex + 1; i < slides.length; i += 1) {
         if (slides[i] && !breakLoop) {
-          slideSize += slides[i].swiperSlideSize;
+          slideSize += Math.ceil(slides[i].swiperSlideSize);
           spv += 1;
           if (slideSize > swiperSize) breakLoop = true;
         }
@@ -81710,7 +81738,7 @@ class Swiper {
       return false;
     }
     el.swiper = swiper;
-    if (el.parentNode && el.parentNode.host && el.parentNode.host.nodeName === 'SWIPER-CONTAINER') {
+    if (el.parentNode && el.parentNode.host && el.parentNode.host.nodeName === swiper.params.swiperElementNodeName.toUpperCase()) {
       swiper.isElement = true;
     }
     const getWrapperSelector = () => {
@@ -81905,15 +81933,15 @@ Swiper.use([Resize, Observer]);
 
 ;// CONCATENATED MODULE: ./node_modules/swiper/swiper.mjs
 /**
- * Swiper 11.0.5
+ * Swiper 11.0.6
  * Most modern mobile touch slider and framework with hardware accelerated transitions
  * https://swiperjs.com
  *
- * Copyright 2014-2023 Vladimir Kharlampidi
+ * Copyright 2014-2024 Vladimir Kharlampidi
  *
  * Released under the MIT License
  *
- * Released on: November 22, 2023
+ * Released on: February 5, 2024
  */
 
 

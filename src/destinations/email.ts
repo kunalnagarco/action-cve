@@ -4,11 +4,22 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport'
 import { ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
 import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 
+const createTableRow = (alert: Alert): string => `
+    <tr>
+      <td>${alert.packageName}</td>
+      <td>${alert.vulnerability?.vulnerableVersionRange}</td>
+      <td>${alert.vulnerability?.firstPatchedVersion}</td>
+      <td>${alert.advisory?.severity}</td>
+      <td>${alert.advisory?.summary}</td>
+      <td><a href="${alert.advisory?.url}">View</a></td>
+    </tr>
+  `
+
 const createTable = (alerts: Alert[]): string => {
   let rowData = ''
-  for (const alert of alerts) {
+  alerts.forEach((alert) => {
     rowData += createTableRow(alert)
-  }
+  })
   return `
     <table border="1" cellpadding="10" width="100%">
       <thead>
@@ -26,28 +37,13 @@ const createTable = (alerts: Alert[]): string => {
   `
 }
 
-const createTableRow = (alert: Alert): string => {
-  return `
-    <tr>
-      <td>${alert.packageName}</td>
-      <td>${alert.vulnerability?.vulnerableVersionRange}</td>
-      <td>${alert.vulnerability?.firstPatchedVersion}</td>
-      <td>${alert.advisory?.severity}</td>
-      <td>${alert.advisory?.summary}</td>
-      <td><a href="${alert.advisory?.url}">View</a></td>
-    </tr>
-  `
-}
-
-const createEmailBody = (alerts: Alert[]): string => {
-  return `
+const createEmailBody = (alerts: Alert[]): string => `
     <p>Hello,</p>
     <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${getFullRepositoryNameFromAlert(
       alerts[0],
     )}</b> via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `
-}
 
 export const sendAlertsToEmailSmtp = async (
   config: SMTPTransport.Options,

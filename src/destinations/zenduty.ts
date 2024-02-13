@@ -14,7 +14,7 @@ export const sendAlertsToZenduty = async (
     ---
 
   `
-  for (const alert of alerts) {
+  alerts.forEach((alert) => {
     summary += `
       Package name: ${alert.packageName}
       Vulnerability Version Range: ${alert.vulnerability?.vulnerableVersionRange}
@@ -22,7 +22,7 @@ export const sendAlertsToZenduty = async (
       Severity: ${alert.advisory?.severity}
       Summary: ${alert.advisory?.summary}
     `
-  }
+  })
 
   summary += `
 

@@ -51,7 +51,7 @@ export const sendAlertsToMicrosoftTeams = async (
     ),
   )
 
-  for (const alert of alerts) {
+  alerts.forEach((alert) => {
     const container = createContainer(true, true)
     container.addItem(createTableRow('Package Name', alert.packageName))
     container.addItem(
@@ -72,7 +72,7 @@ export const sendAlertsToMicrosoftTeams = async (
     container.addItem(createTableRow('Summary', alert.advisory?.summary || ''))
     container.addItem(createTableButtonRow(alert.advisory?.url || ''))
     adaptiveCard.addItem(container)
-  }
+  })
 
   const body = {
     type: 'message',

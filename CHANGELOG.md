@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.5](https://github.com/kunalnagarco/action-cve/compare/v1.9.4...v1.9.5) (2024-02-13)
+
+
+### Chores
+
+* Update ESLint package ([#155](https://github.com/kunalnagarco/action-cve/issues/155)) ([6f2ffeb](https://github.com/kunalnagarco/action-cve/commit/6f2ffeb2fbe506519710ad5330fd25c66f40f92c))
+
 ## [1.9.4](https://github.com/kunalnagarco/action-cve/compare/v1.9.3...v1.9.4) (2024-02-12)
 
 

@@ -25,11 +25,21 @@ exports.sendAlertsToEmailSmtp = void 0;
 const nodemailer_1 = __nccwpck_require__(4289);
 const constants_1 = __nccwpck_require__(5105);
 const entities_1 = __nccwpck_require__(7604);
+const createTableRow = (alert) => `
+    <tr>
+      <td>${alert.packageName}</td>
+      <td>${alert.vulnerability?.vulnerableVersionRange}</td>
+      <td>${alert.vulnerability?.firstPatchedVersion}</td>
+      <td>${alert.advisory?.severity}</td>
+      <td>${alert.advisory?.summary}</td>
+      <td><a href="${alert.advisory?.url}">View</a></td>
+    </tr>
+  `;
 const createTable = (alerts) => {
     let rowData = '';
-    for (const alert of alerts) {
+    alerts.forEach((alert) => {
         rowData += createTableRow(alert);
-    }
+    });
     return `
     <table border="1" cellpadding="10" width="100%">
       <thead>
@@ -46,25 +56,11 @@ const createTable = (alerts) => {
     </table>
   `;
 };
-const createTableRow = (alert) => {
-    return `
-    <tr>
-      <td>${alert.packageName}</td>
-      <td>${alert.vulnerability?.vulnerableVersionRange}</td>
-      <td>${alert.vulnerability?.firstPatchedVersion}</td>
-      <td>${alert.advisory?.severity}</td>
-      <td>${alert.advisory?.summary}</td>
-      <td><a href="${alert.advisory?.url}">View</a></td>
-    </tr>
-  `;
-};
-const createEmailBody = (alerts) => {
-    return `
+const createEmailBody = (alerts) => `
     <p>Hello,</p>
     <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${(0, entities_1.getFullRepositoryNameFromAlert)(alerts[0])}</b> via <a href="${constants_1.ACTION_URL}">${constants_1.ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `;
-};
 const sendAlertsToEmailSmtp = async (config, alerts, emailList, emailFrom, subject) => {
     const transporter = (0, nodemailer_1.createTransport)(config);
     await transporter.sendMail({
@@ -145,7 +141,7 @@ const sendAlertsToMicrosoftTeams = async (webhookUrl, alerts) => {
     const adaptiveCard = (0, utils_1.createAdaptiveCard)();
     adaptiveCard.addItem((0, utils_1.createTextBlock)(constants_1.ACTION_SHORT_SUMMARY));
     adaptiveCard.addItem((0, utils_1.createTextBlock)(`You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
-    for (const alert of alerts) {
+    alerts.forEach((alert) => {
         const container = (0, utils_1.createContainer)(true, true);
         container.addItem(createTableRow('Package Name', alert.packageName));
         container.addItem(createTableRow('Vulnerability Version Range', alert.vulnerability?.vulnerableVersionRange || ''));
@@ -154,7 +150,7 @@ const sendAlertsToMicrosoftTeams = async (webhookUrl, alerts) => {
         container.addItem(createTableRow('Summary', alert.advisory?.summary || ''));
         container.addItem(createTableButtonRow(alert.advisory?.url || ''));
         adaptiveCard.addItem(container);
-    }
+    });
     const body = {
         type: 'message',
         attachments: [
@@ -219,66 +215,58 @@ exports.sendAlertsToPagerDuty = sendAlertsToPagerDuty;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sendAlertsToSlack = exports.MAX_COUNT_SLACK = exports.validateSlackWebhookUrl = void 0;
+exports.sendAlertsToSlack = exports.validateSlackWebhookUrl = exports.MAX_COUNT_SLACK = void 0;
 const webhook_1 = __nccwpck_require__(1095);
 const constants_1 = __nccwpck_require__(5105);
-const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => {
-    return {
-        type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `
+exports.MAX_COUNT_SLACK = 30;
+const createMaxAlertsMarkdownNotice = () => `*Note:* Only ${exports.MAX_COUNT_SLACK} have been sent due to message length restrictions.`;
+const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => ({
+    type: 'section',
+    text: {
+        type: 'mrkdwn',
+        text: `
         You have ${alertCount} vulnerabilities in *${repositoryOwner}/${repositoryName}*.
 ${alertCount > exports.MAX_COUNT_SLACK ? createMaxAlertsMarkdownNotice() : ''}
       `,
-        },
-    };
-};
-const createDividerBlock = () => {
-    return {
-        type: 'divider',
-    };
-};
-const createAlertBlock = (alert) => {
-    return {
-        type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `
+    },
+});
+const createDividerBlock = () => ({
+    type: 'divider',
+});
+const createAlertBlock = (alert) => ({
+    type: 'section',
+    text: {
+        type: 'mrkdwn',
+        text: `
 *Package name:* ${alert.packageName}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}
 *Summary:* ${alert.advisory?.summary}
             `,
+    },
+    accessory: {
+        type: 'button',
+        text: {
+            type: 'plain_text',
+            text: 'View Advisory',
+            emoji: true,
         },
-        accessory: {
-            type: 'button',
-            text: {
-                type: 'plain_text',
-                text: 'View Advisory',
-                emoji: true,
-            },
-            style: 'danger',
-            url: alert.advisory?.url,
-        },
-    };
-};
-const createMaxAlertsMarkdownNotice = () => {
-    return `*Note:* Only ${exports.MAX_COUNT_SLACK} have been sent due to message length restrictions.`;
-};
+        style: 'danger',
+        url: alert.advisory?.url,
+    },
+});
 const validateSlackWebhookUrl = (url) => {
-    const regexPattern = new RegExp(/^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/);
+    const regexPattern = /^https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]{8,10}\/B[a-zA-Z0-9_]{10}\/[a-zA-Z0-9_]{24}/;
     return regexPattern.test(url);
 };
 exports.validateSlackWebhookUrl = validateSlackWebhookUrl;
-exports.MAX_COUNT_SLACK = 30;
 const sendAlertsToSlack = async (webhookUrl, alerts) => {
     const webhook = new webhook_1.IncomingWebhook(webhookUrl);
     const alertBlocks = [];
-    for (const alert of alerts) {
+    alerts.forEach((alert) => {
         alertBlocks.push(createAlertBlock(alert));
-    }
+    });
     await webhook.send({
         blocks: [
             createSummaryBlock(alerts.length, alerts[0].repository.name, alerts[0].repository.owner),
@@ -310,7 +298,7 @@ const sendAlertsToZenduty = async (apiKey, serviceId, escalationPolicyId, alerts
     ---
 
   `;
-    for (const alert of alerts) {
+    alerts.forEach((alert) => {
         summary += `
       Package name: ${alert.packageName}
       Vulnerability Version Range: ${alert.vulnerability?.vulnerableVersionRange}
@@ -318,7 +306,7 @@ const sendAlertsToZenduty = async (apiKey, serviceId, escalationPolicyId, alerts
       Severity: ${alert.advisory?.severity}
       Summary: ${alert.advisory?.summary}
     `;
-    }
+    });
     summary += `
 
     ---
@@ -82148,8 +82136,8 @@ async function run() {
         const emailTransportSmtpPassword = (0, core_1.getInput)('email_transport_smtp_password');
         const count = parseInt((0, core_1.getInput)('count'));
         const severity = (0, core_1.getInput)('severity');
-        const owner = github_1.context.repo.owner;
-        const repo = github_1.context.repo.repo;
+        const { owner } = github_1.context.repo;
+        const { repo } = github_1.context.repo;
         const alerts = await (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, severity, count);
         if (alerts.length > 0) {
             if (microsoftTeamsWebhookUrl) {

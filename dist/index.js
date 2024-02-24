@@ -34249,6 +34249,7 @@ module.exports = JSONTransport;
 
 const MimeNode = __nccwpck_require__(8509);
 const mimeFuncs = __nccwpck_require__(994);
+const parseDataURI = (__nccwpck_require__(2673).parseDataURI);
 
 /**
  * Creates the object for composing a MimeNode instance out from the mail options
@@ -34782,12 +34783,17 @@ class MailComposer {
      * @return {Object} Parsed element
      */
     _processDataUrl(element) {
-        let parts = (element.path || element.href).match(/^data:((?:[^;]*;){0,20}(?:[^,]*)),(.*)$/i);
-        if (!parts) {
+        let parsedDataUri;
+        if ((element.path || element.href).match(/^data:/)) {
+            parsedDataUri = parseDataURI(element.path || element.href);
+        }
+
+        if (!parsedDataUri) {
             return element;
         }
 
-        element.content = /\bbase64$/i.test(parts[1]) ? Buffer.from(parts[2], 'base64') : Buffer.from(decodeURIComponent(parts[2]));
+        element.content = parsedDataUri.data;
+        element.contentType = element.contentType || parsedDataUri.contentType;
 
         if ('path' in element) {
             element.path = false;
@@ -34796,12 +34802,6 @@ class MailComposer {
         if ('href' in element) {
             element.href = false;
         }
-
-        parts[1].split(';').forEach(item => {
-            if (/^\w+\/[^/]+$/i.test(item)) {
-                element.contentType = element.contentType || item.toLowerCase();
-            }
-        });
 
         return element;
     }
@@ -41625,6 +41625,55 @@ module.exports.callbackPromise = (resolve, reject) =>
         }
     };
 
+module.exports.parseDataURI = uri => {
+    let input = uri;
+    let commaPos = input.indexOf(',');
+    if (!commaPos) {
+        return uri;
+    }
+
+    let data = input.substring(commaPos + 1);
+    let metaStr = input.substring('data:'.length, commaPos);
+
+    let encoding;
+
+    let metaEntries = metaStr.split(';');
+    let lastMetaEntry = metaEntries.length > 1 ? metaEntries[metaEntries.length - 1] : false;
+    if (lastMetaEntry && lastMetaEntry.indexOf('=') < 0) {
+        encoding = lastMetaEntry.toLowerCase();
+        metaEntries.pop();
+    }
+
+    let contentType = metaEntries.shift() || 'application/octet-stream';
+    let params = {};
+    for (let entry of metaEntries) {
+        let sep = entry.indexOf('=');
+        if (sep >= 0) {
+            let key = entry.substring(0, sep);
+            let value = entry.substring(sep + 1);
+            params[key] = value;
+        }
+    }
+
+    switch (encoding) {
+        case 'base64':
+            data = Buffer.from(data, 'base64');
+            break;
+        case 'utf8':
+            data = Buffer.from(data);
+            break;
+        default:
+            try {
+                data = Buffer.from(decodeURIComponent(data));
+            } catch (err) {
+                data = Buffer.from(data);
+            }
+            data = Buffer.from(data);
+    }
+
+    return { data, encoding, contentType, params };
+};
+
 /**
  * Resolves a String or a Buffer value for content value. Useful if the value
  * is a Stream or a file or an URL. If the value is a Stream, overwrites
@@ -41677,11 +41726,12 @@ module.exports.resolveContent = (data, key, callback) => {
             contentStream = nmfetch(content.path || content.href);
             return resolveStream(contentStream, callback);
         } else if (/^data:/i.test(content.path || content.href)) {
-            let parts = (content.path || content.href).match(/^data:((?:[^;]*;)*(?:[^,]*)),(.*)$/i);
-            if (!parts) {
+            let parsedDataUri = module.exports.parseDataURI(content.path || content.href);
+
+            if (!parsedDataUri || !parsedDataUri.data) {
                 return callback(null, Buffer.from(0));
             }
-            return callback(null, /\bbase64$/i.test(parts[1]) ? Buffer.from(parts[2], 'base64') : Buffer.from(decodeURIComponent(parts[2])));
+            return callback(null, parsedDataUri.data);
         } else if (content.path) {
             return resolveStream(fs.createReadStream(content.path), callback);
         }
@@ -82043,7 +82093,7 @@ module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":t
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.9","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.484.0","bunyan":"1.8.15","c8":"8.0.1","eslint":"8.56.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.2.1","libmime":"5.2.1","libqp":"2.0.1","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.0"},"engines":{"node":">=6.0.0"}}');
+module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.10","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.484.0","bunyan":"1.8.15","c8":"8.0.1","eslint":"8.56.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.2.1","libmime":"5.2.1","libqp":"2.0.1","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.0"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

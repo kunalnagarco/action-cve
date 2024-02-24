@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.8](https://github.com/kunalnagarco/action-cve/compare/v1.9.7...v1.9.8) (2024-02-24)
+
+
+### Chores
+
+* **deps:** update dependency lint-staged to v15.2.2 ([46c7d83](https://github.com/kunalnagarco/action-cve/commit/46c7d83798d7abfa92ca43f69b37f31f249a08dd))
+
 ## [1.9.7](https://github.com/kunalnagarco/action-cve/compare/v1.9.6...v1.9.7) (2024-02-24)
 
 

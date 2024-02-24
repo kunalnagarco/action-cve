@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.7](https://github.com/kunalnagarco/action-cve/compare/v1.9.6...v1.9.7) (2024-02-24)
+
+
+### Chores
+
+* **deps:** update dependency husky to v9.0.11 ([1a3355a](https://github.com/kunalnagarco/action-cve/commit/1a3355a4e75eb210357513122b6c44c98d6341a9))
+
 ## [1.9.6](https://github.com/kunalnagarco/action-cve/compare/v1.9.5...v1.9.6) (2024-02-19)
 
 

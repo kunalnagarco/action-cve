@@ -10565,7 +10565,7 @@ var AdaptiveApplet = /** @class */ (function () {
                                         if (!(response instanceof activity_request_1.SuccessResponse)) return [3 /*break*/, 5];
                                         this_1.removeProgressOverlay(request);
                                         if (response.rawContent === undefined) {
-                                            throw new Error("internalSendActivityRequestAsync: Action.Execute result is undefined");
+                                            throw new Error("internalSendExecuteRequestAsync: Action.Execute result is undefined");
                                         }
                                         parsedContent = response.rawContent;
                                         try {
@@ -10589,7 +10589,7 @@ var AdaptiveApplet = /** @class */ (function () {
                                             this_1.activityRequestSucceeded(response, this_1.card);
                                         }
                                         else {
-                                            throw new Error("internalSendActivityRequestAsync: Action.Execute result is of unsupported type (" +
+                                            throw new Error("internalSendExecuteRequestAsync: Action.Execute result is of unsupported type (" +
                                                 typeof response.rawContent +
                                                 ")");
                                         }
@@ -10632,7 +10632,7 @@ var AdaptiveApplet = /** @class */ (function () {
                                                     // Attempt to use OAuth
                                                     this_1.removeProgressOverlay(request);
                                                     if (response.signinButton === undefined) {
-                                                        throw new Error("internalSendActivityRequestAsync: the login request doesn't contain a valid signin URL.");
+                                                        throw new Error("internalSendExecuteRequestAsync: the login request doesn't contain a valid signin URL.");
                                                     }
                                                     logEvent(Enums.LogLevel.Info, "Login required at " + response.signinButton.value);
                                                     if (this_1.onShowSigninPrompt) {
@@ -10686,13 +10686,14 @@ var AdaptiveApplet = /** @class */ (function () {
     };
     AdaptiveApplet.prototype.internalSendDataQueryRequestAsync = function (request) {
         return __awaiter(this, void 0, void 0, function () {
-            var response, error_2, rawResponse, parsedResponse;
+            var filter, response, error_2, rawResponse, parsedResponse;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!this.channelAdapter) {
                             throw new Error("internalSendDataQueryRequestAsync: channel adapter not set");
                         }
+                        filter = request.action.filter;
                         if (!this._choiceSet) return [3 /*break*/, 5];
                         this._choiceSet.showLoadingIndicator();
                         response = undefined;
@@ -10705,42 +10706,51 @@ var AdaptiveApplet = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         error_2 = _a.sent();
+                        this._choiceSet.showErrorIndicator(filter, "Unable to load");
                         logEvent(Enums.LogLevel.Error, "Activity request failed: " + error_2);
-                        this._choiceSet.showErrorIndicator("Unable to load");
                         return [3 /*break*/, 4];
                     case 4:
-                        this._choiceSet.removeLoadingIndicator();
                         if (response) {
                             if (response instanceof activity_request_1.SuccessResponse) {
                                 rawResponse = response.rawContent;
                                 if (rawResponse) {
-                                    parsedResponse = rawResponse;
+                                    parsedResponse = void 0;
                                     try {
-                                        parsedResponse = JSON.parse(parsedResponse);
+                                        parsedResponse = JSON.parse(rawResponse);
                                     }
                                     catch (error) {
-                                        throw new Error("Cannot parse response object: " + rawResponse);
+                                        this._choiceSet.showErrorIndicator(filter, "Unable to load");
+                                        throw new Error("internalSendDataQueryRequestAsync: Cannot parse response object: " +
+                                            rawResponse);
                                     }
                                     if (typeof parsedResponse === "object") {
-                                        this._choiceSet.renderChoices(parsedResponse);
-                                        this.activityRequestSucceeded(response, parsedResponse);
+                                        this._choiceSet.renderChoices(filter, parsedResponse);
+                                        this.activityRequestSucceeded(response, rawResponse);
                                     }
                                     else {
+                                        this._choiceSet.showErrorIndicator(filter, "Error loading results");
                                         throw new Error("internalSendDataQueryRequestAsync: Data.Query result is of unsupported type (" +
                                             typeof rawResponse +
                                             ")");
                                     }
                                 }
+                                else {
+                                    this._choiceSet.showErrorIndicator(filter, "Unable to load");
+                                    throw new Error("internalSendDataQueryRequestAsync: Data.Query result is undefined");
+                                }
                             }
                             else if (response instanceof activity_request_1.ErrorResponse) {
-                                this._choiceSet.showErrorIndicator("Error loading results.");
+                                this._choiceSet.showErrorIndicator(filter, response.error.message || "Error loading results");
                                 logEvent(Enums.LogLevel.Error, "Activity request failed: ".concat(response.error.message, "."));
                                 this.activityRequestFailed(response);
                             }
                             else {
-                                this._choiceSet.showErrorIndicator("Unable to load");
+                                this._choiceSet.showErrorIndicator(filter, "Unable to load");
                                 throw new Error("Unhandled response type: " + JSON.stringify(response));
                             }
+                        }
+                        else {
+                            this._choiceSet.removeLoadingIndicator();
                         }
                         _a.label = 5;
                     case 5: return [2 /*return*/];
@@ -10874,6 +10884,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BackgroundImage = exports.ContainerBase = exports.StylableCardElementContainer = exports.ContainerStyleProperty = exports.ActionSet = exports.ShowCardAction = exports.HttpAction = exports.HttpHeader = exports.ToggleVisibilityAction = exports.OpenUrlAction = exports.DataQuery = exports.ExecuteAction = exports.UniversalAction = exports.SubmitAction = exports.SubmitActionBase = exports.Action = exports.TimeInput = exports.TimeProperty = exports.DateInput = exports.NumberInput = exports.FilteredChoiceSet = exports.ChoiceSetInput = exports.ChoiceSetInputDataQuery = exports.Choice = exports.ToggleInput = exports.TextInput = exports.Input = exports.Media = exports.YouTubePlayer = exports.DailymotionPlayer = exports.VimeoPlayer = exports.IFrameMediaMediaPlayer = exports.CustomMediaPlayer = exports.HTML5MediaPlayer = exports.MediaPlayer = exports.MediaSource = exports.CaptionSource = exports.ContentSource = exports.ImageSet = exports.CardElementContainer = exports.Image = exports.FactSet = exports.Fact = exports.RichTextBlock = exports.TextRun = exports.TextBlock = exports.BaseTextBlock = exports.ActionProperty = exports.CardElement = exports.renderSeparation = void 0;
@@ -13834,7 +13853,12 @@ var Input = /** @class */ (function (_super) {
     };
     Input.prototype.resetValidationFailureCue = function () {
         if (this.renderedInputControlElement) {
-            this.renderedInputControlElement.classList.remove(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
+            if (this instanceof ChoiceSetInput && this.isDynamicTypeahead()) {
+                this.removeValidationFailureCue();
+            }
+            else {
+                this.renderedInputControlElement.classList.remove(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
+            }
             this.updateInputControlAriaLabelledBy();
             if (this._renderedErrorMessageElement) {
                 this._outerContainerElement.removeChild(this._renderedErrorMessageElement);
@@ -13933,7 +13957,12 @@ var Input = /** @class */ (function (_super) {
         this.resetValidationFailureCue();
         var result = this.isRequired ? this.isSet() && this.isValid() : this.isValid();
         if (!result && this.renderedInputControlElement) {
-            this.renderedInputControlElement.classList.add(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
+            if (this instanceof ChoiceSetInput && this.isDynamicTypeahead()) {
+                this.showValidationFailureCue();
+            }
+            else {
+                this.renderedInputControlElement.classList.add(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
+            }
             this.showValidationErrorMessage();
         }
         return result;
@@ -14452,17 +14481,22 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         return uniqueCategoryName;
     };
     ChoiceSetInput.prototype.isDynamicTypeahead = function () {
-        return (!!this.choicesData &&
+        return (this.hostConfig.inputs.allowDynamicallyFilteredChoiceSet &&
+            !!this.choicesData &&
             !!this.choicesData.dataset &&
             this.choicesData.type === "Data.Query");
     };
     ChoiceSetInput.prototype.getFilterForDynamicSearch = function () {
-        var _a, _b;
-        return (_b = (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.textInput) === null || _b === void 0 ? void 0 : _b.value;
-    };
-    ChoiceSetInput.prototype.renderChoices = function (fetchedChoices) {
         var _a;
-        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.processResponse(fetchedChoices);
+        return (_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value;
+    };
+    ChoiceSetInput.prototype.getDropdownElement = function () {
+        var _a;
+        return (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.dropdown;
+    };
+    ChoiceSetInput.prototype.renderChoices = function (filter, fetchedChoices) {
+        var _a;
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.processResponse(filter, fetchedChoices);
     };
     ChoiceSetInput.prototype.showLoadingIndicator = function () {
         var _a;
@@ -14472,9 +14506,17 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         var _a;
         (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.removeLoadingIndicator();
     };
-    ChoiceSetInput.prototype.showErrorIndicator = function (error) {
+    ChoiceSetInput.prototype.showErrorIndicator = function (filter, error) {
         var _a;
-        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.showErrorIndicator(error);
+        (_a = this._filteredChoiceSet) === null || _a === void 0 ? void 0 : _a.showErrorIndicator(filter, error);
+    };
+    ChoiceSetInput.prototype.showValidationFailureCue = function () {
+        var _a;
+        (_a = this._textInput) === null || _a === void 0 ? void 0 : _a.classList.add(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
+    };
+    ChoiceSetInput.prototype.removeValidationFailureCue = function () {
+        var _a;
+        (_a = this._textInput) === null || _a === void 0 ? void 0 : _a.classList.remove(this.hostConfig.makeCssClassName("ac-input-validation-failed"));
     };
     ChoiceSetInput.prototype.createPlaceholderOptionWhenValueDoesNotExist = function () {
         if (!this.value) {
@@ -14612,7 +14654,7 @@ var ChoiceSetInput = /** @class */ (function (_super) {
                 }
                 this._textInput.tabIndex = this.isDesignMode() ? -1 : 0;
                 var onInputChangeEventHandler = Utils.debounce(function () {
-                    filteredChoiceSet_1.processStaticChoices();
+                    filteredChoiceSet_1.processChoices();
                     _this.valueChanged();
                     if (_this._textInput) {
                         // Remove aria-label when value is not empty so narration software doesn't
@@ -14896,38 +14938,33 @@ var FilteredChoiceSet = /** @class */ (function () {
         this._choices = choices;
         this._dynamicChoices = [];
         this._visibleChoiceCount = 0;
+        this._highlightedChoiceId = -1;
         this._hostConfig = hostConfig;
     }
     FilteredChoiceSet.prototype.render = function () {
         var _this = this;
         var choiceSetContainer = document.createElement("div");
-        choiceSetContainer.style.position = "relative";
-        choiceSetContainer.style.width = "100%";
+        choiceSetContainer.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-filtered-container");
         this._textInput = document.createElement("input");
-        this._textInput.className = this.hostConfig.makeCssClassName("ac-input", "ac-multichoiceInput", "ac-choiceSetInput-filtered");
+        this._textInput.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-filtered-textbox");
         this._textInput.type = "text";
-        this._textInput.style.width = "100%";
         this._textInput.onkeydown = function (event) {
             if (event.key === "ArrowDown") {
-                _this.focusChoice(0);
+                event.preventDefault();
+                _this.highlightChoice(_this._highlightedChoiceId + 1);
+            }
+            else if (event.key === "ArrowUp") {
+                event.preventDefault();
+                _this.highlightChoice(_this._highlightedChoiceId - 1);
+            }
+            else if (event.key === "Enter") {
+                var choice = document.getElementById("ac-choiceSetInput-".concat(_this._choiceSetId, "-choice-").concat(_this._highlightedChoiceId));
+                choice === null || choice === void 0 ? void 0 : choice.click();
             }
         };
         this._dropdown = document.createElement("div");
-        this._dropdown.style.display = "none";
-        this._dropdown.className = this.hostConfig.makeCssClassName("ac-input", "ac-multichoiceInput", "ac-choiceSetInput-filtered-dropdown");
+        this._dropdown.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-filtered-dropdown");
         choiceSetContainer.append(this._textInput, this._dropdown);
-        document.onclick = function (event) {
-            if (_this._dropdown) {
-                var child = _this._dropdown.firstChild;
-                while (child && event.target !== child) {
-                    child = child.nextSibling;
-                }
-                // Dropdown closes if user clicks outside the choiceset.
-                if (child || !(event.target === _this._textInput)) {
-                    _this._dropdown.style.display = "none";
-                }
-            }
-        };
         this._renderedElement = choiceSetContainer;
     };
     FilteredChoiceSet.prototype.createChoice = function (value, filter, id) {
@@ -14937,61 +14974,57 @@ var FilteredChoiceSet = /** @class */ (function () {
         choice.id = "ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id);
         choice.innerHTML = value.replace(filter, "<b>".concat(filter, "</b>"));
         choice.tabIndex = -1;
-        choice.addEventListener("focusin", function () {
-            choice.classList.add("focused");
-        });
-        choice.addEventListener("focusout", function () {
-            choice.classList.remove("focused");
-        });
         choice.onclick = function () {
+            choice.classList.remove(_this.hostConfig.makeCssClassName("ac-choiceSetInput-choice-highlighted"));
+            _this._highlightedChoiceId = -1;
             if (_this._textInput) {
                 _this._textInput.value = choice.innerText;
+                _this._textInput.focus();
             }
             if (_this._dropdown) {
-                _this._dropdown.style.display = "none";
+                _this._dropdown.classList.remove(_this.hostConfig.makeCssClassName("ac-choiceSetInput-filtered-dropdown-open"));
             }
         };
-        choice.onkeydown = function (event) {
-            if (event.key === "ArrowDown") {
-                _this.focusChoice(id + 1);
+        choice.onmousemove = function () {
+            if (_this._highlightedChoiceId !== id) {
+                _this.highlightChoice(id, false);
             }
-            else if (event.key === "ArrowUp") {
-                _this.focusChoice(id - 1);
-            }
-            else if (event.key === "Enter") {
-                choice.click();
-            }
-        };
-        choice.onmouseover = function () {
-            _this.focusChoice(id);
         };
         return choice;
     };
-    FilteredChoiceSet.prototype.focusChoice = function (id) {
-        var choice = document.getElementById("ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id));
-        if (choice) {
-            choice.focus();
-        }
-        else if (this._textInput) {
-            this._textInput.focus();
-            var textLength = this._textInput.value.length;
-            this._textInput.setSelectionRange(textLength, textLength);
+    FilteredChoiceSet.prototype.highlightChoice = function (id, scrollIntoView) {
+        if (scrollIntoView === void 0) { scrollIntoView = true; }
+        if (this._visibleChoiceCount > 0) {
+            var currentHighlightedChoice = document.getElementById("ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(this._highlightedChoiceId));
+            var nextHighlightedChoice = document.getElementById("ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id));
+            if (nextHighlightedChoice) {
+                currentHighlightedChoice === null || currentHighlightedChoice === void 0 ? void 0 : currentHighlightedChoice.classList.remove(this.hostConfig.makeCssClassName("ac-choiceSetInput-choice-highlighted"));
+                nextHighlightedChoice.classList.add(this.hostConfig.makeCssClassName("ac-choiceSetInput-choice-highlighted"));
+                if (scrollIntoView) {
+                    nextHighlightedChoice.scrollIntoView();
+                }
+                this._highlightedChoiceId = id;
+            }
+            else if (currentHighlightedChoice && this._highlightedChoiceId !== 0) {
+                this.highlightChoice(0);
+            }
+            else {
+                this.highlightChoice(this._visibleChoiceCount - 1);
+            }
         }
     };
-    FilteredChoiceSet.prototype.filterChoices = function (isDynamic) {
+    FilteredChoiceSet.prototype.filterChoices = function () {
         var _a, _b;
-        var filter = (_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value.toLowerCase();
-        if (filter) {
-            var choices = isDynamic ? this._dynamicChoices : this._choices;
-            for (var _i = 0, choices_1 = choices; _i < choices_1.length; _i++) {
-                var choice = choices_1[_i];
-                if (choice.title) {
-                    var matchIndex = choice.title.toLowerCase().indexOf(filter);
-                    if (matchIndex !== -1) {
-                        var matchedText = choice.title.substring(matchIndex, matchIndex + filter.length);
-                        var choiceContainer = this.createChoice(choice.title, matchedText, this._visibleChoiceCount++);
-                        (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.appendChild(choiceContainer);
-                    }
+        var filter = ((_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value.toLowerCase().trim()) || "";
+        var choices = __spreadArray(__spreadArray([], this._choices, true), this._dynamicChoices, true);
+        for (var _i = 0, choices_1 = choices; _i < choices_1.length; _i++) {
+            var choice = choices_1[_i];
+            if (choice.title) {
+                var matchIndex = choice.title.toLowerCase().indexOf(filter);
+                if (matchIndex !== -1) {
+                    var matchedText = choice.title.substring(matchIndex, matchIndex + filter.length);
+                    var choiceContainer = this.createChoice(choice.title, matchedText, this._visibleChoiceCount++);
+                    (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.appendChild(choiceContainer);
                 }
             }
         }
@@ -15018,28 +15051,32 @@ var FilteredChoiceSet = /** @class */ (function () {
         }
     };
     FilteredChoiceSet.prototype.resetDropdown = function () {
-        this._dynamicChoices = [];
         if (this._dropdown) {
             Utils.clearElementChildren(this._dropdown);
             this._visibleChoiceCount = 0;
+            this._highlightedChoiceId = -1;
         }
     };
     FilteredChoiceSet.prototype.showDropdown = function () {
         var _a;
-        if ((_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.hasChildNodes) {
-            this._dropdown.style.display = "block";
+        if ((_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.hasChildNodes()) {
+            this._dropdown.classList.add(this.hostConfig.makeCssClassName("ac-choiceSetInput-filtered-dropdown-open"));
         }
     };
-    FilteredChoiceSet.prototype.processStaticChoices = function () {
+    FilteredChoiceSet.prototype.processChoices = function () {
         this.resetDropdown();
         this.filterChoices();
         this.showDropdown();
     };
-    FilteredChoiceSet.prototype.processResponse = function (fetchedChoices) {
-        this._dynamicChoices = fetchedChoices;
-        this.filterChoices(true);
-        if (this._visibleChoiceCount === 0) {
-            this.showErrorIndicator("No results found.");
+    FilteredChoiceSet.prototype.processResponse = function (filter, fetchedChoices) {
+        var _a;
+        if (filter === ((_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value)) {
+            this.resetDropdown();
+            this._dynamicChoices = fetchedChoices;
+            this.filterChoices();
+            if (this._visibleChoiceCount === 0) {
+                this.showErrorIndicator(filter, "No results found");
+            }
         }
     };
     FilteredChoiceSet.prototype.showLoadingIndicator = function () {
@@ -15054,11 +15091,14 @@ var FilteredChoiceSet = /** @class */ (function () {
             (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.removeChild(this._loadingIndicator);
         }
     };
-    FilteredChoiceSet.prototype.showErrorIndicator = function (error) {
-        var _a;
-        this.removeLoadingIndicator();
-        var errorIndicator = this.getStatusIndicator(error);
-        (_a = this._dropdown) === null || _a === void 0 ? void 0 : _a.appendChild(errorIndicator);
+    FilteredChoiceSet.prototype.showErrorIndicator = function (filter, error) {
+        var _a, _b;
+        if (filter === ((_a = this._textInput) === null || _a === void 0 ? void 0 : _a.value)) {
+            this.processChoices();
+            var errorIndicator = this.getStatusIndicator(error);
+            (_b = this._dropdown) === null || _b === void 0 ? void 0 : _b.appendChild(errorIndicator);
+            errorIndicator.scrollIntoView();
+        }
     };
     Object.defineProperty(FilteredChoiceSet.prototype, "dynamicChoices", {
         get: function () {
@@ -15105,6 +15145,13 @@ var FilteredChoiceSet = /** @class */ (function () {
     Object.defineProperty(FilteredChoiceSet.prototype, "textInput", {
         get: function () {
             return this._textInput;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(FilteredChoiceSet.prototype, "dropdown", {
+        get: function () {
+            return this._dropdown;
         },
         enumerable: false,
         configurable: true
@@ -16394,11 +16441,13 @@ var OverflowAction = /** @class */ (function (_super) {
                 _loop_2(i);
             }
             contextMenu_1.onClose = function () {
-                var _a;
-                (_a = _this.renderedElement) === null || _a === void 0 ? void 0 : _a.setAttribute("aria-expanded", "false");
+                var _a, _b;
+                (_a = _this.renderedElement) === null || _a === void 0 ? void 0 : _a.focus();
+                (_b = _this.renderedElement) === null || _b === void 0 ? void 0 : _b.setAttribute("aria-expanded", "false");
             };
             this.renderedElement.setAttribute("aria-expanded", "true");
             contextMenu_1.popup(this.renderedElement);
+            contextMenu_1.selectedIndex = 0;
         }
     };
     OverflowAction.prototype.setupElementForAccessibility = function (element, promoteTooltipToLabel) {
@@ -18563,6 +18612,17 @@ var AdaptiveCard = /** @class */ (function (_super) {
             Utils.appendChild(target, renderedCard);
             this.updateLayout();
         }
+        var inputElements = this.getAllInputs();
+        document.onclick = function (event) {
+            inputElements.forEach(function (input) {
+                var _a, _b;
+                if (input instanceof ChoiceSetInput &&
+                    !((_a = input.renderedElement) === null || _a === void 0 ? void 0 : _a.contains(event.target))) {
+                    (_b = input
+                        .getDropdownElement()) === null || _b === void 0 ? void 0 : _b.classList.remove(_this.hostConfig.makeCssClassName("ac-choiceSetInput-filtered-dropdown-open"));
+                }
+            });
+        };
         return renderedCard;
     };
     AdaptiveCard.prototype.updateLayout = function (processChildren) {
@@ -19340,9 +19400,6 @@ var Carousel = /** @class */ (function (_super) {
         containerForAdorners.className = this.hostConfig.makeCssClassName("ac-carousel-container");
         this._containerForAdorners = containerForAdorners;
         cardLevelContainer.appendChild(containerForAdorners);
-        var navigationContainer = document.createElement("div");
-        navigationContainer.className = this.hostConfig.makeCssClassName("ac-carousel-navigation");
-        containerForAdorners.appendChild(navigationContainer);
         var carouselWrapper = document.createElement("div");
         carouselWrapper.className = this.hostConfig.makeCssClassName("swiper-wrapper", "ac-carousel-card-container");
         carouselWrapper.style.display = "flex";
@@ -19371,6 +19428,8 @@ var Carousel = /** @class */ (function (_super) {
             // https://stackoverflow.com/questions/36247140/why-doesnt-flex-item-shrink-past-content-size
             carouselWrapper.style.minHeight = "-webkit-min-content";
         }
+        var navigationContainer = document.createElement("div");
+        navigationContainer.className = this.hostConfig.makeCssClassName("ac-carousel-navigation");
         var prevElementDiv = document.createElement("div");
         prevElementDiv.className = this.hostConfig.makeCssClassName("swiper-button-prev");
         var nextElementDiv = document.createElement("div");
@@ -19414,6 +19473,7 @@ var Carousel = /** @class */ (function (_super) {
         carouselContainer.appendChild(carouselWrapper);
         carouselContainer.tabIndex = this.isDesignMode() ? -1 : 0;
         containerForAdorners.appendChild(carouselContainer);
+        containerForAdorners.appendChild(navigationContainer);
         // `isRtl()` will set the correct value of rtl by reading the value from the parents
         this.rtl = this.isRtl();
         this.applyRTL(pagination);
@@ -19831,7 +19891,8 @@ var MenuItem = /** @class */ (function () {
             };
             this._element.onkeydown = function (e) {
                 if (e.key === constants_1.Constants.keys.enter) {
-                    e.cancelBubble = true;
+                    e.stopPropagation();
+                    e.preventDefault();
                     _this.click();
                 }
             };
@@ -20084,6 +20145,9 @@ var PopupMenu = /** @class */ (function (_super) {
             var renderedItem = this._items.get(i).render(this.hostConfig);
             renderedItem.tabIndex = 0;
             element.appendChild(renderedItem);
+            if (i == 0) {
+                renderedItem.setAttribute("aria-expanded", "true");
+            }
             if (i === this.selectedIndex) {
                 renderedItem.focus();
             }
@@ -20119,6 +20183,7 @@ var PopupMenu = /** @class */ (function (_super) {
                     }
                 }
                 this.selectedIndex = selectedItemIndex;
+                this.removeAriaExpanded(selectedItemIndex);
                 e.cancelBubble = true;
                 break;
             case constants_1.Constants.keys.down:
@@ -20130,6 +20195,7 @@ var PopupMenu = /** @class */ (function (_super) {
                     if (selectedItemIndex >= this._renderedItems.length) {
                         selectedItemIndex = 0;
                     }
+                    this.removeAriaExpanded(selectedItemIndex);
                 }
                 this.selectedIndex = selectedItemIndex;
                 e.cancelBubble = true;
@@ -20156,6 +20222,12 @@ var PopupMenu = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    // remove aria-expanded attribute from menu item
+    PopupMenu.prototype.removeAriaExpanded = function (index) {
+        if (this._renderedItems[index].getAttribute("aria-expanded") === "true") {
+            this._renderedItems[index].removeAttribute("aria-expanded");
+        }
+    };
     return PopupMenu;
 }(popup_control_1.PopupControl));
 exports.PopupMenu = PopupMenu;
@@ -20784,12 +20856,17 @@ var InputConfig = /** @class */ (function () {
             color: Enums.TextColor.Attention
         });
         this.debounceTimeInMilliSeconds = 0;
+        this.allowDynamicallyFilteredChoiceSet = true;
         this.allowRevealOnHoverStyle = false;
         if (obj) {
             this.label = new InputLabelConfig(obj["label"]);
             this.errorMessage = new BaseTextDefinition(obj["errorMessage"]);
-            this.allowRevealOnHoverStyle = obj["allowRevealOnHoverStyle"] || this.allowRevealOnHoverStyle;
-            this.debounceTimeInMilliSeconds = obj.debounceTimeInMilliSeconds;
+            this.allowRevealOnHoverStyle =
+                obj["allowRevealOnHoverStyle"] || this.allowRevealOnHoverStyle;
+            this.allowDynamicallyFilteredChoiceSet =
+                obj["allowDynamicallyFilteredChoiceSet"] || this.allowDynamicallyFilteredChoiceSet;
+            this.debounceTimeInMilliSeconds =
+                obj["debounceTimeInMilliSeconds"] || this.debounceTimeInMilliSeconds;
         }
     }
     return InputConfig;
@@ -21865,6 +21942,8 @@ exports.Version = Version;
 var Versions = /** @class */ (function () {
     function Versions() {
     }
+    // If preview tag is added/removed from any version,
+    // don't forget to update .ac-schema-version-1-?::after too in adaptivecards-site\themes\adaptivecards\source\css\style.css
     /* eslint-enable @typescript-eslint/naming-convention */
     Versions.getAllDeclaredVersions = function () {
         var ctor = Versions;
@@ -21893,10 +21972,8 @@ var Versions = /** @class */ (function () {
     Versions.v1_3 = new Version(1, 3);
     Versions.v1_4 = new Version(1, 4);
     Versions.v1_5 = new Version(1, 5);
-    // If preview tag is added/removed from any version,
-    // don't forget to update .ac-schema-version-1-?::after too in adaptivecards-site\themes\adaptivecards\source\css\style.css
-    Versions.v1_6 = new Version(1, 6, "1.6 Preview");
-    Versions.latest = Versions.v1_5;
+    Versions.v1_6 = new Version(1, 6);
+    Versions.latest = Versions.v1_6;
     return Versions;
 }());
 exports.Versions = Versions;

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.14](https://github.com/kunalnagarco/action-cve/compare/v1.9.13...v1.9.14) (2024-02-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @octokit/types to v12.6.0 ([#158](https://github.com/kunalnagarco/action-cve/issues/158)) ([bd70e47](https://github.com/kunalnagarco/action-cve/commit/bd70e4736432fc7d179f79d5aeb16c01c831c195))
+* **deps:** update dependency adaptivecards to v3 ([#161](https://github.com/kunalnagarco/action-cve/issues/161)) ([fd576a4](https://github.com/kunalnagarco/action-cve/commit/fd576a4b100d84c123aa52ad82b8850f608d6acf))
+
+
+### Chores
+
+* **deps:** update dependency @types/jest to v29 ([#159](https://github.com/kunalnagarco/action-cve/issues/159)) ([e857f5d](https://github.com/kunalnagarco/action-cve/commit/e857f5dee7108528ca8a42b6bc8842be4435d99f))
+
 ## [1.9.13](https://github.com/kunalnagarco/action-cve/compare/v1.9.12...v1.9.13) (2024-02-25)
 
 

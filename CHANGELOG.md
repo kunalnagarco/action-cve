@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.15](https://github.com/kunalnagarco/action-cve/compare/v1.9.14...v1.9.15) (2024-02-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @actions/github to v6 ([#160](https://github.com/kunalnagarco/action-cve/issues/160)) ([f9da24d](https://github.com/kunalnagarco/action-cve/commit/f9da24d2657c5abd6ed3a766cb87e833440ca445))
+
 ## [1.9.14](https://github.com/kunalnagarco/action-cve/compare/v1.9.13...v1.9.14) (2024-02-25)
 
 

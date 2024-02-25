@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.12](https://github.com/kunalnagarco/action-cve/compare/v1.9.11...v1.9.12) (2024-02-25)
+
+
+### Chores
+
+* **deps:** update dependency eslint to v8.57.0 ([86aaac2](https://github.com/kunalnagarco/action-cve/commit/86aaac23ff292dfa7c11b39be871db2427c3ebf4))
+
 ## [1.9.11](https://github.com/kunalnagarco/action-cve/compare/v1.9.10...v1.9.11) (2024-02-24)
 
 

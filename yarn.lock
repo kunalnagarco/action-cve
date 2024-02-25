@@ -1588,10 +1588,10 @@ acorn@^8.9.0:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.11.3.tgz#71e0b14e13a4ec160724b38fb7b0f233b1b81d7a"
   integrity sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==
 
-adaptivecards@2.11.3:
-  version "2.11.3"
-  resolved "https://registry.yarnpkg.com/adaptivecards/-/adaptivecards-2.11.3.tgz#0c80723cb8417299be6bc2ab633778ac6a47f36c"
-  integrity sha512-pfqGVU9B33vqVWDhvqGuoinEPwKe7xNPzljaQ0qHMwVCMv2OqweQ2pBH5htfzE/XNYPViq+4rNvqIDubDmuZoQ==
+adaptivecards@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/adaptivecards/-/adaptivecards-3.0.2.tgz#c7f5f82dfaa2fac9cfc314e2b31025a9233a2686"
+  integrity sha512-ioniHtm8c5uENw6jmddnntpjC4MvSOjN2Xrg9YhxuTtoVqz0XoYrInRIq0uf9WmONm7p+wqjAqBkoI6IRDeNwA==
 
 agent-base@^7.0.2, agent-base@^7.1.0:
   version "7.1.0"

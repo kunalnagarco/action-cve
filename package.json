@@ -63,7 +63,7 @@
     "@semantic-release/git": "10.0.1",
     "@semantic-release/github": "9.2.6",
     "@semantic-release/release-notes-generator": "12.1.0",
-    "@types/jest": "27.5.2",
+    "@types/jest": "29.5.12",
     "@types/node": "20.11.20",
     "@types/node-fetch": "2.6.11",
     "@types/nodemailer": "6.4.14",

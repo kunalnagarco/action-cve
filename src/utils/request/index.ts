@@ -1,12 +1,10 @@
-import fetch, { Response as FetchResponse, RequestInit } from 'node-fetch'
-
 type RequestOptions = Pick<RequestInit, 'method' | 'body' | 'headers'>
-type Response = Pick<FetchResponse, 'headers' | 'json' | 'ok' | 'text'>
+type ResponseType = Pick<Response, 'headers' | 'json' | 'ok' | 'text'>
 
 export const request = async (
   url: string,
   options?: RequestOptions,
-): Promise<Response> =>
+): Promise<ResponseType> =>
   fetch(url, {
     ...options,
   })

@@ -449,23 +449,19 @@ exports.toVulnerability = toVulnerability;
 /***/ }),
 
 /***/ 9028:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fetchAlerts = void 0;
-const node_fetch_1 = __importDefault(__nccwpck_require__(467));
 const rest_1 = __nccwpck_require__(5375);
 const entities_1 = __nccwpck_require__(7604);
 const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repositoryOwner, severity, count) => {
     const octokit = new rest_1.Octokit({
         auth: gitHubPersonalAccessToken,
         request: {
-            fetch: node_fetch_1.default,
+            fetch,
         },
     });
     const response = await octokit.dependabot.listAlertsForRepo({
@@ -566,17 +562,13 @@ __exportStar(__nccwpck_require__(8309), exports);
 /***/ }),
 
 /***/ 2063:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.request = void 0;
-const node_fetch_1 = __importDefault(__nccwpck_require__(467));
-const request = async (url, options) => (0, node_fetch_1.default)(url, {
+const request = async (url, options) => fetch(url, {
     ...options,
 });
 exports.request = request;

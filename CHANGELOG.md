@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/kunalnagarco/action-cve/compare/v1.9.16...v1.10.0) (2024-02-26)
+
+
+### Features
+
+* Remove node-fetch ([#163](https://github.com/kunalnagarco/action-cve/issues/163)) ([cedf31f](https://github.com/kunalnagarco/action-cve/commit/cedf31fa22bed3ef1685540987241d6969e96f12))
+
 ## [1.9.16](https://github.com/kunalnagarco/action-cve/compare/v1.9.15...v1.9.16) (2024-02-26)
 
 

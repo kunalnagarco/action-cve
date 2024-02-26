@@ -1,7 +1,6 @@
 import { request } from '.'
-import fetch from 'node-fetch'
 
-jest.mock('node-fetch')
+global.fetch = jest.fn(() => Promise.resolve({})) as jest.Mock
 
 const URL = 'someUrl'
 

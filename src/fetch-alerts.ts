@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import { Octokit } from '@octokit/rest'
 
 import { Alert, isActiveAlert, toAlert } from './entities'

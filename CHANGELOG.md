@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.2](https://github.com/kunalnagarco/action-cve/compare/v1.10.1...v1.10.2) (2024-02-27)
+
+
+### Chores
+
+* **deps:** update dependency swiper to v11.0.7 ([9251552](https://github.com/kunalnagarco/action-cve/commit/925155259a1c317442ff20c4a94667ececf36b75))
+
 ## [1.10.1](https://github.com/kunalnagarco/action-cve/compare/v1.10.0...v1.10.1) (2024-02-26)
 
 

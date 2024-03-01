@@ -35946,6 +35946,15 @@ class MimeNode {
             if (!this.getHeader('MIME-Version')) {
                 this.setHeader('MIME-Version', '1.0');
             }
+
+            // Ensure that Content-Type is the last header for the root node
+            for (let i = this._headers.length - 2; i >= 0; i--) {
+                let header = this._headers[i];
+                if (header.key === 'Content-Type') {
+                    this._headers.splice(i, 1);
+                    this._headers.push(header);
+                }
+            }
         }
 
         this._headers.forEach(header => {
@@ -79221,7 +79230,7 @@ module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":t
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.10","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.484.0","bunyan":"1.8.15","c8":"8.0.1","eslint":"8.56.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.2.1","libmime":"5.2.1","libqp":"2.0.1","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.0"},"engines":{"node":">=6.0.0"}}');
+module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.11","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.523.0","bunyan":"1.8.15","c8":"9.1.0","eslint":"8.57.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.3.0","libmime":"5.3.4","libqp":"2.1.0","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.2"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

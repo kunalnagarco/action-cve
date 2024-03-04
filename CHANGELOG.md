@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.8](https://github.com/kunalnagarco/action-cve/compare/v1.10.7...v1.10.8) (2024-03-04)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-react to v7.34.0 ([246929c](https://github.com/kunalnagarco/action-cve/commit/246929c10c3cc808347b4203d3ff32c07662c3c4))
+
 ## [1.10.7](https://github.com/kunalnagarco/action-cve/compare/v1.10.6...v1.10.7) (2024-03-04)
 
 

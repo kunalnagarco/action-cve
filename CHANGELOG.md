@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.11](https://github.com/kunalnagarco/action-cve/compare/v1.10.10...v1.10.11) (2024-03-07)
+
+
+### Chores
+
+* **deps:** update dependency typescript to v5.4.2 ([0b6aa9f](https://github.com/kunalnagarco/action-cve/commit/0b6aa9f721d5a98cce0c22c5810454527015894b))
+
 ## [1.10.10](https://github.com/kunalnagarco/action-cve/compare/v1.10.9...v1.10.10) (2024-03-06)
 
 

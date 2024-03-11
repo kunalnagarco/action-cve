@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.13](https://github.com/kunalnagarco/action-cve/compare/v1.10.12...v1.10.13) (2024-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v6.9.12 ([#168](https://github.com/kunalnagarco/action-cve/issues/168)) ([bfe918c](https://github.com/kunalnagarco/action-cve/commit/bfe918ca2086762de19ff7c54ad4f8269f4bb3e2))
+
+
+### Chores
+
+* **deps:** update dependency eslint-config-airbnb-typescript to v18 ([#165](https://github.com/kunalnagarco/action-cve/issues/165)) ([44aac56](https://github.com/kunalnagarco/action-cve/commit/44aac56e537c7ffec63cbeac7d9c1e15c564e70d))
+
 ## [1.10.12](https://github.com/kunalnagarco/action-cve/compare/v1.10.11...v1.10.12) (2024-03-11)
 
 

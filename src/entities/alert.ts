@@ -33,13 +33,3 @@ export const toAlert = (
     : undefined,
   createdAt: dependabotAlert.created_at,
 })
-
-export const isActiveAlert = (dependabotAlert: DependabotAlert): boolean => {
-  if (
-    dependabotAlert.dismissed_at === null &&
-    dependabotAlert.fixed_at === null
-  ) {
-    return true
-  }
-  return false
-}

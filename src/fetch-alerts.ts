@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest'
 
-import { Alert, isActiveAlert, toAlert } from './entities'
+import { Alert, toAlert } from './entities'
 
 export const fetchAlerts = async (
   gitHubPersonalAccessToken: string,
@@ -18,13 +18,12 @@ export const fetchAlerts = async (
   const response = await octokit.dependabot.listAlertsForRepo({
     owner: repositoryOwner,
     repo: repositoryName,
+    state: 'open',
     severity,
     per_page: count,
   })
-  const alerts: Alert[] = response.data
-    .filter((dependabotAlert) => isActiveAlert(dependabotAlert))
-    .map((dependabotAlert) =>
-      toAlert(dependabotAlert, repositoryName, repositoryOwner),
-    )
+  const alerts: Alert[] = response.data.map((dependabotAlert) =>
+    toAlert(dependabotAlert, repositoryName, repositoryOwner),
+  )
   return alerts
 }

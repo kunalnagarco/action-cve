@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/kunalnagarco/action-cve/compare/v1.10.15...v1.11.0) (2024-03-12)
+
+
+### Features
+
+* Fetch alerts with open status only ([#167](https://github.com/kunalnagarco/action-cve/issues/167)) ([ff6dac4](https://github.com/kunalnagarco/action-cve/commit/ff6dac4ffa5f0a2ca2b8f3d66b1c87d0275b7df3))
+
 ## [1.10.15](https://github.com/kunalnagarco/action-cve/compare/v1.10.14...v1.10.15) (2024-03-12)
 
 

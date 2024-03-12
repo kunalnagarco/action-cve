@@ -361,7 +361,7 @@ exports.toAdvisory = toAdvisory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isActiveAlert = exports.toAlert = void 0;
+exports.toAlert = void 0;
 const advisory_1 = __nccwpck_require__(9750);
 const vulnerability_1 = __nccwpck_require__(3005);
 const toAlert = (dependabotAlert, repositoryName, repositoryOwner) => ({
@@ -379,14 +379,6 @@ const toAlert = (dependabotAlert, repositoryName, repositoryOwner) => ({
     createdAt: dependabotAlert.created_at,
 });
 exports.toAlert = toAlert;
-const isActiveAlert = (dependabotAlert) => {
-    if (dependabotAlert.dismissed_at === null &&
-        dependabotAlert.fixed_at === null) {
-        return true;
-    }
-    return false;
-};
-exports.isActiveAlert = isActiveAlert;
 //# sourceMappingURL=alert.js.map
 
 /***/ }),
@@ -467,12 +459,11 @@ const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repository
     const response = await octokit.dependabot.listAlertsForRepo({
         owner: repositoryOwner,
         repo: repositoryName,
+        state: 'open',
         severity,
         per_page: count,
     });
-    const alerts = response.data
-        .filter((dependabotAlert) => (0, entities_1.isActiveAlert)(dependabotAlert))
-        .map((dependabotAlert) => (0, entities_1.toAlert)(dependabotAlert, repositoryName, repositoryOwner));
+    const alerts = response.data.map((dependabotAlert) => (0, entities_1.toAlert)(dependabotAlert, repositoryName, repositoryOwner));
     return alerts;
 };
 exports.fetchAlerts = fetchAlerts;

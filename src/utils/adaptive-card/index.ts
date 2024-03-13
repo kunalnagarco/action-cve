@@ -29,9 +29,7 @@ export const createContainer = (
 
 export type Row = ColumnSet
 
-export const createRow = (): ColumnSet => {
-  return new ColumnSet()
-}
+export const createRow = (): ColumnSet => new ColumnSet()
 
 export const createTextBlock = (
   text: string,
@@ -46,9 +44,7 @@ export const createTextBlock = (
   return textBlock
 }
 
-export const createColumn = (): Column => {
-  return new Column()
-}
+export const createColumn = (): Column => new Column()
 
 export type LinkButton = ActionSet
 

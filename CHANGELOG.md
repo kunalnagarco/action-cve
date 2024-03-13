@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/kunalnagarco/action-cve/compare/v1.11.0...v1.12.0) (2024-03-13)
+
+
+### Features
+
+* Upgrade yarn ([#169](https://github.com/kunalnagarco/action-cve/issues/169)) ([5316f4c](https://github.com/kunalnagarco/action-cve/commit/5316f4c070721a0415d96b00ad4bb3550875c56c))
+
 ## [1.11.0](https://github.com/kunalnagarco/action-cve/compare/v1.10.15...v1.11.0) (2024-03-12)
 
 

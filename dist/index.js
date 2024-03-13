@@ -490,9 +490,7 @@ const createContainer = (isSpacingLarge, isStyleEmphasis) => {
     return container;
 };
 exports.createContainer = createContainer;
-const createRow = () => {
-    return new adaptivecards_1.ColumnSet();
-};
+const createRow = () => new adaptivecards_1.ColumnSet();
 exports.createRow = createRow;
 const createTextBlock = (text, isBold = false, isWrap = true) => {
     const textBlock = new adaptivecards_1.TextBlock(text);
@@ -503,9 +501,7 @@ const createTextBlock = (text, isBold = false, isWrap = true) => {
     return textBlock;
 };
 exports.createTextBlock = createTextBlock;
-const createColumn = () => {
-    return new adaptivecards_1.Column();
-};
+const createColumn = () => new adaptivecards_1.Column();
 exports.createColumn = createColumn;
 const createLinkButton = (text, url) => {
     const linkButton = new adaptivecards_1.ActionSet();

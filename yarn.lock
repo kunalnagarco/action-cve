@@ -888,7 +888,7 @@ __metadata:
     lint-staged: "npm:15.2.2"
     nodemailer: "npm:6.9.12"
     prettier: "npm:3.2.5"
-    semantic-release: "npm:23.0.3"
+    semantic-release: "npm:23.0.4"
     sort-package-json: "npm:2.8.0"
     swiper: "npm:^11.0.5"
     ts-jest: "npm:29.1.2"
@@ -1551,9 +1551,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/npm@npm:^11.0.0":
-  version: 11.0.3
-  resolution: "@semantic-release/npm@npm:11.0.3"
+"@semantic-release/npm@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "@semantic-release/npm@npm:12.0.0"
   dependencies:
     "@semantic-release/error": "npm:^4.0.0"
     aggregate-error: "npm:^5.0.0"
@@ -1570,7 +1570,7 @@ __metadata:
     tempy: "npm:^3.0.0"
   peerDependencies:
     semantic-release: ">=20.1.0"
-  checksum: 10c0/142f396de87ceb42d917b598cb7889b68e3f09b0a97736de8cf7ee48879714bb66efed10520a7a20699493c58b5523ed2925089cd5b59642b045e458101ef13c
+  checksum: 10c0/857972de2e9d5292c7d8434f073be125f34c5d355fe7a7f8fbde39c953fbe3b30ded6e1361512c31de3bc4378cb9529ce61eaa60bf9afcab00bd682b5d43c5ff
   languageName: node
   linkType: hard
 
@@ -8022,14 +8022,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semantic-release@npm:23.0.3":
-  version: 23.0.3
-  resolution: "semantic-release@npm:23.0.3"
+"semantic-release@npm:23.0.4":
+  version: 23.0.4
+  resolution: "semantic-release@npm:23.0.4"
   dependencies:
     "@semantic-release/commit-analyzer": "npm:^11.0.0"
     "@semantic-release/error": "npm:^4.0.0"
     "@semantic-release/github": "npm:^10.0.0"
-    "@semantic-release/npm": "npm:^11.0.0"
+    "@semantic-release/npm": "npm:^12.0.0"
     "@semantic-release/release-notes-generator": "npm:^12.0.0"
     aggregate-error: "npm:^5.0.0"
     cosmiconfig: "npm:^9.0.0"
@@ -8057,7 +8057,7 @@ __metadata:
     yargs: "npm:^17.5.1"
   bin:
     semantic-release: bin/semantic-release.js
-  checksum: 10c0/5d47c0c09865dc93aefaa0b73ff0880e624d8675cf9ed137a4c4db9baacdb2c8765d5c886ca1fe738add33396846d40383775868993e191c9c45d611a1976bd1
+  checksum: 10c0/1e99360d1ce7ffb96c0f590ebcd749539ded66addde69c946e726de9a51e1b785a48ad744ef5df92434c95a86e32fc88f1d60dc0ac3561fcabe59fe2e202cd11
   languageName: node
   linkType: hard
 

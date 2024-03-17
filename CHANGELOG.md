@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.6](https://github.com/kunalnagarco/action-cve/compare/v1.12.5...v1.12.6) (2024-03-17)
+
+
+### Chores
+
+* **deps:** update dependency @semantic-release/github to v10 ([#170](https://github.com/kunalnagarco/action-cve/issues/170)) ([98a0682](https://github.com/kunalnagarco/action-cve/commit/98a068289967a845e63709cad5eb5e0fb90a4b85))
+
 ## [1.12.5](https://github.com/kunalnagarco/action-cve/compare/v1.12.4...v1.12.5) (2024-03-16)
 
 

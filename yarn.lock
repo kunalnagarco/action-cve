@@ -886,7 +886,7 @@ __metadata:
     husky: "npm:9.0.11"
     jest: "npm:29.7.0"
     lint-staged: "npm:15.2.2"
-    nodemailer: "npm:6.9.12"
+    nodemailer: "npm:6.9.13"
     prettier: "npm:3.2.5"
     semantic-release: "npm:23.0.5"
     sort-package-json: "npm:2.8.0"
@@ -6778,10 +6778,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:6.9.12":
-  version: 6.9.12
-  resolution: "nodemailer@npm:6.9.12"
-  checksum: 10c0/2c5ff1f064a264e008ca27f66db0dbf25c44bc38178e5ddb9a05bd7b5517bfa3c0e018845b87256df56b554ed6c3720380f3735e9029cf9f7c830e9fdab4189a
+"nodemailer@npm:6.9.13":
+  version: 6.9.13
+  resolution: "nodemailer@npm:6.9.13"
+  checksum: 10c0/4d6899f45abb7760a7d3b4d1046de7e08e80a471b84d1f09065a25941ded482e7f9877be248550e681e0270383cb9299f6caded507cbc0e917341bb137cc94a4
   languageName: node
   linkType: hard
 

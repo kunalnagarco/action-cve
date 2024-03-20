@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.12](https://github.com/kunalnagarco/action-cve/compare/v1.12.11...v1.12.12) (2024-03-20)
+
+
+### Chores
+
+* **deps:** update dependency @semantic-release/commit-analyzer to v12 ([#171](https://github.com/kunalnagarco/action-cve/issues/171)) ([86a47c7](https://github.com/kunalnagarco/action-cve/commit/86a47c7d54a810486ff5fd725dcece4aed2d36d8))
+
 ## [1.12.11](https://github.com/kunalnagarco/action-cve/compare/v1.12.10...v1.12.11) (2024-03-19)
 
 

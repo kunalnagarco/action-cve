@@ -39348,6 +39348,8 @@ class SMTPConnection extends EventEmitter {
         this.port = Number(this.options.port) || (this.secureConnection ? 465 : 587);
         this.host = this.options.host || 'localhost';
 
+        this.servername = this.options.servername ? this.options.servername : !net.isIP(this.host) ? this.host : false;
+
         this.allowInternalNetworkInterfaces = this.options.allowInternalNetworkInterfaces || false;
 
         if (typeof this.options.secure === 'undefined' && this.port === 465) {
@@ -39586,6 +39588,12 @@ class SMTPConnection extends EventEmitter {
                     opts[key] = this.options.tls[key];
                 });
             }
+
+            // ensure servername for SNI
+            if (this.servername && !opts.servername) {
+                opts.servername = this.servername;
+            }
+
             return shared.resolveHostname(opts, (err, resolved) => {
                 if (err) {
                     return setImmediate(() => this._onError(err, 'EDNS', false, 'CONN'));
@@ -40193,6 +40201,11 @@ class SMTPConnection extends EventEmitter {
         Object.keys(this.options.tls || {}).forEach(key => {
             opts[key] = this.options.tls[key];
         });
+
+        // ensure servername for SNI
+        if (this.servername && !opts.servername) {
+            opts.servername = this.servername;
+        }
 
         this.upgrading = true;
         // tls.connect is not an asynchronous function however it may still throw errors and requires to be wrapped with try/catch
@@ -79218,7 +79231,7 @@ module.exports = JSON.parse('{"126":{"host":"smtp.126.com","port":465,"secure":t
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.12","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.529.1","bunyan":"1.8.15","c8":"9.1.0","eslint":"8.57.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.3.0","libmime":"5.3.4","libqp":"2.1.0","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.3"},"engines":{"node":">=6.0.0"}}');
+module.exports = JSON.parse('{"name":"nodemailer","version":"6.9.13","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","test:coverage":"c8 node --test --test-concurrency=1 test/**/*.test.js test/**/*-test.js","lint":"eslint .","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-ses":"3.529.1","bunyan":"1.8.15","c8":"9.1.0","eslint":"8.57.0","eslint-config-nodemailer":"1.2.0","eslint-config-prettier":"9.1.0","libbase64":"1.3.0","libmime":"5.3.4","libqp":"2.1.0","nodemailer-ntlm-auth":"1.0.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.13.3"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

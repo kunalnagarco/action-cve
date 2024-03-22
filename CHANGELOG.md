@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.14](https://github.com/kunalnagarco/action-cve/compare/v1.12.13...v1.12.14) (2024-03-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v6.9.13 ([#172](https://github.com/kunalnagarco/action-cve/issues/172)) ([2bde0f9](https://github.com/kunalnagarco/action-cve/commit/2bde0f95cd68f001eeac7251d89ec721f71e28ed))
+
 ## [1.12.13](https://github.com/kunalnagarco/action-cve/compare/v1.12.12...v1.12.13) (2024-03-20)
 
 

@@ -864,7 +864,7 @@ __metadata:
     "@semantic-release/commit-analyzer": "npm:12.0.0"
     "@semantic-release/git": "npm:10.0.1"
     "@semantic-release/github": "npm:10.0.2"
-    "@semantic-release/release-notes-generator": "npm:12.1.0"
+    "@semantic-release/release-notes-generator": "npm:13.0.0"
     "@slack/types": "npm:2.11.0"
     "@slack/webhook": "npm:7.0.2"
     "@types/jest": "npm:29.5.12"
@@ -1523,27 +1523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/release-notes-generator@npm:12.1.0":
-  version: 12.1.0
-  resolution: "@semantic-release/release-notes-generator@npm:12.1.0"
-  dependencies:
-    conventional-changelog-angular: "npm:^7.0.0"
-    conventional-changelog-writer: "npm:^7.0.0"
-    conventional-commits-filter: "npm:^4.0.0"
-    conventional-commits-parser: "npm:^5.0.0"
-    debug: "npm:^4.0.0"
-    get-stream: "npm:^7.0.0"
-    import-from-esm: "npm:^1.0.3"
-    into-stream: "npm:^7.0.0"
-    lodash-es: "npm:^4.17.21"
-    read-pkg-up: "npm:^11.0.0"
-  peerDependencies:
-    semantic-release: ">=20.1.0"
-  checksum: 10c0/29dee44ee90e6396386ac5187a1e23cd44ad64b7440348ea4e18c7440199007aa7a7d8f158cc773ea142288b2c212b666b77d57b769224e9e7cdcb2ef8978555
-  languageName: node
-  linkType: hard
-
-"@semantic-release/release-notes-generator@npm:^13.0.0":
+"@semantic-release/release-notes-generator@npm:13.0.0, @semantic-release/release-notes-generator@npm:^13.0.0":
   version: 13.0.0
   resolution: "@semantic-release/release-notes-generator@npm:13.0.0"
   dependencies:

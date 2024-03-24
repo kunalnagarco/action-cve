@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.15](https://github.com/kunalnagarco/action-cve/compare/v1.12.14...v1.12.15) (2024-03-24)
+
+
+### Chores
+
+* **deps:** update dependency semantic-release to v23.0.6 ([ec73f1d](https://github.com/kunalnagarco/action-cve/commit/ec73f1d0eb5ae48e4bc9981f4f058074717468d1))
+
 ## [1.12.14](https://github.com/kunalnagarco/action-cve/compare/v1.12.13...v1.12.14) (2024-03-22)
 
 

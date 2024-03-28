@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.19](https://github.com/kunalnagarco/action-cve/compare/v1.12.18...v1.12.19) (2024-03-28)
+
+
+### Chores
+
+* **deps:** update dependency @semantic-release/release-notes-generator to v13 ([#173](https://github.com/kunalnagarco/action-cve/issues/173)) ([5535240](https://github.com/kunalnagarco/action-cve/commit/553524031af0ef1189d14ec82f0cb252dfd0b45a))
+* **deps:** update dependency node to v20.12.0 ([#174](https://github.com/kunalnagarco/action-cve/issues/174)) ([b84c9c1](https://github.com/kunalnagarco/action-cve/commit/b84c9c13f053b3c0a3dab4b6161da26b316b35c0))
+
 ## [1.12.18](https://github.com/kunalnagarco/action-cve/compare/v1.12.17...v1.12.18) (2024-03-26)
 
 

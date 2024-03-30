@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.21](https://github.com/kunalnagarco/action-cve/compare/v1.12.20...v1.12.21) (2024-03-30)
+
+
+### Chores
+
+* **deps:** update dependency sort-package-json to v2.10.0 ([e5a08ce](https://github.com/kunalnagarco/action-cve/commit/e5a08ceaab108bcf332a57a32b4d2bf01af6f278))
+
 ## [1.12.20](https://github.com/kunalnagarco/action-cve/compare/v1.12.19...v1.12.20) (2024-03-28)
 
 

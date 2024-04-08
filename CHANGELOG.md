@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.30](https://github.com/kunalnagarco/action-cve/compare/v1.12.29...v1.12.30) (2024-04-08)
+
+
+### Chores
+
+* **deps:** update typescript-eslint monorepo to v7.6.0 ([299b959](https://github.com/kunalnagarco/action-cve/commit/299b9590163ebfde0aada1991151749370743c08))
+
 ## [1.12.29](https://github.com/kunalnagarco/action-cve/compare/v1.12.28...v1.12.29) (2024-04-08)
 
 

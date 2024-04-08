@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.29](https://github.com/kunalnagarco/action-cve/compare/v1.12.28...v1.12.29) (2024-04-08)
+
+
+### Chores
+
+* **deps:** lock file maintenance ([2dbb014](https://github.com/kunalnagarco/action-cve/commit/2dbb014988f470023b2b50e2e30689aebc0b5de0))
+
 ## [1.12.28](https://github.com/kunalnagarco/action-cve/compare/v1.12.27...v1.12.28) (2024-04-07)
 
 

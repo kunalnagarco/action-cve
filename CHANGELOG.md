@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.32](https://github.com/kunalnagarco/action-cve/compare/v1.12.31...v1.12.32) (2024-04-09)
+
+
+### Chores
+
+* **deps:** update dependency @types/node to v20.12.6 ([4d7b50c](https://github.com/kunalnagarco/action-cve/commit/4d7b50c0e0e68d54c2d9ff6b781cc37ba88f4fe6))
+
 ## [1.12.31](https://github.com/kunalnagarco/action-cve/compare/v1.12.30...v1.12.31) (2024-04-09)
 
 

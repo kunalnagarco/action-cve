@@ -1,5 +1,5 @@
 import { getInput, setFailed } from '@actions/core'
-import { context } from '@actions/github'
+// import { context } from '@actions/github'
 
 import {
   sendAlertsToMicrosoftTeams,

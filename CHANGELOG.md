@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.34](https://github.com/kunalnagarco/action-cve/compare/v1.12.33...v1.12.34) (2024-04-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @octokit/types to v13.4.0 ([#180](https://github.com/kunalnagarco/action-cve/issues/180)) ([1ec4f95](https://github.com/kunalnagarco/action-cve/commit/1ec4f95febfcea51e09d6a13f01d077e48285e9a))
+
 ## [1.12.33](https://github.com/kunalnagarco/action-cve/compare/v1.12.32...v1.12.33) (2024-04-09)
 
 

@@ -891,7 +891,6 @@ __metadata:
     prettier: "npm:3.2.5"
     semantic-release: "npm:23.0.7"
     sort-package-json: "npm:2.10.0"
-    swiper: "npm:^11.0.5"
     ts-jest: "npm:29.1.2"
     typescript: "npm:5.4.4"
   languageName: unknown
@@ -8641,13 +8640,6 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10c0/6c4032340701a9950865f7ae8ef38578d8d7053f5e10518076e6554a9381fa91bd9c6850193695c141f32b21f979c985db07265a758867bac95de05f7d8aeb39
-  languageName: node
-  linkType: hard
-
-"swiper@npm:^11.0.5":
-  version: 11.1.1
-  resolution: "swiper@npm:11.1.1"
-  checksum: 10c0/02ded86e5033dbac47bbaa5e5592e15e945be990235f244236ddb2b8d6299cf6e66f1a45ad67277b1a133295daa5c7bad38e9c725b6d00b72d33431603202288
   languageName: node
   linkType: hard
 

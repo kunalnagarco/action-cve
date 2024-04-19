@@ -857,7 +857,7 @@ __metadata:
   dependencies:
     "@actions/core": "npm:1.10.1"
     "@actions/github": "npm:6.0.0"
-    "@kunalnagarco/eslint-config": "npm:2.3.0-beta.1"
+    "@kunalnagarco/eslint-config": "npm:2.3.0-beta.2"
     "@octokit/rest": "npm:^20.0.2"
     "@octokit/types": "npm:^13.0.0"
     "@pagerduty/pdjs": "npm:2.2.4"
@@ -897,9 +897,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kunalnagarco/eslint-config@npm:2.3.0-beta.1":
-  version: 2.3.0-beta.1
-  resolution: "@kunalnagarco/eslint-config@npm:2.3.0-beta.1"
+"@kunalnagarco/eslint-config@npm:2.3.0-beta.2":
+  version: 2.3.0-beta.2
+  resolution: "@kunalnagarco/eslint-config@npm:2.3.0-beta.2"
   peerDependencies:
     "@typescript-eslint/eslint-plugin": ">=6.x"
     "@typescript-eslint/parser": ">=6.x"
@@ -910,7 +910,7 @@ __metadata:
     eslint-plugin-import: ">=2.x"
     eslint-plugin-jest: ">=27.x"
     prettier: ">=2.x"
-  checksum: 10c0/d70affb896b70c668e549e02a978e59d531f7f1a377030df01ea871115746d39216b71e94cf020429cc162c6b39884fe2f07a002ca4f6cc7334ee668ef777e1f
+  checksum: 10c0/2ad90bb534172de4343d8c12bb52b2108022b6f1bad39886bc77101f396da91adeded7bd3c5f7b93e9f00140e067540a64a3fcd13e41d6be20424347b569dd85
   languageName: node
   linkType: hard
 

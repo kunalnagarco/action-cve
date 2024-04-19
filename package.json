@@ -27,8 +27,8 @@
     "build": "tsc",
     "format": "prettier --write src/**/*.ts",
     "format-check": "prettier --check src/**/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint --fix src/**/*.ts",
+    "lint": "eslint",
+    "lint:fix": "eslint",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "all": "yarn build && yarn format && yarn lint && yarn package && yarn test",
@@ -56,7 +56,7 @@
     "nodemailer": "6.9.13"
   },
   "devDependencies": {
-    "@kunalnagarco/eslint-config": "2.1.0",
+    "@kunalnagarco/eslint-config": "2.3.0-beta.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/commit-analyzer": "12.0.0",
     "@semantic-release/git": "10.0.1",

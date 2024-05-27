@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/kunalnagarco/action-cve/compare/v1.12.36...v1.13.0) (2024-05-27)
+
+
+### Features
+
+* Add filter by ecosystem ([#184](https://github.com/kunalnagarco/action-cve/issues/184)) ([41d6d72](https://github.com/kunalnagarco/action-cve/commit/41d6d7251948f353c0dc8749345f41f9e4be13b6))
+
 ## [1.12.36](https://github.com/kunalnagarco/action-cve/compare/v1.12.35...v1.12.36) (2024-05-09)
 
 

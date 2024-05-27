@@ -31,9 +31,17 @@ async function run(): Promise<void> {
     const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
     const count = parseInt(getInput('count'))
     const severity = getInput('severity')
+    const ecosystem = getInput('ecosystem')
     const { owner } = context.repo
     const { repo } = context.repo
-    const alerts = await fetchAlerts(token, repo, owner, severity, count)
+    const alerts = await fetchAlerts(
+      token,
+      repo,
+      owner,
+      severity,
+      ecosystem,
+      count,
+    )
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)

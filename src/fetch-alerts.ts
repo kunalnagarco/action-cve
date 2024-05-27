@@ -7,6 +7,7 @@ export const fetchAlerts = async (
   repositoryName: string,
   repositoryOwner: string,
   severity: string,
+  ecosystem: string,
   count: number,
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
@@ -20,6 +21,7 @@ export const fetchAlerts = async (
     repo: repositoryName,
     state: 'open',
     severity,
+    ecosystem,
     per_page: count,
   })
   const alerts: Alert[] = response.data.map((dependabotAlert) =>

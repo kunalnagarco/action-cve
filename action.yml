@@ -37,6 +37,8 @@ inputs:
     default: 20
   severity:
     description: 'Comma separated list of severities. E.g. low,medium,high,critical (NO SPACES BETWEEN COMMA AND SEVERITY)'
+  ecosystem:
+    description: "A comma-separated list of ecosystems. If specified, only alerts for these ecosystems will be returned."
 branding:
   icon: 'alert-octagon'
   color: 'red'

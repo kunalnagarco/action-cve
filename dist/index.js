@@ -449,7 +449,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fetchAlerts = void 0;
 const rest_1 = __nccwpck_require__(5375);
 const entities_1 = __nccwpck_require__(7604);
-const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repositoryOwner, severity, count) => {
+const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repositoryOwner, severity, ecosystem, count) => {
     const octokit = new rest_1.Octokit({
         auth: gitHubPersonalAccessToken,
         request: {
@@ -461,6 +461,7 @@ const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repository
         repo: repositoryName,
         state: 'open',
         severity,
+        ecosystem,
         per_page: count,
     });
     const alerts = response.data.map((dependabotAlert) => (0, entities_1.toAlert)(dependabotAlert, repositoryName, repositoryOwner));
@@ -79559,9 +79560,10 @@ async function run() {
         const emailTransportSmtpPassword = (0, core_1.getInput)('email_transport_smtp_password');
         const count = parseInt((0, core_1.getInput)('count'));
         const severity = (0, core_1.getInput)('severity');
+        const ecosystem = (0, core_1.getInput)('ecosystem');
         const { owner } = github_1.context.repo;
         const { repo } = github_1.context.repo;
-        const alerts = await (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, severity, count);
+        const alerts = await (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, severity, ecosystem, count);
         if (alerts.length > 0) {
             if (microsoftTeamsWebhookUrl) {
                 await (0, destinations_1.sendAlertsToMicrosoftTeams)(microsoftTeamsWebhookUrl, alerts);

@@ -52,7 +52,7 @@
     "@pagerduty/pdjs": "2.2.4",
     "@slack/types": "2.11.0",
     "@slack/webhook": "7.0.2",
-    "adaptivecards": "3.0.2",
+    "adaptivecards": "3.0.4",
     "nodemailer": "6.9.13"
   },
   "devDependencies": {

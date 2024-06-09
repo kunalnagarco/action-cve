@@ -874,7 +874,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7.0.1"
     "@typescript-eslint/parser": "npm:^7.0.1"
     "@vercel/ncc": "npm:0.38.1"
-    adaptivecards: "npm:3.0.2"
+    adaptivecards: "npm:3.0.4"
     conventional-changelog-conventionalcommits: "npm:7.0.2"
     eslint: "npm:^8.56.0"
     eslint-config-airbnb: "npm:^19.0.4"
@@ -2102,12 +2102,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"adaptivecards@npm:3.0.2":
-  version: 3.0.2
-  resolution: "adaptivecards@npm:3.0.2"
+"adaptivecards@npm:3.0.4":
+  version: 3.0.4
+  resolution: "adaptivecards@npm:3.0.4"
   peerDependencies:
     swiper: ^8.2.6
-  checksum: 10c0/86b80998112fef946dcb0928bed27fc1bba5c2c4215b22a7d6a42cf6ef3e5bffe1c06ba953821c1e16f22a3e02fbf01667de1ff33d58c88a94084eb8432f8b6f
+  checksum: 10c0/10fb7caa9d078f4feb73ee53ccd202546514c9c27e86768d04a08b8ef4bcbf78c784d50a137d40b8d6881cdc4a24cf2066d6a0ae6bf3e96bbedb22e57c978cc5
   languageName: node
   linkType: hard
 

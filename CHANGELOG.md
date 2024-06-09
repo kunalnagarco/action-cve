@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.2](https://github.com/kunalnagarco/action-cve/compare/v1.13.1...v1.13.2) (2024-06-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency adaptivecards to v3.0.4 ([#185](https://github.com/kunalnagarco/action-cve/issues/185)) ([1cf21b7](https://github.com/kunalnagarco/action-cve/commit/1cf21b7c7d81f32fee99131df47b97a4f69f43ff))
+
 ## [1.13.1](https://github.com/kunalnagarco/action-cve/compare/v1.13.0...v1.13.1) (2024-06-01)
 
 

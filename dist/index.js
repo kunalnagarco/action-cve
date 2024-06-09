@@ -9591,17 +9591,7 @@ var Image = /** @class */ (function (_super) {
                 // auto and stretch are ignored (default to medium). THis is necessary for
                 // ImageSet which uses a maximum image height as opposed to the cards width
                 // as a constraining dimension
-                switch (this.size) {
-                    case Enums.Size.Small:
-                        element.style.height = this.hostConfig.imageSizes.small + "px";
-                        break;
-                    case Enums.Size.Large:
-                        element.style.height = this.hostConfig.imageSizes.large + "px";
-                        break;
-                    default:
-                        element.style.height = this.hostConfig.imageSizes.medium + "px";
-                        break;
-                }
+                element.style.height = this.hostConfig.getEffectiveImageSize(this.size) + "px";
                 element.style.maxHeight = this.maxHeight + "px";
             }
             else {
@@ -9612,14 +9602,8 @@ var Image = /** @class */ (function (_super) {
                     case Enums.Size.Auto:
                         element.style.maxWidth = "100%";
                         break;
-                    case Enums.Size.Small:
-                        element.style.width = this.hostConfig.imageSizes.small + "px";
-                        break;
-                    case Enums.Size.Large:
-                        element.style.width = this.hostConfig.imageSizes.large + "px";
-                        break;
-                    case Enums.Size.Medium:
-                        element.style.width = this.hostConfig.imageSizes.medium + "px";
+                    default:
+                        element.style.width = this.hostConfig.getEffectiveImageSize(this.size) + "px";
                         break;
                 }
                 element.style.maxHeight = "100%";
@@ -10009,33 +9993,56 @@ var ImageSet = /** @class */ (function (_super) {
     }
     //#endregion
     ImageSet.prototype.internalRender = function () {
+        var _a;
         var element = undefined;
         if (this._images.length > 0) {
+            var imageSetIsGrid = (this.presentationStyle === Enums.ImageSetPresentationStyle.Grid);
             element = document.createElement("div");
             element.style.display = "flex";
             element.style.flexWrap = "wrap";
-            for (var _i = 0, _a = this._images; _i < _a.length; _i++) {
-                var image = _a[_i];
-                switch (this.imageSize) {
-                    case Enums.ImageSize.Small:
-                        image.size = Enums.Size.Small;
-                        break;
-                    case Enums.ImageSize.Large:
-                        image.size = Enums.Size.Large;
-                        break;
-                    default:
-                        image.size = Enums.Size.Medium;
-                        break;
-                }
+            element.classList.add(this.hostConfig.makeCssClassName("ac-imageSet"));
+            element.classList.toggle(this.hostConfig.makeCssClassName("ac-imageSetStyle-grid"), imageSetIsGrid);
+            element.style.gap = "5px";
+            var renderImageSize = void 0;
+            switch (this.imageSize) {
+                case Enums.ImageSize.Small:
+                    renderImageSize = Enums.Size.Small;
+                    break;
+                case Enums.ImageSize.Large:
+                    renderImageSize = Enums.Size.Large;
+                    break;
+                default:
+                    renderImageSize = Enums.Size.Medium;
+                    break;
+            }
+            var effectiveImageSize = this.hostConfig.getEffectiveImageSize(renderImageSize);
+            for (var _i = 0, _b = this._images; _i < _b.length; _i++) {
+                var image = _b[_i];
                 image.maxHeight = this.hostConfig.imageSet.maxImageHeight;
-                var renderedImage = image.render();
-                if (renderedImage) {
-                    renderedImage.style.display = "inline-flex";
-                    renderedImage.style.margin = "0px";
-                    if (this.presentationStyle == Enums.ImageSetPresentationStyle.Default) {
-                        renderedImage.style.marginRight = "10px";
+                if (imageSetIsGrid) {
+                    image.pixelWidth = effectiveImageSize;
+                }
+                else {
+                    image.size = renderImageSize;
+                }
+                var imageContainer = image.render();
+                if (imageContainer) {
+                    imageContainer.style.display = "inline-flex";
+                    imageContainer.style.margin = "0px";
+                    if (imageSetIsGrid) {
+                        imageContainer.style.flexBasis = effectiveImageSize + "px";
+                        imageContainer.style.height = effectiveImageSize + "px";
+                        imageContainer.style.flexGrow = "0";
+                        imageContainer.style.flexShrink = "0";
+                        var renderedImageStyle = (_a = image.renderedImageElement) === null || _a === void 0 ? void 0 : _a.style;
+                        if (renderedImageStyle) {
+                            renderedImageStyle.width = "100%";
+                            renderedImageStyle.height = "100%";
+                            renderedImageStyle.objectFit = "cover";
+                            renderedImageStyle.verticalAlign = "middle";
+                        }
                     }
-                    Utils.appendChild(element, renderedImage);
+                    Utils.appendChild(element, imageContainer);
                 }
             }
             if (this.presentationStyle == Enums.ImageSetPresentationStyle.Stacked) {
@@ -10890,7 +10897,6 @@ var Input = /** @class */ (function (_super) {
             this._renderedInputControlElement.id = renderedInputControlId;
             this._renderedInputControlElement.style.minWidth = "0px";
             if (this.isNullable && this.isRequired) {
-                this._renderedInputControlElement.setAttribute("aria-required", "true");
                 this._renderedInputControlElement.classList.add(hostConfig.makeCssClassName("ac-input-required"));
             }
             this._inputControlContainerElement.appendChild(this._renderedInputControlElement);
@@ -11636,7 +11642,6 @@ var ChoiceSetInput = /** @class */ (function (_super) {
         var element = document.createElement("div");
         element.className = this.hostConfig.makeCssClassName("ac-input", cssClassName);
         element.style.width = "100%";
-        element.tabIndex = this.isDesignMode() ? -1 : 0;
         this._toggleInputs = [];
         this._labels = [];
         for (var _i = 0, _a = this.choices; _i < _a.length; _i++) {
@@ -11702,12 +11707,16 @@ var ChoiceSetInput = /** @class */ (function (_super) {
             this._labels) {
             var labelIds = this.getAllLabelIds();
             for (var i = 0; i < this._toggleInputs.length; i++) {
-                var joinedLabelIds = labelIds.join(" ");
+                var joinedLabelIds = "";
+                // Only include the overall information for the first input
+                if (i === 0) {
+                    joinedLabelIds = labelIds.join(" ");
+                }
                 var label = this._labels[i];
                 if (label && label.id) {
                     joinedLabelIds += " " + label.id;
                 }
-                if (joinedLabelIds) {
+                if (joinedLabelIds !== "") {
                     this._toggleInputs[i].setAttribute("aria-labelledby", joinedLabelIds);
                 }
                 else {
@@ -12054,7 +12063,34 @@ var FilteredChoiceSet = /** @class */ (function () {
         var choice = document.createElement("span");
         choice.className = this.hostConfig.makeCssClassName("ac-input", "ac-choiceSetInput-choice");
         choice.id = "ac-choiceSetInput-".concat(this._choiceSetId, "-choice-").concat(id);
-        choice.innerHTML = value.replace(filter, "<b>".concat(filter, "</b>"));
+        var startIndex = value.indexOf(filter);
+        if (startIndex === -1) {
+            // Filter wasn't found, add the value as is
+            var valueSpan = document.createElement("span");
+            valueSpan.innerText = value;
+            choice.appendChild(valueSpan);
+        }
+        else {
+            if (startIndex > 0) {
+                // Add a span with the beginning unmatched text
+                var unmatchedBeg = value.substring(0, startIndex);
+                var unmatchedBegSpan = document.createElement("span");
+                unmatchedBegSpan.innerText = unmatchedBeg;
+                choice.appendChild(unmatchedBegSpan);
+            }
+            // Add the matched filter with bold styling
+            var filterSpan = document.createElement("span");
+            filterSpan.innerText = filter;
+            filterSpan.style.fontWeight = "bold";
+            choice.appendChild(filterSpan);
+            if (startIndex + filter.length < value.length) {
+                // Add a span with the ending unmatched text
+                var unmatchedEnd = value.substring(startIndex + filter.length);
+                var unmatchedEndSpan = document.createElement("span");
+                unmatchedEndSpan.innerText = unmatchedEnd;
+                choice.appendChild(unmatchedEndSpan);
+            }
+        }
         choice.tabIndex = -1;
         choice.onclick = function () {
             choice.classList.remove(_this.hostConfig.makeCssClassName("ac-choiceSetInput-choice-highlighted"));
@@ -12570,6 +12606,7 @@ var Action = /** @class */ (function (_super) {
                 iconElement.style.width = hostConfig.actions.iconSize + "px";
                 iconElement.style.height = hostConfig.actions.iconSize + "px";
                 iconElement.style.flex = "0 0 auto";
+                iconElement.setAttribute("role", "presentation");
                 if (hostConfig.actions.iconPlacement === Enums.ActionIconPlacement.AboveTitle) {
                     this.renderedElement.classList.add("iconAbove");
                     this.renderedElement.style.flexDirection = "column";
@@ -13507,7 +13544,7 @@ var OverflowAction = /** @class */ (function (_super) {
             var contextMenu_1 = new controls_1.PopupMenu();
             contextMenu_1.hostConfig = this.hostConfig;
             var _loop_2 = function (i) {
-                var menuItem = new controls_1.MenuItem(i.toString(), (_a = this_1._actions[i].title) !== null && _a !== void 0 ? _a : "");
+                var menuItem = new controls_1.MenuItem(i.toString(), (_a = this_1._actions[i].title) !== null && _a !== void 0 ? _a : "", this_1._actions[i].iconUrl);
                 menuItem.isEnabled = this_1._actions[i].isEnabled;
                 menuItem.onClick = function () {
                     var actionToExecute = _this._actions[i];
@@ -16934,10 +16971,11 @@ exports.MenuItem = void 0;
 var host_config_1 = __nccwpck_require__(7785);
 var constants_1 = __nccwpck_require__(7839);
 var MenuItem = /** @class */ (function () {
-    function MenuItem(key, value) {
+    function MenuItem(key, value, iconUrl) {
         this._isEnabled = true;
         this.key = key;
         this._value = value;
+        this._iconUrl = iconUrl;
     }
     MenuItem.prototype.click = function () {
         if (this.isEnabled && this.onClick) {
@@ -16959,14 +16997,31 @@ var MenuItem = /** @class */ (function () {
     };
     MenuItem.prototype.render = function (hostConfig) {
         var _this = this;
+        var _a, _b, _c;
         this._hostConfig = hostConfig;
         if (!this._element) {
             this._element = document.createElement("span");
-            this._element.innerText = this.value;
             this._element.setAttribute("role", "menuitem");
+            this._element.style.display = "flex";
+            this._element.style.alignItems = "center";
+            this._element.style.justifyContent = "left";
             if (!this.isEnabled) {
                 this._element.setAttribute("aria-disabled", "true");
             }
+            if (this._iconUrl && ((_a = this._hostConfig) === null || _a === void 0 ? void 0 : _a.actions.showIconInOverflow)) {
+                var iconSize = (_c = (_b = this._hostConfig) === null || _b === void 0 ? void 0 : _b.actions.iconSize) !== null && _c !== void 0 ? _c : 16;
+                var iconElement = document.createElement("img");
+                iconElement.style.width = iconSize + "px";
+                iconElement.style.height = iconSize + "px";
+                iconElement.style.marginRight = "6px";
+                iconElement.setAttribute("role", "presentation");
+                iconElement.src = this._iconUrl;
+                this._element.appendChild(iconElement);
+            }
+            var textElement = document.createElement("span");
+            textElement.style.flex = "0 1 auto";
+            textElement.innerText = this.value;
+            this._element.appendChild(textElement);
             this._element.setAttribute("aria-current", "false");
             this._element.onmouseup = function (_e) {
                 _this.click();
@@ -17222,7 +17277,7 @@ var PopupMenu = /** @class */ (function (_super) {
     PopupMenu.prototype.renderContent = function () {
         var element = document.createElement("div");
         element.className = this.hostConfig.makeCssClassName("ac-ctrl ac-popup");
-        element.setAttribute("role", "listbox");
+        element.setAttribute("role", "menu");
         for (var i = 0; i < this._items.length; i++) {
             var renderedItem = this._items.get(i).render(this.hostConfig);
             renderedItem.tabIndex = 0;
@@ -17392,6 +17447,7 @@ var ImageSetPresentationStyle;
 (function (ImageSetPresentationStyle) {
     ImageSetPresentationStyle[ImageSetPresentationStyle["Default"] = 0] = "Default";
     ImageSetPresentationStyle[ImageSetPresentationStyle["Stacked"] = 1] = "Stacked";
+    ImageSetPresentationStyle[ImageSetPresentationStyle["Grid"] = 2] = "Grid";
 })(ImageSetPresentationStyle = exports.ImageSetPresentationStyle || (exports.ImageSetPresentationStyle = {}));
 var SizeUnit;
 (function (SizeUnit) {
@@ -18035,6 +18091,7 @@ var ShowCardActionConfig = /** @class */ (function () {
 exports.ShowCardActionConfig = ShowCardActionConfig;
 var ActionsConfig = /** @class */ (function () {
     function ActionsConfig(obj) {
+        var _a;
         this.maxActions = 5;
         this.spacing = Enums.Spacing.Default;
         this.buttonSpacing = 20;
@@ -18044,6 +18101,7 @@ var ActionsConfig = /** @class */ (function () {
         this.actionAlignment = Enums.ActionAlignment.Left;
         this.iconPlacement = Enums.ActionIconPlacement.LeftOfTitle;
         this.allowTitleToWrap = false;
+        this.showIconInOverflow = false;
         this.iconSize = 16;
         if (obj) {
             this.maxActions = obj["maxActions"] != null ? obj["maxActions"] : this.maxActions;
@@ -18057,6 +18115,7 @@ var ActionsConfig = /** @class */ (function () {
             this.iconPlacement = parseHostConfigEnum(Enums.ActionIconPlacement, obj["iconPlacement"], Enums.ActionIconPlacement.LeftOfTitle);
             this.allowTitleToWrap =
                 obj["allowTitleToWrap"] != null ? obj["allowTitleToWrap"] : this.allowTitleToWrap;
+            this.showIconInOverflow = (_a = obj["showIconInOverflow"]) !== null && _a !== void 0 ? _a : this.showIconInOverflow;
             try {
                 var sizeAndUnit = Shared.SizeAndUnit.parse(obj["iconSize"]);
                 if (sizeAndUnit.unit === Enums.SizeUnit.Pixel) {
@@ -18414,6 +18473,17 @@ var HostConfig = /** @class */ (function () {
             return style === Enums.FontType.Monospace
                 ? FontTypeDefinition.monospace
                 : this._legacyFontType;
+        }
+    };
+    HostConfig.prototype.getEffectiveImageSize = function (imageSize) {
+        switch (imageSize) {
+            case Enums.Size.Small:
+                return this.imageSizes.small;
+            case Enums.Size.Large:
+                return this.imageSizes.large;
+            case Enums.Size.Medium:
+            default:
+                return this.imageSizes.medium;
         }
     };
     HostConfig.prototype.getEffectiveSpacing = function (spacing) {

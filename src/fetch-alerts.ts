@@ -16,7 +16,6 @@ export const fetchAlerts = async (
       fetch,
     },
   })
-  console.log('severity', severity)
   const response = await octokit.request(
     'GET /repos/{owner}/{repo}/dependabot/alerts',
     {
@@ -27,6 +26,9 @@ export const fetchAlerts = async (
       ecosystem,
       per_page: count,
     },
+  )
+  response.data.forEach((item) =>
+    console.log(item.security_vulnerability.severity),
   )
   // const response = await octokit.dependabot.listAlertsForRepo({
   //   owner: repositoryOwner,

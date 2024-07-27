@@ -17,14 +17,25 @@ export const fetchAlerts = async (
     },
   })
   console.log('severity', severity)
-  const response = await octokit.dependabot.listAlertsForRepo({
-    owner: repositoryOwner,
-    repo: repositoryName,
-    state: 'open',
-    severity: 'low',
-    ecosystem,
-    per_page: count,
-  })
+  const response = await octokit.request(
+    'GET /repos/{owner}/{repo}/dependabot/alerts',
+    {
+      owner: repositoryOwner,
+      repo: repositoryName,
+      state: 'open',
+      severity: 'low',
+      ecosystem,
+      per_page: count,
+    },
+  )
+  // const response = await octokit.dependabot.listAlertsForRepo({
+  //   owner: repositoryOwner,
+  //   repo: repositoryName,
+  //   state: 'open',
+  //   severity: 'low',
+  //   ecosystem,
+  //   per_page: count,
+  // })
   const alerts: Alert[] = response.data.map((dependabotAlert) =>
     toAlert(dependabotAlert, repositoryName, repositoryOwner),
   )

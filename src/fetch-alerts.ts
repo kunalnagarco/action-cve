@@ -16,6 +16,7 @@ export const fetchAlerts = async (
       fetch,
     },
   })
+  console.log('severity', severity)
   const response = await octokit.dependabot.listAlertsForRepo({
     owner: repositoryOwner,
     repo: repositoryName,

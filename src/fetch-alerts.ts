@@ -20,7 +20,7 @@ export const fetchAlerts = async (
     owner: repositoryOwner,
     repo: repositoryName,
     state: 'open',
-    severity: severity.length > 0 ? severity : undefined,
+    severity,
     ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })

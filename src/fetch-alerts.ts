@@ -21,7 +21,7 @@ export const fetchAlerts = async (
     repo: repositoryName,
     state: 'open',
     severity,
-    ecosystem,
+    ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })
   const alerts: Alert[] = response.data.map((dependabotAlert) =>

@@ -461,7 +461,7 @@ const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repository
         repo: repositoryName,
         state: 'open',
         severity,
-        ecosystem,
+        ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
         per_page: count,
     });
     const alerts = response.data.map((dependabotAlert) => (0, entities_1.toAlert)(dependabotAlert, repositoryName, repositoryOwner));

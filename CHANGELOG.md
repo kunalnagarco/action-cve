@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.3](https://github.com/kunalnagarco/action-cve/compare/v1.13.2...v1.13.3) (2024-08-04)
+
+
+### Bug Fixes
+
+* Severity filter not working in case of empty ecosystem value ([#188](https://github.com/kunalnagarco/action-cve/issues/188)) ([f30d072](https://github.com/kunalnagarco/action-cve/commit/f30d072e9955329ce161340bf0e0e7002d44a372)), closes [#186](https://github.com/kunalnagarco/action-cve/issues/186)
+
 ## [1.13.2](https://github.com/kunalnagarco/action-cve/compare/v1.13.1...v1.13.2) (2024-06-09)
 
 

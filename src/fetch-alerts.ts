@@ -12,9 +12,6 @@ export const fetchAlerts = async (
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
     auth: gitHubPersonalAccessToken,
-    request: {
-      fetch,
-    },
   })
   console.log(repositoryOwner, repositoryName, ecosystem, count)
   const response = await octokit.request(

@@ -16,6 +16,7 @@ export const fetchAlerts = async (
       fetch,
     },
   })
+  console.log(repositoryOwner, repositoryName, ecosystem, count)
   const response = await octokit.request(
     'GET /repos/{owner}/{repo}/dependabot/alerts',
     {

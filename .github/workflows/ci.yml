@@ -28,7 +28,7 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          # org: ${{ secrets.ORG_NAME }}
+          org: ${{ secrets.ORG_NAME }}
           # enterprise: ${{ secrets.ENTERPRISE_NAME }}
           # microsoft_teams_webhook: ${{ secrets.MICROSOFT_TEAMS_WEBHOOK }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}

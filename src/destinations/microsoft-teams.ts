@@ -9,7 +9,7 @@ import {
   request,
 } from '../utils'
 import { ACTION_SHORT_SUMMARY } from '../constants'
-import { Alert } from '../entities'
+import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 
 const createTableRow = (key: string, value: string): Row => {
   const row = createRow()
@@ -53,7 +53,10 @@ export const sendAlertsToMicrosoftTeams = async (
 
   alerts.forEach((alert) => {
     const container = createContainer(true, true)
-    container.addItem(createTableRow('Package Name', alert.packageName))
+    container.addItem(createTableRow('Package', alert.packageName))
+    container.addItem(
+      createTableRow('Repository', getFullRepositoryNameFromAlert(alert)),
+    )
     container.addItem(
       createTableRow(
         'Vulnerability Version Range',

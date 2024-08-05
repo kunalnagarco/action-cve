@@ -53,8 +53,6 @@ async function run(): Promise<void> {
       )
     } else {
       const { owner, repo } = context.repo
-      // const owner = 'kunalnagar'
-      // const repo = 'cve-base'
       alerts = await fetchRepositoryAlerts(
         token,
         repo,

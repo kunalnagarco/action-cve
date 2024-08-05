@@ -1,15 +1,15 @@
 import { Octokit } from '@octokit/rest'
 
-import { Alert, toAlert } from './entities'
+import { RepositoryAlert, toRepositoryAlert } from './RepositoryAlert'
 
-export const fetchAlerts = async (
+export const fetchRepositoryAlerts = async (
   gitHubPersonalAccessToken: string,
   repositoryName: string,
   repositoryOwner: string,
   severity: string,
   ecosystem: string,
   count: number,
-): Promise<Alert[] | []> => {
+): Promise<RepositoryAlert[] | []> => {
   const octokit = new Octokit({
     auth: gitHubPersonalAccessToken,
     request: {
@@ -24,8 +24,8 @@ export const fetchAlerts = async (
     ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })
-  const alerts: Alert[] = response.data.map((dependabotAlert) =>
-    toAlert(dependabotAlert, repositoryName, repositoryOwner),
+  const alerts: RepositoryAlert[] = response.data.map((dependabotAlert) =>
+    toRepositoryAlert(dependabotAlert, repositoryName, repositoryOwner),
   )
   return alerts
 }

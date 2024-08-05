@@ -9,7 +9,7 @@ import {
   sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
-import { fetchAlerts } from './fetch-alerts'
+import { fetchRepositoryAlerts } from './entities'
 
 async function run(): Promise<void> {
   try {
@@ -32,9 +32,8 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'))
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
-    const { owner } = context.repo
-    const { repo } = context.repo
-    const alerts = await fetchAlerts(
+    const { owner = 'kunalnagar', repo = 'cve-base' } = context.repo
+    const alerts = await fetchRepositoryAlerts(
       token,
       repo,
       owner,

@@ -28,7 +28,7 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          org: ${{ secrets.ORG_NAME }}
+          # org: ${{ secrets.ORG_NAME }}
           # enterprise: ${{ secrets.ENTERPRISE_NAME }}
           # microsoft_teams_webhook: ${{ secrets.MICROSOFT_TEAMS_WEBHOOK }}
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
@@ -39,10 +39,10 @@ jobs:
           # zenduty_api_key: ${{ secrets.ZENDUTY_API_KEY }}
           # zenduty_service_id: ${{ secrets.ZENDUTY_SERVICE_ID }}
           # zenduty_escalation_policy_id: ${{ secrets.ZENDUTY_ESCALATION_POLICY_ID }}
-          email_from: ${{ secrets.EMAIL_FROM }}
-          email_list: ${{ secrets.EMAIL_BCC_LIST }}
-          email_transport_smtp_user: ${{ secrets.EMAIL_TRANSPORT_SMTP_USER }}
-          email_transport_smtp_password: ${{ secrets.EMAIL_TRANSPORT_SMTP_PASSWORD }}
+          # email_from: ${{ secrets.EMAIL_FROM }}
+          # email_list: ${{ secrets.EMAIL_BCC_LIST }}
+          # email_transport_smtp_user: ${{ secrets.EMAIL_TRANSPORT_SMTP_USER }}
+          # email_transport_smtp_password: ${{ secrets.EMAIL_TRANSPORT_SMTP_PASSWORD }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release (dry-run)

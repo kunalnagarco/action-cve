@@ -52,8 +52,7 @@ async function run(): Promise<void> {
         count,
       )
     } else {
-      const { owner } = context.repo
-      const { repo } = context.repo
+      const { owner, repo } = context.repo
       alerts = await fetchRepositoryAlerts(
         token,
         repo,

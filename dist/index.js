@@ -28,6 +28,7 @@ const entities_1 = __nccwpck_require__(7604);
 const createTableRow = (alert) => `
     <tr>
       <td>${alert.packageName}</td>
+      <td>${(0, entities_1.getFullRepositoryNameFromAlert)(alert)}</td>
       <td>${alert.vulnerability?.vulnerableVersionRange}</td>
       <td>${alert.vulnerability?.firstPatchedVersion}</td>
       <td>${alert.advisory?.severity}</td>
@@ -43,7 +44,8 @@ const createTable = (alerts) => {
     return `
     <table border="1" cellpadding="10" width="100%">
       <thead>
-        <th>Package name</th>
+        <th>Package</th>
+        <th>Repository</th>
         <th>Vulnerability Version Range</th>
         <th>Patched Version</th>
         <th>Severity</th>
@@ -58,7 +60,7 @@ const createTable = (alerts) => {
 };
 const createEmailBody = (alerts) => `
     <p>Hello,</p>
-    <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${(0, entities_1.getFullRepositoryNameFromAlert)(alerts[0])}</b> via <a href="${constants_1.ACTION_URL}">${constants_1.ACTION_SHORT_SUMMARY}</a>.</p>
+    <p>You are receiving this message as you have set up email notifications for vulnerabilities via <a href="${constants_1.ACTION_URL}">${constants_1.ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `;
 const sendAlertsToEmailSmtp = async (config, alerts, emailList, emailFrom, subject) => {
@@ -66,8 +68,7 @@ const sendAlertsToEmailSmtp = async (config, alerts, emailList, emailFrom, subje
     await transporter.sendMail({
         from: emailFrom,
         bcc: emailList,
-        subject: subject ||
-            `${constants_1.ACTION_SHORT_SUMMARY} - ${alerts.length} vulnerabilities in ${(0, entities_1.getFullRepositoryNameFromAlert)(alerts[0])}`,
+        subject: subject || constants_1.ACTION_SHORT_SUMMARY,
         html: createEmailBody(alerts),
     });
 };
@@ -114,6 +115,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToMicrosoftTeams = void 0;
 const utils_1 = __nccwpck_require__(1606);
 const constants_1 = __nccwpck_require__(5105);
+const entities_1 = __nccwpck_require__(7604);
 const createTableRow = (key, value) => {
     const row = (0, utils_1.createRow)();
     const keyColumn = (0, utils_1.createColumn)();
@@ -143,7 +145,8 @@ const sendAlertsToMicrosoftTeams = async (webhookUrl, alerts) => {
     adaptiveCard.addItem((0, utils_1.createTextBlock)(`You have ${alertCount} vulnerabilities in ${repositoryOwner}/${repositoryName}`));
     alerts.forEach((alert) => {
         const container = (0, utils_1.createContainer)(true, true);
-        container.addItem(createTableRow('Package Name', alert.packageName));
+        container.addItem(createTableRow('Package', alert.packageName));
+        container.addItem(createTableRow('Repository', (0, entities_1.getFullRepositoryNameFromAlert)(alert)));
         container.addItem(createTableRow('Vulnerability Version Range', alert.vulnerability?.vulnerableVersionRange || ''));
         container.addItem(createTableRow('Patched Version', alert.vulnerability?.firstPatchedVersion || ''));
         container.addItem(createTableRow('Severity', alert.advisory?.severity || ''));
@@ -189,7 +192,7 @@ const sendAlertsToPagerDuty = async (integrationKey, alerts) => {
             routing_key: integrationKey,
             event_action: 'trigger',
             payload: {
-                summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
+                summary: `You have ${alerts.length} vulnerabilities`,
                 source: 'GitHub Dependabot Alerts',
                 severity: 'info',
                 custom_details: { ...alerts },
@@ -218,6 +221,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToSlack = exports.validateSlackWebhookUrl = exports.MAX_COUNT_SLACK = void 0;
 const webhook_1 = __nccwpck_require__(1095);
 const constants_1 = __nccwpck_require__(5105);
+const entities_1 = __nccwpck_require__(7604);
 exports.MAX_COUNT_SLACK = 30;
 const createMaxAlertsMarkdownNotice = () => `*Note:* Only ${exports.MAX_COUNT_SLACK} have been sent due to message length restrictions.`;
 const createSummaryBlock = (alertCount, repositoryName, repositoryOwner) => ({
@@ -238,7 +242,8 @@ const createAlertBlock = (alert) => ({
     text: {
         type: 'mrkdwn',
         text: `
-*Package name:* ${alert.packageName}
+*Package:* ${alert.packageName}
+*Repository:* ${(0, entities_1.getFullRepositoryNameFromAlert)(alert)}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}
@@ -290,6 +295,7 @@ exports.sendAlertsToSlack = sendAlertsToSlack;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendAlertsToZenduty = void 0;
 const constants_1 = __nccwpck_require__(5105);
+const entities_1 = __nccwpck_require__(7604);
 const utils_1 = __nccwpck_require__(1606);
 const sendAlertsToZenduty = async (apiKey, serviceId, escalationPolicyId, alerts) => {
     let summary = `
@@ -300,7 +306,8 @@ const sendAlertsToZenduty = async (apiKey, serviceId, escalationPolicyId, alerts
   `;
     alerts.forEach((alert) => {
         summary += `
-      Package name: ${alert.packageName}
+      Package: ${alert.packageName}
+      Repository: ${(0, entities_1.getFullRepositoryNameFromAlert)(alert)}
       Vulnerability Version Range: ${alert.vulnerability?.vulnerableVersionRange}
       Patched Version: ${alert.vulnerability?.firstPatchedVersion}
       Severity: ${alert.advisory?.severity}
@@ -361,10 +368,10 @@ exports.toAdvisory = toAdvisory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toAlert = void 0;
+exports.toEnterpriseAlert = exports.toOrgAlert = exports.toRepositoryAlert = void 0;
 const advisory_1 = __nccwpck_require__(9750);
 const vulnerability_1 = __nccwpck_require__(3005);
-const toAlert = (dependabotAlert, repositoryName, repositoryOwner) => ({
+const toRepositoryAlert = (dependabotAlert, repositoryName, repositoryOwner) => ({
     repository: {
         name: repositoryName,
         owner: repositoryOwner,
@@ -378,7 +385,37 @@ const toAlert = (dependabotAlert, repositoryName, repositoryOwner) => ({
         : undefined,
     createdAt: dependabotAlert.created_at,
 });
-exports.toAlert = toAlert;
+exports.toRepositoryAlert = toRepositoryAlert;
+const toOrgAlert = (dependabotOrgAlert) => ({
+    repository: {
+        name: dependabotOrgAlert.repository.name,
+        owner: dependabotOrgAlert.repository.owner.login,
+    },
+    packageName: dependabotOrgAlert.security_vulnerability.package.name || '',
+    advisory: dependabotOrgAlert.security_advisory
+        ? (0, advisory_1.toAdvisory)(dependabotOrgAlert.security_advisory)
+        : undefined,
+    vulnerability: dependabotOrgAlert.security_vulnerability
+        ? (0, vulnerability_1.toVulnerability)(dependabotOrgAlert.security_vulnerability)
+        : undefined,
+    createdAt: dependabotOrgAlert.created_at,
+});
+exports.toOrgAlert = toOrgAlert;
+const toEnterpriseAlert = (dependabotEnterpriseAlert) => ({
+    repository: {
+        name: dependabotEnterpriseAlert.repository.name,
+        owner: dependabotEnterpriseAlert.repository.owner.login,
+    },
+    packageName: dependabotEnterpriseAlert.security_vulnerability.package.name || '',
+    advisory: dependabotEnterpriseAlert.security_advisory
+        ? (0, advisory_1.toAdvisory)(dependabotEnterpriseAlert.security_advisory)
+        : undefined,
+    vulnerability: dependabotEnterpriseAlert.security_vulnerability
+        ? (0, vulnerability_1.toVulnerability)(dependabotEnterpriseAlert.security_vulnerability)
+        : undefined,
+    createdAt: dependabotEnterpriseAlert.created_at,
+});
+exports.toEnterpriseAlert = toEnterpriseAlert;
 //# sourceMappingURL=alert.js.map
 
 /***/ }),
@@ -446,10 +483,10 @@ exports.toVulnerability = toVulnerability;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fetchAlerts = void 0;
+exports.fetchEnterpriseAlerts = exports.fetchOrgAlerts = exports.fetchRepositoryAlerts = void 0;
 const rest_1 = __nccwpck_require__(5375);
 const entities_1 = __nccwpck_require__(7604);
-const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repositoryOwner, severity, ecosystem, count) => {
+const fetchRepositoryAlerts = async (gitHubPersonalAccessToken, repositoryName, repositoryOwner, severity, ecosystem, count) => {
     const octokit = new rest_1.Octokit({
         auth: gitHubPersonalAccessToken,
         request: {
@@ -464,10 +501,46 @@ const fetchAlerts = async (gitHubPersonalAccessToken, repositoryName, repository
         ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
         per_page: count,
     });
-    const alerts = response.data.map((dependabotAlert) => (0, entities_1.toAlert)(dependabotAlert, repositoryName, repositoryOwner));
+    const alerts = response.data.map((dependabotAlert) => (0, entities_1.toRepositoryAlert)(dependabotAlert, repositoryName, repositoryOwner));
     return alerts;
 };
-exports.fetchAlerts = fetchAlerts;
+exports.fetchRepositoryAlerts = fetchRepositoryAlerts;
+const fetchOrgAlerts = async (gitHubPersonalAccessToken, org, severity, ecosystem, count) => {
+    const octokit = new rest_1.Octokit({
+        auth: gitHubPersonalAccessToken,
+        request: {
+            fetch,
+        },
+    });
+    const response = await octokit.dependabot.listAlertsForOrg({
+        org,
+        state: 'open',
+        severity,
+        ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
+        per_page: count,
+    });
+    const alerts = response.data.map((dependabotOrgAlert) => (0, entities_1.toOrgAlert)(dependabotOrgAlert));
+    return alerts;
+};
+exports.fetchOrgAlerts = fetchOrgAlerts;
+const fetchEnterpriseAlerts = async (gitHubPersonalAccessToken, enterprise, severity, ecosystem, count) => {
+    const octokit = new rest_1.Octokit({
+        auth: gitHubPersonalAccessToken,
+        request: {
+            fetch,
+        },
+    });
+    const response = await octokit.dependabot.listAlertsForEnterprise({
+        enterprise,
+        state: 'open',
+        severity,
+        ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
+        per_page: count,
+    });
+    const alerts = response.data.map((dependabotEnterpriseAlert) => (0, entities_1.toEnterpriseAlert)(dependabotEnterpriseAlert));
+    return alerts;
+};
+exports.fetchEnterpriseAlerts = fetchEnterpriseAlerts;
 //# sourceMappingURL=fetch-alerts.js.map
 
 /***/ }),
@@ -79615,6 +79688,8 @@ const fetch_alerts_1 = __nccwpck_require__(9028);
 async function run() {
     try {
         const token = (0, core_1.getInput)('token');
+        const org = (0, core_1.getInput)('org');
+        const enterprise = (0, core_1.getInput)('enterprise');
         const microsoftTeamsWebhookUrl = (0, core_1.getInput)('microsoft_teams_webhook');
         const slackWebhookUrl = (0, core_1.getInput)('slack_webhook');
         const pagerDutyIntegrationKey = (0, core_1.getInput)('pager_duty_integration_key');
@@ -79631,9 +79706,17 @@ async function run() {
         const count = parseInt((0, core_1.getInput)('count'));
         const severity = (0, core_1.getInput)('severity');
         const ecosystem = (0, core_1.getInput)('ecosystem');
-        const { owner } = github_1.context.repo;
-        const { repo } = github_1.context.repo;
-        const alerts = await (0, fetch_alerts_1.fetchAlerts)(token, repo, owner, severity, ecosystem, count);
+        let alerts = [];
+        if (org) {
+            alerts = await (0, fetch_alerts_1.fetchOrgAlerts)(token, org, severity, ecosystem, count);
+        }
+        else if (enterprise) {
+            alerts = await (0, fetch_alerts_1.fetchEnterpriseAlerts)(token, org, severity, ecosystem, count);
+        }
+        else {
+            const { owner, repo } = github_1.context.repo;
+            alerts = await (0, fetch_alerts_1.fetchRepositoryAlerts)(token, repo, owner, severity, ecosystem, count);
+        }
         if (alerts.length > 0) {
             if (microsoftTeamsWebhookUrl) {
                 await (0, destinations_1.sendAlertsToMicrosoftTeams)(microsoftTeamsWebhookUrl, alerts);

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/kunalnagarco/action-cve/compare/v1.13.3...v1.14.0) (2024-08-05)
+
+
+### Features
+
+* Support Org and Enterprise level alerts ([#190](https://github.com/kunalnagarco/action-cve/issues/190)) ([19e0872](https://github.com/kunalnagarco/action-cve/commit/19e08726bc5e1db9a255a0c64400393bcc5564d0)), closes [#187](https://github.com/kunalnagarco/action-cve/issues/187)
+
 ## [1.13.3](https://github.com/kunalnagarco/action-cve/compare/v1.13.2...v1.13.3) (2024-08-04)
 
 

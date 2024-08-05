@@ -9,11 +9,18 @@ import {
   sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
-import { fetchAlerts } from './fetch-alerts'
+import {
+  fetchRepositoryAlerts,
+  fetchOrgAlerts,
+  fetchEnterpriseAlerts,
+} from './fetch-alerts'
+import { Alert } from './entities'
 
 async function run(): Promise<void> {
   try {
     const token = getInput('token')
+    const org = getInput('org')
+    const enterprise = getInput('enterprise')
     const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
@@ -32,16 +39,30 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'))
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
-    const { owner } = context.repo
-    const { repo } = context.repo
-    const alerts = await fetchAlerts(
-      token,
-      repo,
-      owner,
-      severity,
-      ecosystem,
-      count,
-    )
+
+    let alerts: Alert[]
+    if (org) {
+      alerts = await fetchOrgAlerts(token, org, severity, ecosystem, count)
+    } else if (enterprise) {
+      alerts = await fetchEnterpriseAlerts(
+        token,
+        org,
+        severity,
+        ecosystem,
+        count,
+      )
+    } else {
+      const { owner } = context.repo
+      const { repo } = context.repo
+      alerts = await fetchRepositoryAlerts(
+        token,
+        repo,
+        owner,
+        severity,
+        ecosystem,
+        count,
+      )
+    }
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)

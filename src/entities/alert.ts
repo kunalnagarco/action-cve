@@ -15,7 +15,7 @@ export interface Alert {
   createdAt: string
 }
 
-export const toAlert = (
+export const toRepositoryAlert = (
   dependabotAlert: DependabotAlert,
   repositoryName: string,
   repositoryOwner: string,
@@ -32,4 +32,43 @@ export const toAlert = (
     ? toVulnerability(dependabotAlert.security_vulnerability)
     : undefined,
   createdAt: dependabotAlert.created_at,
+})
+
+export type DependabotOrgAlert =
+  Endpoints['GET /orgs/{org}/dependabot/alerts']['response']['data'][0]
+
+export const toOrgAlert = (dependabotOrgAlert: DependabotOrgAlert): Alert => ({
+  repository: {
+    name: dependabotOrgAlert.repository.name,
+    owner: dependabotOrgAlert.repository.owner.login,
+  },
+  packageName: dependabotOrgAlert.security_vulnerability.package.name || '',
+  advisory: dependabotOrgAlert.security_advisory
+    ? toAdvisory(dependabotOrgAlert.security_advisory)
+    : undefined,
+  vulnerability: dependabotOrgAlert.security_vulnerability
+    ? toVulnerability(dependabotOrgAlert.security_vulnerability)
+    : undefined,
+  createdAt: dependabotOrgAlert.created_at,
+})
+
+export type DependabotEnterpriseAlert =
+  Endpoints['GET /enterprises/{enterprise}/dependabot/alerts']['response']['data'][0]
+
+export const toEnterpriseAlert = (
+  dependabotEnterpriseAlert: DependabotEnterpriseAlert,
+): Alert => ({
+  repository: {
+    name: dependabotEnterpriseAlert.repository.name,
+    owner: dependabotEnterpriseAlert.repository.owner.login,
+  },
+  packageName:
+    dependabotEnterpriseAlert.security_vulnerability.package.name || '',
+  advisory: dependabotEnterpriseAlert.security_advisory
+    ? toAdvisory(dependabotEnterpriseAlert.security_advisory)
+    : undefined,
+  vulnerability: dependabotEnterpriseAlert.security_vulnerability
+    ? toVulnerability(dependabotEnterpriseAlert.security_vulnerability)
+    : undefined,
+  createdAt: dependabotEnterpriseAlert.created_at,
 })

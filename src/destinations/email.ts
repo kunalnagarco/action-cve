@@ -7,6 +7,7 @@ import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 const createTableRow = (alert: Alert): string => `
     <tr>
       <td>${alert.packageName}</td>
+      <td>${getFullRepositoryNameFromAlert(alert)}</td>
       <td>${alert.vulnerability?.vulnerableVersionRange}</td>
       <td>${alert.vulnerability?.firstPatchedVersion}</td>
       <td>${alert.advisory?.severity}</td>
@@ -23,7 +24,8 @@ const createTable = (alerts: Alert[]): string => {
   return `
     <table border="1" cellpadding="10" width="100%">
       <thead>
-        <th>Package name</th>
+        <th>Package</th>
+        <th>Repository</th>
         <th>Vulnerability Version Range</th>
         <th>Patched Version</th>
         <th>Severity</th>
@@ -39,9 +41,7 @@ const createTable = (alerts: Alert[]): string => {
 
 const createEmailBody = (alerts: Alert[]): string => `
     <p>Hello,</p>
-    <p>You are receiving this message as you have set up email notifications for vulnerabilities in <b>${getFullRepositoryNameFromAlert(
-      alerts[0],
-    )}</b> via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
+    <p>You are receiving this message as you have set up email notifications for vulnerabilities via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `
 
@@ -56,11 +56,7 @@ export const sendAlertsToEmailSmtp = async (
   await transporter.sendMail({
     from: emailFrom,
     bcc: emailList,
-    subject:
-      subject ||
-      `${ACTION_SHORT_SUMMARY} - ${
-        alerts.length
-      } vulnerabilities in ${getFullRepositoryNameFromAlert(alerts[0])}`,
+    subject: subject || ACTION_SHORT_SUMMARY,
     html: createEmailBody(alerts),
   })
 }

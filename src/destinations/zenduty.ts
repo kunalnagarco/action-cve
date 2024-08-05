@@ -1,5 +1,5 @@
 import { ACTION_SHORT_SUMMARY } from '../constants'
-import { Alert } from '../entities'
+import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 import { request } from '../utils'
 
 export const sendAlertsToZenduty = async (
@@ -16,7 +16,8 @@ export const sendAlertsToZenduty = async (
   `
   alerts.forEach((alert) => {
     summary += `
-      Package name: ${alert.packageName}
+      Package: ${alert.packageName}
+      Repository: ${getFullRepositoryNameFromAlert(alert)}
       Vulnerability Version Range: ${alert.vulnerability?.vulnerableVersionRange}
       Patched Version: ${alert.vulnerability?.firstPatchedVersion}
       Severity: ${alert.advisory?.severity}

@@ -2,7 +2,7 @@ import { IncomingWebhook } from '@slack/webhook'
 import { KnownBlock } from '@slack/types'
 
 import { ACTION_ICON, ACTION_SHORT_SUMMARY } from '../constants'
-import { Alert } from '../entities'
+import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 
 export const MAX_COUNT_SLACK = 30
 
@@ -33,7 +33,8 @@ const createAlertBlock = (alert: Alert): KnownBlock => ({
   text: {
     type: 'mrkdwn',
     text: `
-*Package name:* ${alert.packageName}
+*Package:* ${alert.packageName}
+*Repository:* ${getFullRepositoryNameFromAlert(alert)}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}

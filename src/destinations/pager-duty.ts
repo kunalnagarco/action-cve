@@ -12,7 +12,7 @@ export const sendAlertsToPagerDuty = async (
       routing_key: integrationKey,
       event_action: 'trigger',
       payload: {
-        summary: `You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}`,
+        summary: `You have ${alerts.length} vulnerabilities`,
         source: 'GitHub Dependabot Alerts',
         severity: 'info',
         custom_details: { ...alerts },

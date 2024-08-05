@@ -40,7 +40,7 @@ async function run(): Promise<void> {
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
 
-    let alerts: Alert[]
+    let alerts: Alert[] = []
     if (org) {
       alerts = await fetchOrgAlerts(token, org, severity, ecosystem, count)
     } else if (enterprise) {
@@ -52,7 +52,7 @@ async function run(): Promise<void> {
         count,
       )
     } else {
-      const { owner, repo } = context.repo
+      const { owner = 'kunalnagar', repo = 'cve-base' } = context.repo
       alerts = await fetchRepositoryAlerts(
         token,
         repo,

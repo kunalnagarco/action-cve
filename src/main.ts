@@ -1,5 +1,5 @@
 import { getInput, setFailed } from '@actions/core'
-import { context } from '@actions/github'
+// import { context } from '@actions/github'
 
 import {
   sendAlertsToMicrosoftTeams,
@@ -52,7 +52,9 @@ async function run(): Promise<void> {
         count,
       )
     } else {
-      const { owner = 'kunalnagar', repo = 'cve-base' } = context.repo
+      // const { owner, repo } = context.repo
+      const owner = 'kunalnagar'
+      const repo = 'cve-base'
       alerts = await fetchRepositoryAlerts(
         token,
         repo,

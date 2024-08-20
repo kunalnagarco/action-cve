@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/kunalnagarco/action-cve/compare/v1.14.0...v1.14.1) (2024-08-20)
+
+
+### Chores
+
+* Upgrade deps ([#191](https://github.com/kunalnagarco/action-cve/issues/191)) ([435c631](https://github.com/kunalnagarco/action-cve/commit/435c6311d7de02f766307ad3a74ae9aa943d7dd4))
+
 ## [1.14.0](https://github.com/kunalnagarco/action-cve/compare/v1.13.3...v1.14.0) (2024-08-05)
 
 

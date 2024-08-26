@@ -35,6 +35,7 @@ const createAlertBlock = (alert: Alert): KnownBlock => ({
     text: `
 *Package:* ${alert.packageName}
 *Repository:* ${getFullRepositoryNameFromAlert(alert)}
+*Manifest path:* ${alert.manifestPath}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}

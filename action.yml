@@ -43,6 +43,8 @@ inputs:
     description: 'Comma separated list of severities. E.g. low,medium,high,critical (NO SPACES BETWEEN COMMA AND SEVERITY)'
   ecosystem:
     description: 'A comma-separated list of ecosystems. If specified, only alerts for these ecosystems will be returned.'
+  manifest_paths:
+    description: 'Multi-line list of manifest paths. If specified, only alerts for these manifests will be sent.'
 branding:
   icon: 'alert-octagon'
   color: 'red'

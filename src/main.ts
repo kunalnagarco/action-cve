@@ -23,6 +23,7 @@ async function run(): Promise<void> {
     const enterprise = getInput('enterprise')
     const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
+    const slackChannel = getInput('slack_channel')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const zenDutyApiKey = getInput('zenduty_api_key')
     const zenDutyServiceId = getInput('zenduty_service_id')
@@ -87,7 +88,7 @@ async function run(): Promise<void> {
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {
-          await sendAlertsToSlack(slackWebhookUrl, alerts)
+          await sendAlertsToSlack(slackWebhookUrl, slackChannel, alerts)
         }
       }
       if (pagerDutyIntegrationKey) {

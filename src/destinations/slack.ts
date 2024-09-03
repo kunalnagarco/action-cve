@@ -62,9 +62,12 @@ export const validateSlackWebhookUrl = (url: string): boolean => {
 
 export const sendAlertsToSlack = async (
   webhookUrl: string,
+  channel: string,
   alerts: Alert[],
 ): Promise<void> => {
-  const webhook = new IncomingWebhook(webhookUrl)
+  const webhook = new IncomingWebhook(webhookUrl, {
+    channel,
+  })
   const alertBlocks: KnownBlock[] = []
   alerts.forEach((alert) => {
     alertBlocks.push(createAlertBlock(alert))

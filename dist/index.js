@@ -267,8 +267,10 @@ const validateSlackWebhookUrl = (url) => {
     return regexPattern.test(url);
 };
 exports.validateSlackWebhookUrl = validateSlackWebhookUrl;
-const sendAlertsToSlack = async (webhookUrl, alerts) => {
-    const webhook = new webhook_1.IncomingWebhook(webhookUrl);
+const sendAlertsToSlack = async (webhookUrl, channel, alerts) => {
+    const webhook = new webhook_1.IncomingWebhook(webhookUrl, {
+        channel,
+    });
     const alertBlocks = [];
     alerts.forEach((alert) => {
         alertBlocks.push(createAlertBlock(alert));
@@ -82651,6 +82653,7 @@ async function run() {
         const enterprise = (0, core_1.getInput)('enterprise');
         const microsoftTeamsWebhookUrl = (0, core_1.getInput)('microsoft_teams_webhook');
         const slackWebhookUrl = (0, core_1.getInput)('slack_webhook');
+        const slackChannel = (0, core_1.getInput)('slack_channel');
         const pagerDutyIntegrationKey = (0, core_1.getInput)('pager_duty_integration_key');
         const zenDutyApiKey = (0, core_1.getInput)('zenduty_api_key');
         const zenDutyServiceId = (0, core_1.getInput)('zenduty_service_id');
@@ -82690,7 +82693,7 @@ async function run() {
                     (0, core_1.setFailed)(new Error('Invalid Slack Webhook URL'));
                 }
                 else {
-                    await (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, alerts);
+                    await (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, slackChannel, alerts);
                 }
             }
             if (pagerDutyIntegrationKey) {

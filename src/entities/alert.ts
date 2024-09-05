@@ -10,6 +10,7 @@ export type DependabotAlert =
 export interface Alert {
   repository: Repository
   packageName: string
+  manifestPath?: string
   advisory?: Advisory
   vulnerability?: Vulnerability
   createdAt: string
@@ -25,6 +26,7 @@ export const toRepositoryAlert = (
     owner: repositoryOwner,
   },
   packageName: dependabotAlert.security_vulnerability.package.name || '',
+  manifestPath: dependabotAlert.dependency.manifest_path,
   advisory: dependabotAlert.security_advisory
     ? toAdvisory(dependabotAlert.security_advisory)
     : undefined,
@@ -43,6 +45,7 @@ export const toOrgAlert = (dependabotOrgAlert: DependabotOrgAlert): Alert => ({
     owner: dependabotOrgAlert.repository.owner.login,
   },
   packageName: dependabotOrgAlert.security_vulnerability.package.name || '',
+  manifestPath: dependabotOrgAlert.dependency.manifest_path,
   advisory: dependabotOrgAlert.security_advisory
     ? toAdvisory(dependabotOrgAlert.security_advisory)
     : undefined,
@@ -64,6 +67,7 @@ export const toEnterpriseAlert = (
   },
   packageName:
     dependabotEnterpriseAlert.security_vulnerability.package.name || '',
+  manifestPath: dependabotEnterpriseAlert.dependency.manifest_path,
   advisory: dependabotEnterpriseAlert.security_advisory
     ? toAdvisory(dependabotEnterpriseAlert.security_advisory)
     : undefined,

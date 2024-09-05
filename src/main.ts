@@ -1,4 +1,4 @@
-import { getInput, setFailed } from '@actions/core'
+import { getInput, getMultilineInput, setFailed } from '@actions/core'
 import { context } from '@actions/github'
 
 import {
@@ -23,6 +23,7 @@ async function run(): Promise<void> {
     const enterprise = getInput('enterprise')
     const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
+    const slackChannel = getInput('slack_channel')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const zenDutyApiKey = getInput('zenduty_api_key')
     const zenDutyServiceId = getInput('zenduty_service_id')
@@ -39,12 +40,19 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'))
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
+    const manifestPaths = getMultilineInput('manifest_paths')
 
-    let alerts: Alert[] = []
+    let fetchedAlerts: Alert[] = []
     if (org) {
-      alerts = await fetchOrgAlerts(token, org, severity, ecosystem, count)
+      fetchedAlerts = await fetchOrgAlerts(
+        token,
+        org,
+        severity,
+        ecosystem,
+        count,
+      )
     } else if (enterprise) {
-      alerts = await fetchEnterpriseAlerts(
+      fetchedAlerts = await fetchEnterpriseAlerts(
         token,
         org,
         severity,
@@ -53,7 +61,7 @@ async function run(): Promise<void> {
       )
     } else {
       const { owner, repo } = context.repo
-      alerts = await fetchRepositoryAlerts(
+      fetchedAlerts = await fetchRepositoryAlerts(
         token,
         repo,
         owner,
@@ -62,6 +70,16 @@ async function run(): Promise<void> {
         count,
       )
     }
+    const alerts =
+      manifestPaths.length > 0
+        ? fetchedAlerts.filter(
+            (alert) =>
+              alert.manifestPath &&
+              manifestPaths.some(
+                (manifestPath) => manifestPath === alert.manifestPath,
+              ),
+          )
+        : fetchedAlerts
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)
@@ -70,7 +88,7 @@ async function run(): Promise<void> {
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {
-          await sendAlertsToSlack(slackWebhookUrl, alerts)
+          await sendAlertsToSlack(slackWebhookUrl, slackChannel, alerts)
         }
       }
       if (pagerDutyIntegrationKey) {

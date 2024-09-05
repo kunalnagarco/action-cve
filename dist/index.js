@@ -244,6 +244,7 @@ const createAlertBlock = (alert) => ({
         text: `
 *Package:* ${alert.packageName}
 *Repository:* ${(0, entities_1.getFullRepositoryNameFromAlert)(alert)}
+*Manifest path:* ${alert.manifestPath}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}
@@ -266,8 +267,10 @@ const validateSlackWebhookUrl = (url) => {
     return regexPattern.test(url);
 };
 exports.validateSlackWebhookUrl = validateSlackWebhookUrl;
-const sendAlertsToSlack = async (webhookUrl, alerts) => {
-    const webhook = new webhook_1.IncomingWebhook(webhookUrl);
+const sendAlertsToSlack = async (webhookUrl, channel, alerts) => {
+    const webhook = new webhook_1.IncomingWebhook(webhookUrl, {
+        channel,
+    });
     const alertBlocks = [];
     alerts.forEach((alert) => {
         alertBlocks.push(createAlertBlock(alert));
@@ -377,6 +380,7 @@ const toRepositoryAlert = (dependabotAlert, repositoryName, repositoryOwner) => 
         owner: repositoryOwner,
     },
     packageName: dependabotAlert.security_vulnerability.package.name || '',
+    manifestPath: dependabotAlert.dependency.manifest_path,
     advisory: dependabotAlert.security_advisory
         ? (0, advisory_1.toAdvisory)(dependabotAlert.security_advisory)
         : undefined,
@@ -392,6 +396,7 @@ const toOrgAlert = (dependabotOrgAlert) => ({
         owner: dependabotOrgAlert.repository.owner.login,
     },
     packageName: dependabotOrgAlert.security_vulnerability.package.name || '',
+    manifestPath: dependabotOrgAlert.dependency.manifest_path,
     advisory: dependabotOrgAlert.security_advisory
         ? (0, advisory_1.toAdvisory)(dependabotOrgAlert.security_advisory)
         : undefined,
@@ -407,6 +412,7 @@ const toEnterpriseAlert = (dependabotEnterpriseAlert) => ({
         owner: dependabotEnterpriseAlert.repository.owner.login,
     },
     packageName: dependabotEnterpriseAlert.security_vulnerability.package.name || '',
+    manifestPath: dependabotEnterpriseAlert.dependency.manifest_path,
     advisory: dependabotEnterpriseAlert.security_advisory
         ? (0, advisory_1.toAdvisory)(dependabotEnterpriseAlert.security_advisory)
         : undefined,
@@ -82647,6 +82653,7 @@ async function run() {
         const enterprise = (0, core_1.getInput)('enterprise');
         const microsoftTeamsWebhookUrl = (0, core_1.getInput)('microsoft_teams_webhook');
         const slackWebhookUrl = (0, core_1.getInput)('slack_webhook');
+        const slackChannel = (0, core_1.getInput)('slack_channel');
         const pagerDutyIntegrationKey = (0, core_1.getInput)('pager_duty_integration_key');
         const zenDutyApiKey = (0, core_1.getInput)('zenduty_api_key');
         const zenDutyServiceId = (0, core_1.getInput)('zenduty_service_id');
@@ -82661,17 +82668,22 @@ async function run() {
         const count = parseInt((0, core_1.getInput)('count'));
         const severity = (0, core_1.getInput)('severity');
         const ecosystem = (0, core_1.getInput)('ecosystem');
-        let alerts = [];
+        const manifestPaths = (0, core_1.getMultilineInput)('manifest_paths');
+        let fetchedAlerts = [];
         if (org) {
-            alerts = await (0, fetch_alerts_1.fetchOrgAlerts)(token, org, severity, ecosystem, count);
+            fetchedAlerts = await (0, fetch_alerts_1.fetchOrgAlerts)(token, org, severity, ecosystem, count);
         }
         else if (enterprise) {
-            alerts = await (0, fetch_alerts_1.fetchEnterpriseAlerts)(token, org, severity, ecosystem, count);
+            fetchedAlerts = await (0, fetch_alerts_1.fetchEnterpriseAlerts)(token, org, severity, ecosystem, count);
         }
         else {
             const { owner, repo } = github_1.context.repo;
-            alerts = await (0, fetch_alerts_1.fetchRepositoryAlerts)(token, repo, owner, severity, ecosystem, count);
+            fetchedAlerts = await (0, fetch_alerts_1.fetchRepositoryAlerts)(token, repo, owner, severity, ecosystem, count);
         }
+        const alerts = manifestPaths.length > 0
+            ? fetchedAlerts.filter((alert) => alert.manifestPath &&
+                manifestPaths.some((manifestPath) => manifestPath === alert.manifestPath))
+            : fetchedAlerts;
         if (alerts.length > 0) {
             if (microsoftTeamsWebhookUrl) {
                 await (0, destinations_1.sendAlertsToMicrosoftTeams)(microsoftTeamsWebhookUrl, alerts);
@@ -82681,7 +82693,7 @@ async function run() {
                     (0, core_1.setFailed)(new Error('Invalid Slack Webhook URL'));
                 }
                 else {
-                    await (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, alerts);
+                    await (0, destinations_1.sendAlertsToSlack)(slackWebhookUrl, slackChannel, alerts);
                 }
             }
             if (pagerDutyIntegrationKey) {

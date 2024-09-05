@@ -35,6 +35,7 @@ const createAlertBlock = (alert: Alert): KnownBlock => ({
     text: `
 *Package:* ${alert.packageName}
 *Repository:* ${getFullRepositoryNameFromAlert(alert)}
+*Manifest path:* ${alert.manifestPath}
 *Vulnerability Version Range:* ${alert.vulnerability?.vulnerableVersionRange}
 *Patched Version:* ${alert.vulnerability?.firstPatchedVersion}
 *Severity:* ${alert.advisory?.severity}
@@ -61,9 +62,12 @@ export const validateSlackWebhookUrl = (url: string): boolean => {
 
 export const sendAlertsToSlack = async (
   webhookUrl: string,
+  channel: string,
   alerts: Alert[],
 ): Promise<void> => {
-  const webhook = new IncomingWebhook(webhookUrl)
+  const webhook = new IncomingWebhook(webhookUrl, {
+    channel,
+  })
   const alertBlocks: KnownBlock[] = []
   alerts.forEach((alert) => {
     alertBlocks.push(createAlertBlock(alert))

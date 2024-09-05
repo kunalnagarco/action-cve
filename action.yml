@@ -12,6 +12,10 @@ inputs:
     description: 'Microsoft Teams Channel Webhook URL. More info: https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook'
   slack_webhook:
     description: 'Slack Webhook URL. More info: https://api.slack.com/messaging/webhooks'
+  slack_channel:
+    description: 'Explicit channel for Slack webhook. If omitted, the channel configured in the webhook is used.'
+    required: false
+    default: ''
   pager_duty_integration_key:
     description: 'Pager Duty Integration Key. More info: https://support.pagerduty.com/docs/services-and-integrations'
   zenduty_api_key:
@@ -43,6 +47,8 @@ inputs:
     description: 'Comma separated list of severities. E.g. low,medium,high,critical (NO SPACES BETWEEN COMMA AND SEVERITY)'
   ecosystem:
     description: 'A comma-separated list of ecosystems. If specified, only alerts for these ecosystems will be returned.'
+  manifest_paths:
+    description: 'Multi-line list of manifest paths. If specified, only alerts for these manifests will be sent.'
 branding:
   icon: 'alert-octagon'
   color: 'red'

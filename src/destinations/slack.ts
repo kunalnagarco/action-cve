@@ -45,11 +45,11 @@ const createAlertBlock = (alert: Alert): KnownBlock => ({
     type: 'button',
     text: {
       type: 'plain_text',
-      text: 'View Advisory',
+      text: 'View Link',
       emoji: true,
     },
     style: 'danger',
-    url: alert.advisory?.url,
+    url: alert.url,
   },
 })
 

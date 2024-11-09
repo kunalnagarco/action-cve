@@ -13,6 +13,7 @@ export interface Alert {
   advisory?: Advisory
   vulnerability?: Vulnerability
   createdAt: string
+  url?: string
 }
 
 export const toRepositoryAlert = (
@@ -32,6 +33,7 @@ export const toRepositoryAlert = (
     ? toVulnerability(dependabotAlert.security_vulnerability)
     : undefined,
   createdAt: dependabotAlert.created_at,
+  url: dependabotAlert.html_url,
 })
 
 export type DependabotOrgAlert =
@@ -50,6 +52,7 @@ export const toOrgAlert = (dependabotOrgAlert: DependabotOrgAlert): Alert => ({
     ? toVulnerability(dependabotOrgAlert.security_vulnerability)
     : undefined,
   createdAt: dependabotOrgAlert.created_at,
+  url: dependabotOrgAlert.html_url,
 })
 
 export type DependabotEnterpriseAlert =
@@ -71,4 +74,5 @@ export const toEnterpriseAlert = (
     ? toVulnerability(dependabotEnterpriseAlert.security_vulnerability)
     : undefined,
   createdAt: dependabotEnterpriseAlert.created_at,
+  url: dependabotEnterpriseAlert.html_url,
 })

@@ -21,14 +21,20 @@ export const fetchRepositoryAlerts = async (
       fetch,
     },
   })
-  const response = await octokit.dependabot.listAlertsForRepo({
-    owner: repositoryOwner,
-    repo: repositoryName,
-    state: 'open',
-    severity,
-    ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
-    per_page: count,
-  })
+  let response;
+  try {
+    response = await octokit.dependabot.listAlertsForRepo({
+      owner: repositoryOwner,
+      repo: repositoryName,
+      state: 'open',
+      severity,
+      ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
+      per_page: count,
+    });
+  } catch (error) {
+    console.error('Error fetching repo alerts', error)
+    throw error
+  }
   const alerts: Alert[] = response.data.map((dependabotAlert) =>
     toRepositoryAlert(dependabotAlert, repositoryName, repositoryOwner),
   )
@@ -48,13 +54,19 @@ export const fetchOrgAlerts = async (
       fetch,
     },
   })
-  const response = await octokit.dependabot.listAlertsForOrg({
-    org,
-    state: 'open',
-    severity,
-    ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
-    per_page: count,
-  })
+  let response;
+  try {
+    response = await octokit.dependabot.listAlertsForOrg({
+      org,
+      state: 'open',
+      severity,
+      ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
+      per_page: count,
+    })
+  } catch (error) {
+    console.error('Error fetching org alerts', error)
+    throw error
+  }
   const alerts: Alert[] = response.data.map((dependabotOrgAlert) =>
     toOrgAlert(dependabotOrgAlert),
   )
@@ -74,13 +86,19 @@ export const fetchEnterpriseAlerts = async (
       fetch,
     },
   })
-  const response = await octokit.dependabot.listAlertsForEnterprise({
-    enterprise,
-    state: 'open',
-    severity,
-    ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
-    per_page: count,
-  })
+  let response;
+  try {
+    response = await octokit.dependabot.listAlertsForEnterprise({
+      enterprise,
+      state: 'open',
+      severity,
+      ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
+      per_page: count,
+    })
+  } catch (error) {
+    console.error('Error fetching enterprise alerts', error)
+    throw error
+  }
   const alerts: Alert[] = response.data.map((dependabotEnterpriseAlert) =>
     toEnterpriseAlert(dependabotEnterpriseAlert),
   )

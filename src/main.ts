@@ -62,11 +62,13 @@ async function run(): Promise<void> {
         count,
       )
     }
+    console.log(`Got ${alerts.length} alerts`);
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)
       }
       if (slackWebhookUrl) {
+        console.log('Slack Webhook URL Validity:', validateSlackWebhookUrl(slackWebhookUrl));
         if (!validateSlackWebhookUrl(slackWebhookUrl)) {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {

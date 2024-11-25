@@ -62,6 +62,7 @@ async function run(): Promise<void> {
         count,
       )
     }
+    console.log('Alerts:', alerts);
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)

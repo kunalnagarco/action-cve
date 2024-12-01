@@ -67,7 +67,7 @@
     "@types/nodemailer": "6.4.15",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "@vercel/ncc": "0.38.1",
+    "@vercel/ncc": "0.38.3",
     "conventional-changelog-conventionalcommits": "7.0.2",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.3](https://github.com/kunalnagarco/action-cve/compare/v1.14.2...v1.14.3) (2024-12-01)
+
+
+### Chores
+
+* **deps:** update dependency @types/jest to v29.5.14 ([8b88c59](https://github.com/kunalnagarco/action-cve/commit/8b88c593d661975ef24d1c3e1912aaf0c01991d6))
+
 ## [1.14.2](https://github.com/kunalnagarco/action-cve/compare/v1.14.1...v1.14.2) (2024-11-01)
 
 

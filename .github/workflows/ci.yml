@@ -34,6 +34,7 @@ jobs:
           # slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
           # severity: low,medium
           # ecosystem: npm,rubygems
+          # ignore_packages: foo#CVE-2021-21291,foo#CVE-2021-21292,bar
           # count: 20
           # pager_duty_integration_key: ${{ secrets.PAGER_DUTY_INTEGRATION_KEY }}
           # zenduty_api_key: ${{ secrets.ZENDUTY_API_KEY }}

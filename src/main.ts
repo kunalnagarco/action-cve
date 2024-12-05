@@ -39,16 +39,20 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'))
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
+    const ignoreDependencies = (
+      getInput('ignore_dependencies') || ''
+    ).split(',').map((str: string) => str.trim())
 
     let alerts: Alert[] = []
     if (org) {
-      alerts = await fetchOrgAlerts(token, org, severity, ecosystem, count)
+      alerts = await fetchOrgAlerts(token, org, severity, ecosystem, ignoreDependencies, count)
     } else if (enterprise) {
       alerts = await fetchEnterpriseAlerts(
         token,
         org,
         severity,
         ecosystem,
+        ignoreDependencies,
         count,
       )
     } else {
@@ -59,6 +63,7 @@ async function run(): Promise<void> {
         owner,
         severity,
         ecosystem,
+        ignoreDependencies,
         count,
       )
     }

@@ -13,6 +13,7 @@ export const fetchRepositoryAlerts = async (
   repositoryOwner: string,
   severity: string,
   ecosystem: string,
+  ignoreDependencies: string[],
   count: number,
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
@@ -29,9 +30,14 @@ export const fetchRepositoryAlerts = async (
     ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })
-  const alerts: Alert[] = response.data.map((dependabotAlert) =>
-    toRepositoryAlert(dependabotAlert, repositoryName, repositoryOwner),
-  )
+  const alerts: Alert[] = response
+                            .data
+                            .filter((dependabotAlert) =>
+                              !ignoreDependencies.includes(dependabotAlert.security_vulnerability.package.name)
+                            )
+                            .map((dependabotAlert) =>
+                              toRepositoryAlert(dependabotAlert, repositoryName, repositoryOwner),
+                            )
   return alerts
 }
 
@@ -40,6 +46,7 @@ export const fetchOrgAlerts = async (
   org: string,
   severity: string,
   ecosystem: string,
+  ignoreDependencies: string[],
   count: number,
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
@@ -55,9 +62,14 @@ export const fetchOrgAlerts = async (
     ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })
-  const alerts: Alert[] = response.data.map((dependabotOrgAlert) =>
-    toOrgAlert(dependabotOrgAlert),
-  )
+  const alerts: Alert[] = response
+                            .data
+                            .filter((dependabotOrgAlert) =>
+                              !ignoreDependencies.includes(dependabotOrgAlert.security_vulnerability.package.name)
+                            )
+                            .map((dependabotOrgAlert) =>
+                              toOrgAlert(dependabotOrgAlert),
+                            )
   return alerts
 }
 
@@ -66,6 +78,7 @@ export const fetchEnterpriseAlerts = async (
   enterprise: string,
   severity: string,
   ecosystem: string,
+  ignoreDependencies: string[],
   count: number,
 ): Promise<Alert[] | []> => {
   const octokit = new Octokit({
@@ -81,8 +94,13 @@ export const fetchEnterpriseAlerts = async (
     ecosystem: ecosystem.length > 0 ? ecosystem : undefined,
     per_page: count,
   })
-  const alerts: Alert[] = response.data.map((dependabotEnterpriseAlert) =>
-    toEnterpriseAlert(dependabotEnterpriseAlert),
-  )
+  const alerts: Alert[] = response
+                            .data
+                            .filter((dependabotEnterpriseAlert) =>
+                              !ignoreDependencies.includes(dependabotEnterpriseAlert.security_vulnerability.package.name)
+                            )
+                            .map((dependabotEnterpriseAlert) =>
+                              toEnterpriseAlert(dependabotEnterpriseAlert),
+                            )
   return alerts
 }

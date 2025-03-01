@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.4](https://github.com/kunalnagarco/action-cve/compare/v1.14.3...v1.14.4) (2025-03-01)
+
+
+### Chores
+
+* **deps:** update dependency @vercel/ncc to v0.38.3 ([6fdcd6b](https://github.com/kunalnagarco/action-cve/commit/6fdcd6b4ddce546da34a3d7cb7b39c9ea81d2d2a))
+
 ## [1.14.3](https://github.com/kunalnagarco/action-cve/compare/v1.14.2...v1.14.3) (2024-12-01)
 
 

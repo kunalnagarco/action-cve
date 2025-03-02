@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.6](https://github.com/kunalnagarco/action-cve/compare/v1.14.5...v1.14.6) (2025-03-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @slack/webhook to v7.0.4 ([#197](https://github.com/kunalnagarco/action-cve/issues/197)) ([3a485c1](https://github.com/kunalnagarco/action-cve/commit/3a485c1abe7d2c63751b813b403fadab1fdf32b1))
+
 ## [1.14.5](https://github.com/kunalnagarco/action-cve/compare/v1.14.4...v1.14.5) (2025-03-02)
 
 

@@ -848,7 +848,7 @@ __metadata:
     "@semantic-release/github": "npm:10.1.6"
     "@semantic-release/release-notes-generator": "npm:14.0.1"
     "@slack/types": "npm:2.12.0"
-    "@slack/webhook": "npm:7.0.3"
+    "@slack/webhook": "npm:7.0.4"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:20.16.1"
     "@types/nodemailer": "npm:6.4.15"
@@ -1748,14 +1748,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@slack/webhook@npm:7.0.3":
-  version: 7.0.3
-  resolution: "@slack/webhook@npm:7.0.3"
+"@slack/webhook@npm:7.0.4":
+  version: 7.0.4
+  resolution: "@slack/webhook@npm:7.0.4"
   dependencies:
     "@slack/types": "npm:^2.9.0"
     "@types/node": "npm:>=18.0.0"
-    axios: "npm:^1.7.4"
-  checksum: 10c0/2226042a66679ab2858119d8fda899ca865626ecb76e803a3952fa8018808ee75a553cf62de8411e6e9a704066a0b05b3dace7b4cc461552c73ac9038a28ea40
+    axios: "npm:^1.7.8"
+  checksum: 10c0/43ba1612f7c7bcbb65873ecbbaea5c6fc132d364a2aa8feb3f9df77e814322256a2be102bfe522ab0ecc6cf4768ed16f1fbcce25ed3983509d52b2a390dc713e
   languageName: node
   linkType: hard
 
@@ -2498,14 +2498,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.7.4":
-  version: 1.7.4
-  resolution: "axios@npm:1.7.4"
+"axios@npm:^1.7.8":
+  version: 1.8.1
+  resolution: "axios@npm:1.8.1"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/5ea1a93140ca1d49db25ef8e1bd8cfc59da6f9220159a944168860ad15a2743ea21c5df2967795acb15cbe81362f5b157fdebbea39d53117ca27658bab9f7f17
+  checksum: 10c0/b2e1d5a61264502deee4b50f0a6df0aa3b174c546ccf68c0dff714a2b8863232e0bd8cb5b84f853303e97f242a98260f9bb9beabeafe451ad5af538e9eb7ac22
   languageName: node
   linkType: hard
 

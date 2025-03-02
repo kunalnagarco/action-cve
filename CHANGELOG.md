@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.5](https://github.com/kunalnagarco/action-cve/compare/v1.14.4...v1.14.5) (2025-03-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency adaptivecards to v3.0.5 ([#198](https://github.com/kunalnagarco/action-cve/issues/198)) ([62494ad](https://github.com/kunalnagarco/action-cve/commit/62494ad47cdd5ab39fd5c18bf2cac3c0217204f3))
+
 ## [1.14.4](https://github.com/kunalnagarco/action-cve/compare/v1.14.3...v1.14.4) (2025-03-01)
 
 

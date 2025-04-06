@@ -865,7 +865,7 @@ __metadata:
     eslint-plugin-jest: "npm:^28.8.0"
     eslint-plugin-jsx-a11y: "npm:^6.9.0"
     eslint-plugin-react: "npm:^7.35.0"
-    husky: "npm:9.1.5"
+    husky: "npm:9.1.7"
     jest: "npm:29.7.0"
     lint-staged: "npm:15.2.9"
     nodemailer: "npm:6.9.14"
@@ -4887,12 +4887,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:9.1.5":
-  version: 9.1.5
-  resolution: "husky@npm:9.1.5"
+"husky@npm:9.1.7":
+  version: 9.1.7
+  resolution: "husky@npm:9.1.7"
   bin:
     husky: bin.js
-  checksum: 10c0/f42efb95a026303eb880898760f802d88409780dd72f17781d2dfc302177d4f80b641cf1f1694f53f6d97c536c7397684133d8c8fe4a4426f7460186a7d1c6b8
+  checksum: 10c0/35bb110a71086c48906aa7cd3ed4913fb913823715359d65e32e0b964cb1e255593b0ae8014a5005c66a68e6fa66c38dcfa8056dbbdfb8b0187c0ffe7ee3a58f
   languageName: node
   linkType: hard
 

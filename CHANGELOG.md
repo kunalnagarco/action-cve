@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.8](https://github.com/kunalnagarco/action-cve/compare/v1.14.7...v1.14.8) (2025-04-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @slack/webhook to v7.0.5 ([#199](https://github.com/kunalnagarco/action-cve/issues/199)) ([7f9c093](https://github.com/kunalnagarco/action-cve/commit/7f9c093adafa7538082d96979a21019b529fbd15))
+* **deps:** update octokit monorepo ([#200](https://github.com/kunalnagarco/action-cve/issues/200)) ([6cc7116](https://github.com/kunalnagarco/action-cve/commit/6cc7116c753bc9aab51608896e9ccb8b47839dd3))
+
 ## [1.14.7](https://github.com/kunalnagarco/action-cve/compare/v1.14.6...v1.14.7) (2025-04-01)
 
 

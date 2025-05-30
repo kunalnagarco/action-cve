@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.10](https://github.com/kunalnagarco/action-cve/compare/v1.14.9...v1.14.10) (2025-05-30)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-import to v2.31.0 ([#201](https://github.com/kunalnagarco/action-cve/issues/201)) ([fcd0de3](https://github.com/kunalnagarco/action-cve/commit/fcd0de3af5592347e498706cf3d202a9a779f5bb))
+* **deps:** update dependency eslint-plugin-jest to v28.12.0 ([#202](https://github.com/kunalnagarco/action-cve/issues/202)) ([70f2b23](https://github.com/kunalnagarco/action-cve/commit/70f2b232fea6889172f76835088790ca7633e10e))
+
 ## [1.14.9](https://github.com/kunalnagarco/action-cve/compare/v1.14.8...v1.14.9) (2025-05-01)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.11](https://github.com/kunalnagarco/action-cve/compare/v1.14.10...v1.14.11) (2025-06-01)
+
+
+### Chores
+
+* **deps:** update semantic-release monorepo ([7a0dcaf](https://github.com/kunalnagarco/action-cve/commit/7a0dcafaa11610e689df70154f861154009d54c0))
+
 ## [1.14.10](https://github.com/kunalnagarco/action-cve/compare/v1.14.9...v1.14.10) (2025-05-30)
 
 

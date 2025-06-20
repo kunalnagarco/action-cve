@@ -8,6 +8,8 @@ import {
   sendAlertsToZenduty,
   sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
+  validateMattermostWebhookUrl,
+  sendAlertsToMattermost,
 } from './destinations'
 import {
   fetchRepositoryAlerts,
@@ -24,6 +26,7 @@ async function run(): Promise<void> {
     const enterprise = getInput('enterprise')
     const microsoftTeamsWebhookUrl = getInput('microsoft_teams_webhook')
     const slackWebhookUrl = getInput('slack_webhook')
+    const mattermostWebhookUrl = getInput('mattermost_webhook')
     const pagerDutyIntegrationKey = getInput('pager_duty_integration_key')
     const zenDutyApiKey = getInput('zenduty_api_key')
     const zenDutyServiceId = getInput('zenduty_service_id')
@@ -82,6 +85,13 @@ async function run(): Promise<void> {
           setFailed(new Error('Invalid Slack Webhook URL'))
         } else {
           await sendAlertsToSlack(slackWebhookUrl, alerts)
+        }
+      }
+      if (mattermostWebhookUrl) {
+        if (!validateMattermostWebhookUrl(mattermostWebhookUrl)) {
+          setFailed(new Error('Invalid Mattermost Webhook URL'))
+        } else {
+          await sendAlertsToMattermost(mattermostWebhookUrl, alerts)
         }
       }
       if (pagerDutyIntegrationKey) {

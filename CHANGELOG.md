@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.14](https://github.com/kunalnagarco/action-cve/compare/v1.14.13...v1.14.14) (2025-07-09)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-jsx-a11y to v6.10.2 ([#204](https://github.com/kunalnagarco/action-cve/issues/204)) ([2004da1](https://github.com/kunalnagarco/action-cve/commit/2004da1a90922ac33065bb3db30538eea6143619))
+
 ## [1.14.13](https://github.com/kunalnagarco/action-cve/compare/v1.14.12...v1.14.13) (2025-07-01)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.15](https://github.com/kunalnagarco/action-cve/compare/v1.14.14...v1.14.15) (2025-08-01)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-import to v2.32.0 ([92965dc](https://github.com/kunalnagarco/action-cve/commit/92965dca557b62b00811e7d32c5ca2cc936c45f1))
+
 ## [1.14.14](https://github.com/kunalnagarco/action-cve/compare/v1.14.13...v1.14.14) (2025-07-09)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.16](https://github.com/kunalnagarco/action-cve/compare/v1.14.15...v1.14.16) (2025-11-01)
+
+
+### Chores
+
+* **deps:** update dependency eslint-config-prettier to v9.1.2 ([5dc00a5](https://github.com/kunalnagarco/action-cve/commit/5dc00a57fc72e47cd2cb2d0ebe6565930dc17717))
+
 ## [1.14.15](https://github.com/kunalnagarco/action-cve/compare/v1.14.14...v1.14.15) (2025-08-01)
 
 

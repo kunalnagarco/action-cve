@@ -3,9 +3,7 @@ import { Alert, getFullRepositoryNameFromAlert } from '../entities'
 import { request } from '../utils'
 
 export const sendAlertsToZenduty = async (
-  apiKey: string,
-  serviceId: string,
-  escalationPolicyId: string,
+  zenDutyIntegrationKey: string,
   alerts: Alert[],
 ): Promise<void> => {
   let summary = `
@@ -30,17 +28,13 @@ export const sendAlertsToZenduty = async (
     ---
   `
   const payload = {
-    service: serviceId,
-    escalation_policy: escalationPolicyId,
-    title: `${ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}`,
-    urgency: 0,
-    summary,
+    alert_type: "critical",
+    message: `${ACTION_SHORT_SUMMARY} - ${alerts[0].repository.name}` ,
+    summary: summary,
   }
-  const bearer = `Token ${apiKey}`
-  await request('https://www.zenduty.com/api/incidents/', {
+  await request('https://www.zenduty.com/api/events/${zenDutyIntegrationKey}/', {
     method: 'POST',
     headers: {
-      Authorization: bearer,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),

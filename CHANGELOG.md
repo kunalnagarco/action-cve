@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.18](https://github.com/kunalnagarco/action-cve/compare/v1.14.17...v1.14.18) (2025-12-01)
+
+
+### Chores
+
+* **deps:** update dependency prettier to v3.7.3 ([1edd592](https://github.com/kunalnagarco/action-cve/commit/1edd592144af4ce87db34d1d0a6a74d94feb9a71))
+
 ## [1.14.17](https://github.com/kunalnagarco/action-cve/compare/v1.14.16...v1.14.17) (2025-11-03)
 
 

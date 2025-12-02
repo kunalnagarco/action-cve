@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.19](https://github.com/kunalnagarco/action-cve/compare/v1.14.18...v1.14.19) (2025-12-02)
+
+
+### Chores
+
+* **deps:** update dependency eslint-plugin-jest to v28.14.0 ([#211](https://github.com/kunalnagarco/action-cve/issues/211)) ([4383556](https://github.com/kunalnagarco/action-cve/commit/4383556fabfc0fa3330911fcf67256d62f2a52dd))
+* **deps:** update dependency swiper to v11.2.10 ([#212](https://github.com/kunalnagarco/action-cve/issues/212)) ([d7945a3](https://github.com/kunalnagarco/action-cve/commit/d7945a31176a9bf6f79b6006b7d673054424883c))
+
 ## [1.14.18](https://github.com/kunalnagarco/action-cve/compare/v1.14.17...v1.14.18) (2025-12-01)
 
 

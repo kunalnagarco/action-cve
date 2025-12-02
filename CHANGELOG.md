@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.20](https://github.com/kunalnagarco/action-cve/compare/v1.14.19...v1.14.20) (2025-12-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v7 [security] ([#210](https://github.com/kunalnagarco/action-cve/issues/210)) ([6300a65](https://github.com/kunalnagarco/action-cve/commit/6300a659f76293361ce5eae26a2e6f4837f07c72)), closes [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [#8203](https://github.com/kunalnagarco/action-cve/issues/8203) [/github.com/nodemailer/nodemailer/blob/master/lib/addressparser/index.js#L90](https://github.com/kunalnagarco//github.com/nodemailer/nodemailer/blob/master/lib/addressparser/index.js/issues/L90)
+
 ## [1.14.19](https://github.com/kunalnagarco/action-cve/compare/v1.14.18...v1.14.19) (2025-12-02)
 
 

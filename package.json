@@ -63,7 +63,7 @@
     "@semantic-release/github": "10.3.5",
     "@semantic-release/release-notes-generator": "14.0.3",
     "@types/jest": "29.5.14",
-    "@types/node": "20.16.1",
+    "@types/node": "20.19.27",
     "@types/nodemailer": "6.4.21",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",

@@ -1351,7 +1351,7 @@ __metadata:
     "@semantic-release/github": "npm:10.3.5"
     "@semantic-release/release-notes-generator": "npm:14.0.3"
     "@slack/types": "npm:2.12.0"
-    "@slack/webhook": "npm:7.0.5"
+    "@slack/webhook": "npm:7.0.6"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:20.16.1"
     "@types/nodemailer": "npm:6.4.21"
@@ -2291,14 +2291,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@slack/webhook@npm:7.0.5":
-  version: 7.0.5
-  resolution: "@slack/webhook@npm:7.0.5"
+"@slack/webhook@npm:7.0.6":
+  version: 7.0.6
+  resolution: "@slack/webhook@npm:7.0.6"
   dependencies:
     "@slack/types": "npm:^2.9.0"
     "@types/node": "npm:>=18.0.0"
-    axios: "npm:^1.8.3"
-  checksum: 10c0/051342bdbcd6ecf4e01e279e6b98616fa1008a8d4713308c319441458a383886cc6e1479dc55d03aa6cdddea56be42dbe2940b00da1ce75d8c0c2d395bb1441c
+    axios: "npm:^1.11.0"
+  checksum: 10c0/aea2e538403ca29f69157d7377811770b86c9e8e7b9474ab01b7f1738acddd68500e6ae128dd4a0ff3ff7c245b2b87a34e230eb0cfa699630423a2ecc192b432
   languageName: node
   linkType: hard
 
@@ -3606,14 +3606,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.8.3":
-  version: 1.8.4
-  resolution: "axios@npm:1.8.4"
+"axios@npm:^1.11.0":
+  version: 1.13.2
+  resolution: "axios@npm:1.13.2"
   dependencies:
     follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.0"
+    form-data: "npm:^4.0.4"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/450993c2ba975ffccaf0d480b68839a3b2435a5469a71fa2fb0b8a55cdb2c2ae47e609360b9c1e2b2534b73dfd69e2733a1cf9f8215bee0bcd729b72f801b0ce
+  checksum: 10c0/e8a42e37e5568ae9c7a28c348db0e8cf3e43d06fcbef73f0048669edfe4f71219664da7b6cc991b0c0f01c28a48f037c515263cb79be1f1ae8ff034cd813867b
   languageName: node
   linkType: hard
 
@@ -5662,14 +5662,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "form-data@npm:4.0.0"
+"form-data@npm:^4.0.4":
+  version: 4.0.5
+  resolution: "form-data@npm:4.0.5"
   dependencies:
     asynckit: "npm:^0.4.0"
     combined-stream: "npm:^1.0.8"
+    es-set-tostringtag: "npm:^2.1.0"
+    hasown: "npm:^2.0.2"
     mime-types: "npm:^2.1.12"
-  checksum: 10c0/cb6f3ac49180be03ff07ba3ff125f9eba2ff0b277fb33c7fc47569fc5e616882c5b1c69b9904c4c4187e97dd0419dd03b134174756f296dec62041e6527e2c6e
+  checksum: 10c0/dd6b767ee0bbd6d84039db12a0fa5a2028160ffbfaba1800695713b46ae974a5f6e08b3356c3195137f8530dcd9dfcb5d5ae1eeff53d0db1e5aad863b619ce3b
   languageName: node
   linkType: hard
 

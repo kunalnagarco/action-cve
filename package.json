@@ -82,7 +82,7 @@
     "lint-staged": "15.5.2",
     "prettier": "3.7.3",
     "semantic-release": "23.1.1",
-    "sort-package-json": "2.10.0",
+    "sort-package-json": "2.15.1",
     "swiper": "^11.1.9",
     "ts-jest": "29.2.4",
     "typescript": "5.5.4"

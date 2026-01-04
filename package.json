@@ -85,7 +85,7 @@
     "sort-package-json": "2.10.0",
     "swiper": "^11.1.9",
     "ts-jest": "29.2.4",
-    "typescript": "5.5.4"
+    "typescript": "5.9.3"
   },
   "packageManager": "yarn@4.1.1"
 }

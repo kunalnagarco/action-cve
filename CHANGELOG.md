@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.14.22](https://github.com/kunalnagarco/action-cve/compare/v1.14.21...v1.14.22) (2026-01-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @slack/webhook to v7.0.6 ([#213](https://github.com/kunalnagarco/action-cve/issues/213)) ([7729440](https://github.com/kunalnagarco/action-cve/commit/7729440bfb6f9e884bc8dc814c1f2ae769aa35ee))
+
+
+### Chores
+
+* **deps:** update node.js to v20.19.6 ([#214](https://github.com/kunalnagarco/action-cve/issues/214)) ([fc3d098](https://github.com/kunalnagarco/action-cve/commit/fc3d09822e9f8b988db8ba84c709024586d07ca8))
+
 ## [1.14.21](https://github.com/kunalnagarco/action-cve/compare/v1.14.20...v1.14.21) (2026-01-01)
 
 

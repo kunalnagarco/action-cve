@@ -51,7 +51,7 @@
     "@octokit/types": "^13.5.0",
     "@pagerduty/pdjs": "2.2.4",
     "@slack/types": "2.12.0",
-    "@slack/webhook": "7.0.5",
+    "@slack/webhook": "7.0.6",
     "adaptivecards": "3.0.5",
     "nodemailer": "7.0.11"
   },

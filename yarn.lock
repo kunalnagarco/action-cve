@@ -1351,7 +1351,7 @@ __metadata:
     "@semantic-release/github": "npm:10.3.5"
     "@semantic-release/release-notes-generator": "npm:14.0.3"
     "@slack/types": "npm:2.12.0"
-    "@slack/webhook": "npm:7.0.6"
+    "@slack/webhook": "npm:7.0.7"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:20.19.27"
     "@types/nodemailer": "npm:6.4.21"
@@ -2291,14 +2291,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@slack/webhook@npm:7.0.6":
-  version: 7.0.6
-  resolution: "@slack/webhook@npm:7.0.6"
+"@slack/webhook@npm:7.0.7":
+  version: 7.0.7
+  resolution: "@slack/webhook@npm:7.0.7"
   dependencies:
     "@slack/types": "npm:^2.9.0"
     "@types/node": "npm:>=18.0.0"
-    axios: "npm:^1.11.0"
-  checksum: 10c0/aea2e538403ca29f69157d7377811770b86c9e8e7b9474ab01b7f1738acddd68500e6ae128dd4a0ff3ff7c245b2b87a34e230eb0cfa699630423a2ecc192b432
+    axios: "npm:^1.13.5"
+  checksum: 10c0/df355ffbc4f99c00a18d6bca8269be9fa70e39d43b51768c94194fc7475ea13c79e9b7ad6b3ffb2acd2873e67690c662eda724b12bfd2fe51b34215811d762b3
   languageName: node
   linkType: hard
 
@@ -3606,14 +3606,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.11.0":
-  version: 1.13.2
-  resolution: "axios@npm:1.13.2"
+"axios@npm:^1.13.5":
+  version: 1.13.6
+  resolution: "axios@npm:1.13.6"
   dependencies:
-    follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.4"
+    follow-redirects: "npm:^1.15.11"
+    form-data: "npm:^4.0.5"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/e8a42e37e5568ae9c7a28c348db0e8cf3e43d06fcbef73f0048669edfe4f71219664da7b6cc991b0c0f01c28a48f037c515263cb79be1f1ae8ff034cd813867b
+  checksum: 10c0/51fb5af055c3b85662fa97df17d986ae2c37d13bf86d50b6bb36b6b3a2dec6966a1d3a14ab3774b71707b155ae3597ed9b7babdf1a1a863d1a31840cb8e7ec71
   languageName: node
   linkType: hard
 
@@ -5624,13 +5624,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.6":
-  version: 1.15.6
-  resolution: "follow-redirects@npm:1.15.6"
+"follow-redirects@npm:^1.15.11":
+  version: 1.15.11
+  resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 10c0/9ff767f0d7be6aa6870c82ac79cf0368cd73e01bbc00e9eb1c2a16fbb198ec105e3c9b6628bb98e9f3ac66fe29a957b9645bcb9a490bb7aa0d35f908b6b85071
+  checksum: 10c0/d301f430542520a54058d4aeeb453233c564aaccac835d29d15e050beb33f339ad67d9bddbce01739c5dc46a6716dbe3d9d0d5134b1ca203effa11a7ef092343
   languageName: node
   linkType: hard
 
@@ -5662,7 +5662,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.4":
+"form-data@npm:^4.0.5":
   version: 4.0.5
   resolution: "form-data@npm:4.0.5"
   dependencies:

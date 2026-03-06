@@ -1353,7 +1353,7 @@ __metadata:
     "@slack/types": "npm:2.12.0"
     "@slack/webhook": "npm:7.0.6"
     "@types/jest": "npm:29.5.14"
-    "@types/node": "npm:20.19.27"
+    "@types/node": "npm:20.19.37"
     "@types/nodemailer": "npm:6.4.21"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
@@ -2920,12 +2920,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.19.27":
-  version: 20.19.27
-  resolution: "@types/node@npm:20.19.27"
+"@types/node@npm:20.19.37":
+  version: 20.19.37
+  resolution: "@types/node@npm:20.19.37"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/7599c24d80465c1aa6e29b53581fc20ad8862ff33e6eef31d05c1c706868476ee57319c89b802ea972dd4d64ce86d18020aa5344f851fb59b730ea509a63300f
+  checksum: 10c0/8420353aee776ae5c1e9720058949909a0e908fa2af85501e9db2645bb9f9acd7d767890f8aaee34d375e6f8b5f550a9a169e908d2d8cf7d5daf63dce64092a0
   languageName: node
   linkType: hard
 

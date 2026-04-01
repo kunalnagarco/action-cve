@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.24](https://github.com/kunalnagarco/action-cve/compare/v1.14.23...v1.14.24) (2026-04-01)
+
+
+### Chores
+
+* **deps:** update dependency @types/nodemailer to v6.4.23 ([1e1e1b2](https://github.com/kunalnagarco/action-cve/commit/1e1e1b2f510d75914b73642190b26cd3513a281f))
+
 ## [1.14.23](https://github.com/kunalnagarco/action-cve/compare/v1.14.22...v1.14.23) (2026-03-01)
 
 

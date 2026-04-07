@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.14.25](https://github.com/kunalnagarco/action-cve/compare/v1.14.24...v1.14.25) (2026-04-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @slack/webhook to v7.0.8 ([#215](https://github.com/kunalnagarco/action-cve/issues/215)) ([ae995ec](https://github.com/kunalnagarco/action-cve/commit/ae995ecd3b7df1bb998a159ecd07c67bbcf2d333))
+* **deps:** update dependency nodemailer to v8 [security] ([#218](https://github.com/kunalnagarco/action-cve/issues/218)) ([e1acb74](https://github.com/kunalnagarco/action-cve/commit/e1acb74b7af5ce2a59439ac897e6105dbfbc590f))
+
+
+### Chores
+
+* **deps:** update dependency swiper to v12 [security] ([#217](https://github.com/kunalnagarco/action-cve/issues/217)) ([346bc2b](https://github.com/kunalnagarco/action-cve/commit/346bc2bd78ba5fa52af32b336cc9d6e5750c9226))
+* **deps:** update node.js to v20.20.2 ([#216](https://github.com/kunalnagarco/action-cve/issues/216)) ([dfd5ec5](https://github.com/kunalnagarco/action-cve/commit/dfd5ec53f78227ac886545fd88ef81d262bf43ab))
+
 ## [1.14.24](https://github.com/kunalnagarco/action-cve/compare/v1.14.23...v1.14.24) (2026-04-01)
 
 

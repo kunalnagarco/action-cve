@@ -872,7 +872,7 @@ __metadata:
     jest: "npm:29.7.0"
     lint-staged: "npm:15.5.2"
     nodemailer: "npm:8.0.4"
-    prettier: "npm:3.7.3"
+    prettier: "npm:3.8.2"
     semantic-release: "npm:23.1.1"
     sort-package-json: "npm:2.10.0"
     swiper: "npm:^12.0.0"
@@ -8280,12 +8280,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.7.3":
-  version: 3.7.3
-  resolution: "prettier@npm:3.7.3"
+"prettier@npm:3.8.2":
+  version: 3.8.2
+  resolution: "prettier@npm:3.8.2"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/ee86bb06121c74dadc54f30b6f99aff6288966d9b842ce501d6991e20d20c6ce2d45028651b3b0955ca6e5fa89c1bee1e72b6f810243a93cef8bc69737972ef7
+  checksum: 10c0/2d64bd01d269c8dd6d8c423a2a2e1fb88230a53aac523204b327de40059ccf8bd8e6fe70b8ce6154b97ed4442e9fd878504ff8a5330f3a4f64bd13d1576f7652
   languageName: node
   linkType: hard
 

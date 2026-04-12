@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest'
 
-import { Alert } from '../entities'
-import { request } from '../utils'
+import { Alert } from '../../src/entities'
+import { request } from '../../src/utils'
 
-import { sendAlertsToZenduty } from './zenduty'
+import { sendAlertsToZenduty } from '../../src/destinations/zenduty'
 
-vi.mock('../utils', () => ({
+vi.mock('../../src/utils', () => ({
   request: vi.fn().mockResolvedValue(undefined),
 }))
 

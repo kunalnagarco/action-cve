@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 
-import { toRepositoryAlert, toOrgAlert, toEnterpriseAlert } from './alert'
-import { getFullRepositoryNameFromAlert } from './repository'
+import { toRepositoryAlert, toOrgAlert, toEnterpriseAlert } from '../../src/entities/alert'
+import { getFullRepositoryNameFromAlert } from '../../src/entities/repository'
 
 const mockRawAlert = {
   security_vulnerability: {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 
-import { request } from '.'
+import { request } from '../../../src/utils/request'
 
 vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true })))
 

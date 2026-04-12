@@ -24,12 +24,12 @@ export default tseslint.config(
       'import-x/no-cycle': 'off',
       'import-x/no-extraneous-dependencies': [
         'error',
-        { devDependencies: ['src/**/*.test.ts', 'vitest.config.ts'] },
+        { devDependencies: ['tests/**/*.test.ts', 'vitest.config.ts'] },
       ],
     },
   },
   {
-    files: ['src/**/*.test.ts'],
+    files: ['tests/**/*.test.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',

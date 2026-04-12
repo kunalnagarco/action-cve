@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { toAdvisory } from './advisory'
+import { toAdvisory } from '../../src/entities/advisory'
 
 const mockSecurityAdvisory = {
   cvss: { score: 9.8 },

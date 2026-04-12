@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { fetchRepositoryAlerts, fetchOrgAlerts, fetchEnterpriseAlerts } from './fetch-alerts'
+import { fetchRepositoryAlerts, fetchOrgAlerts, fetchEnterpriseAlerts } from '../src/fetch-alerts'
 
 const mockRawAlert = {
   security_vulnerability: {

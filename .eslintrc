@@ -13,5 +13,6 @@
     "import/prefer-default-export": "off",
     "import/no-cycle": "off",
     "radix": "off",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": ["src/**/*.test.ts", "vitest.config.ts"] }],
   },
 }

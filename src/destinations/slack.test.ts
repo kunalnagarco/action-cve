@@ -1,7 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
 
-import { sendAlertsToSlack, validateSlackWebhookUrl } from './slack'
 import { Alert } from '../entities'
+
+import { sendAlertsToSlack, validateSlackWebhookUrl } from './slack'
+
+// Split to avoid triggering secret-scanning heuristics on the hooks.slack.com pattern
+const SLACK_BASE = 'https://hooks' + '.slack.com/services'
+const VALID_SLACK_URL = `${SLACK_BASE}/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`
+const STUB_SLACK_URL = `${SLACK_BASE}/T/B/x`
 
 const mockSend = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 
@@ -29,11 +35,6 @@ const mockAlert: Alert = {
   },
   createdAt: '2021-01-01T00:00:00Z',
 }
-
-// Split to avoid triggering secret-scanning heuristics on the hooks.slack.com pattern
-const SLACK_BASE = 'https://hooks' + '.slack.com/services'
-const VALID_SLACK_URL = `${SLACK_BASE}/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`
-const STUB_SLACK_URL = `${SLACK_BASE}/T/B/x`
 
 describe('validateSlackWebhookUrl', () => {
   it('accepts a valid Slack webhook URL', () => {

@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
+import SMTPTransport from 'nodemailer/lib/smtp-transport'
+
+import { ACTION_SHORT_SUMMARY } from '../constants'
+import { Alert } from '../entities'
 
 import { sendAlertsToEmailSmtp } from './email'
-import { Alert } from '../entities'
-import { ACTION_SHORT_SUMMARY } from '../constants'
-import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
 const mockSendMail = vi.fn().mockResolvedValue(undefined)
 const mockCreateTransport = vi.fn().mockReturnValue({ sendMail: mockSendMail })

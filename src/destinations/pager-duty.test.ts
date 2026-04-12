@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 
-import { sendAlertsToPagerDuty } from './pager-duty'
-import { Alert } from '../entities'
 import { ACTION_ICON, ACTION_SHORT_SUMMARY, ACTION_URL } from '../constants'
+import { Alert } from '../entities'
+
+import { sendAlertsToPagerDuty } from './pager-duty'
 
 const mockEvent = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
 

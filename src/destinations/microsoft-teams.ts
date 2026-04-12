@@ -37,6 +37,7 @@ export const sendAlertsToMicrosoftTeams = async (
   webhookUrl: string,
   alerts: Alert[],
 ): Promise<void> => {
+  if (alerts.length === 0) return
   const alertCount = alerts.length
   const repositoryOwner = alerts[0].repository.owner
   const repositoryName = alerts[0].repository.name

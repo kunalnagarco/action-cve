@@ -1,6 +1,8 @@
+import { describe, it, expect, vi } from 'vitest'
+
 import { request } from '.'
 
-global.fetch = jest.fn(() => Promise.resolve({})) as jest.Mock
+vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true })))
 
 const URL = 'someUrl'
 

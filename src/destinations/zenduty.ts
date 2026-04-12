@@ -8,6 +8,7 @@ export const sendAlertsToZenduty = async (
   escalationPolicyId: string,
   alerts: Alert[],
 ): Promise<void> => {
+  if (alerts.length === 0) return
   let summary = `
     You have ${alerts.length} vulnerabilities in ${alerts[0].repository.owner}/${alerts[0].repository.name}
 

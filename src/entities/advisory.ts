@@ -45,7 +45,7 @@ export const toAdvisory = (securityAdvisory: SecurityAdvisory): Advisory => ({
     (securityAdvisory.severity?.toUpperCase() as AdvisorySeverity) || 'LOW',
   summary: securityAdvisory.summary,
   description: securityAdvisory.description || '',
-  url: securityAdvisory.references[0].url,
+  url: securityAdvisory.references?.[0]?.url ?? '',
   publishedAt: securityAdvisory.published_at || '',
   updatedAt: securityAdvisory.updated_at || '',
   withdrawnAt: securityAdvisory.withdrawn_at || '',

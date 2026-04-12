@@ -33,10 +33,11 @@ async function run(): Promise<void> {
     const emailTransportSmtpHost = getInput('email_transport_smtp_host')
     const emailTransportSmtpPort = parseInt(
       getInput('email_transport_smtp_port'),
+      10,
     )
     const emailTransportSmtpUser = getInput('email_transport_smtp_user')
     const emailTransportSmtpPassword = getInput('email_transport_smtp_password')
-    const count = parseInt(getInput('count'))
+    const count = parseInt(getInput('count'), 10)
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
 
@@ -103,7 +104,7 @@ async function run(): Promise<void> {
               pass: emailTransportSmtpPassword,
             },
           }
-          sendAlertsToEmailSmtp(
+          await sendAlertsToEmailSmtp(
             emailTransportSmtpConfig,
             alerts,
             emailList,

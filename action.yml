@@ -14,12 +14,14 @@ inputs:
     description: 'Slack Webhook URL. More info: https://api.slack.com/messaging/webhooks'
   pager_duty_integration_key:
     description: 'Pager Duty Integration Key. More info: https://support.pagerduty.com/docs/services-and-integrations'
+  zenduty_integration_key:
+    description: 'Zenduty Integration Key (preferred). Create a Generic Integration in your Zenduty service to get this key: https://docs.zenduty.com/docs/integrations/integrations'
   zenduty_api_key:
-    description: 'Create a Zenduty API Key by visiting Account Settings > API Keys'
+    description: 'Zenduty API Key (deprecated, use zenduty_integration_key instead). Create one by visiting Account Settings > API Keys'
   zenduty_service_id:
-    description: 'Zenduty Service ID: https://docs.zenduty.com/docs/services'
+    description: 'Zenduty Service ID (only required when using zenduty_api_key): https://docs.zenduty.com/docs/services'
   zenduty_escalation_policy_id:
-    description: 'Zenduty Escalation Policy ID: https://docs.zenduty.com/docs/escalationpolicies'
+    description: 'Zenduty Escalation Policy ID (only required when using zenduty_api_key): https://docs.zenduty.com/docs/escalationpolicies'
   email_from:
     description: 'Sender email'
   email_list:
@@ -37,14 +39,14 @@ inputs:
     default: 'smtp.gmail.com'
   email_transport_smtp_port:
     description: 'SMTP port'
-    default: 587
+    default: '587'
   email_transport_smtp_user:
     description: 'SMTP user'
   email_transport_smtp_password:
     description: 'SMTP password'
   count:
     description: 'Number of vulnerability alerts to send'
-    default: 20
+    default: '20'
   severity:
     description: 'Comma separated list of severities. E.g. low,medium,high,critical (NO SPACES BETWEEN COMMA AND SEVERITY)'
   ecosystem:

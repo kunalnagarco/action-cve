@@ -26,6 +26,12 @@ inputs:
     description: 'Comma-separated list of emails sent as bcc'
   email_subject:
     description: 'Custom subject line for email filtering'
+  email_transport_ses_region:
+    description: 'AWS SES region e.g. us-east-1'
+  email_transport_ses_access_key_id:
+    description: 'AWS SES Access Key ID'
+  email_transport_ses_secret_access_key:
+    description: 'AWS SES Secret Access Key'
   email_transport_smtp_host:
     description: 'SMTP host e.g. smtp.gmail.com'
     default: 'smtp.gmail.com'

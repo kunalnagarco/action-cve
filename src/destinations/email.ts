@@ -1,3 +1,4 @@
+import { SESClient, SendRawEmailCommand } from '@aws-sdk/client-ses'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
@@ -44,6 +45,30 @@ const createEmailBody = (alerts: Alert[]): string => `
     <p>You are receiving this message as you have set up email notifications for vulnerabilities via <a href="${ACTION_URL}">${ACTION_SHORT_SUMMARY}</a>.</p>
     ${createTable(alerts)}
   `
+
+export const sendAlertsToEmailSes = async (
+  region: string,
+  accessKeyId: string,
+  secretAccessKey: string,
+  alerts: Alert[],
+  emailList: string,
+  emailFrom: string,
+  subject?: string,
+): Promise<void> => {
+  const ses = new SESClient({
+    region,
+    credentials: { accessKeyId, secretAccessKey },
+  })
+  const transporter = createTransport({
+    SES: { ses, aws: { SendRawEmailCommand } },
+  })
+  await transporter.sendMail({
+    from: emailFrom,
+    bcc: emailList,
+    subject: subject || ACTION_SHORT_SUMMARY,
+    html: createEmailBody(alerts),
+  })
+}
 
 export const sendAlertsToEmailSmtp = async (
   config: SMTPTransport.Options,

@@ -47,6 +47,7 @@
   "dependencies": {
     "@actions/core": "1.10.1",
     "@actions/github": "6.0.1",
+    "@aws-sdk/client-ses": "^3.1030.0",
     "@octokit/rest": "^20.0.2",
     "@octokit/types": "^13.5.0",
     "@pagerduty/pdjs": "2.2.4",

@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   DependabotAlert,
   DependabotOrgAlert,
-  DependabotEnterpriseAlert,
 } from '../src/entities/alert'
 import { fetchRepositoryAlerts, fetchOrgAlerts, fetchEnterpriseAlerts } from '../src/fetch-alerts'
 
@@ -49,7 +48,7 @@ const mockRawAlert: DependabotAlert = {
   auto_dismissed_at: null,
 }
 
-const mockRawOrgEnterpriseAlert: DependabotOrgAlert & DependabotEnterpriseAlert = {
+const mockRawOrgEnterpriseAlert: DependabotOrgAlert = {
   ...mockRawAlert,
   repository: {
     id: 1,

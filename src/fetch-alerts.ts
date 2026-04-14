@@ -7,6 +7,11 @@ import {
   toEnterpriseAlert,
 } from './entities'
 
+export const filterIgnoredAlerts = (alerts: Alert[], ignoreList: string[]): Alert[] => {
+  if (ignoreList.length === 0) return alerts
+  return alerts.filter((alert) => !ignoreList.includes(alert.packageName))
+}
+
 export const fetchRepositoryAlerts = async (
   gitHubPersonalAccessToken: string,
   repositoryName: string,

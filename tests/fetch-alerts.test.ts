@@ -4,7 +4,7 @@ import {
   DependabotAlert,
   DependabotOrgAlert,
 } from '../src/entities/alert'
-import { fetchRepositoryAlerts, fetchOrgAlerts, fetchEnterpriseAlerts } from '../src/fetch-alerts'
+import { fetchRepositoryAlerts, fetchOrgAlerts, fetchEnterpriseAlerts, filterIgnoredAlerts } from '../src/fetch-alerts'
 
 const mockRawAlert: DependabotAlert = {
   number: 1,
@@ -200,5 +200,33 @@ describe('fetchEnterpriseAlerts', () => {
     expect(mockListAlertsForEnterprise).toHaveBeenCalledWith(
       expect.objectContaining({ ecosystem: undefined }),
     )
+  })
+})
+
+describe('filterIgnoredAlerts', () => {
+  const alerts = [
+    { packageName: 'lodash', repository: { name: 'repo', owner: 'org' }, createdAt: '' },
+    { packageName: 'axios', repository: { name: 'repo', owner: 'org' }, createdAt: '' },
+    { packageName: 'express', repository: { name: 'repo', owner: 'org' }, createdAt: '' },
+  ]
+
+  it('returns all alerts when ignore list is empty', () => {
+    expect(filterIgnoredAlerts(alerts, [])).toHaveLength(3)
+  })
+
+  it('removes a single ignored package', () => {
+    const result = filterIgnoredAlerts(alerts, ['lodash'])
+    expect(result).toHaveLength(2)
+    expect(result.map((a) => a.packageName)).not.toContain('lodash')
+  })
+
+  it('removes multiple ignored packages', () => {
+    const result = filterIgnoredAlerts(alerts, ['lodash', 'axios'])
+    expect(result).toHaveLength(1)
+    expect(result[0].packageName).toBe('express')
+  })
+
+  it('returns all alerts when no packages match the ignore list', () => {
+    expect(filterIgnoredAlerts(alerts, ['moment'])).toHaveLength(3)
   })
 })

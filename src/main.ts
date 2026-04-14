@@ -15,6 +15,7 @@ import {
   fetchRepositoryAlerts,
   fetchOrgAlerts,
   fetchEnterpriseAlerts,
+  filterIgnoredAlerts,
 } from './fetch-alerts'
 import { Alert } from './entities'
 
@@ -46,6 +47,8 @@ async function run(): Promise<void> {
     const count = parseInt(getInput('count'), 10)
     const severity = getInput('severity')
     const ecosystem = getInput('ecosystem')
+    const ignore = getInput('ignore')
+    const ignoreList = ignore ? ignore.split(',') : []
 
     let alerts: Alert[] = []
     if (org) {
@@ -69,6 +72,7 @@ async function run(): Promise<void> {
         count,
       )
     }
+    alerts = filterIgnoredAlerts(alerts, ignoreList)
     if (alerts.length > 0) {
       if (microsoftTeamsWebhookUrl) {
         await sendAlertsToMicrosoftTeams(microsoftTeamsWebhookUrl, alerts)

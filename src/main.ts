@@ -6,6 +6,7 @@ import {
   sendAlertsToPagerDuty,
   sendAlertsToSlack,
   sendAlertsToZenduty,
+  sendAlertsToEmailSes,
   sendAlertsToEmailSmtp,
   validateSlackWebhookUrl,
 } from './destinations'
@@ -30,6 +31,9 @@ async function run(): Promise<void> {
     const emailFrom = getInput('email_from')
     const emailList = getInput('email_list')
     const emailSubject = getInput('email_subject')
+    const emailTransportSesRegion = getInput('email_transport_ses_region')
+    const emailTransportSesAccessKeyId = getInput('email_transport_ses_access_key_id')
+    const emailTransportSesSecretAccessKey = getInput('email_transport_ses_secret_access_key')
     const emailTransportSmtpHost = getInput('email_transport_smtp_host')
     const emailTransportSmtpPort = parseInt(
       getInput('email_transport_smtp_port'),
@@ -94,7 +98,17 @@ async function run(): Promise<void> {
       if (emailFrom && emailList) {
         const emailWikiLink =
           'https://github.com/kunalnagarco/action-cve/wiki/Send-alerts-to-email'
-        if (emailTransportSmtpUser && emailTransportSmtpPassword) {
+        if (emailTransportSesRegion && emailTransportSesAccessKeyId && emailTransportSesSecretAccessKey) {
+          await sendAlertsToEmailSes(
+            emailTransportSesRegion,
+            emailTransportSesAccessKeyId,
+            emailTransportSesSecretAccessKey,
+            alerts,
+            emailList,
+            emailFrom,
+            emailSubject,
+          )
+        } else if (emailTransportSmtpUser && emailTransportSmtpPassword) {
           const emailTransportSmtpConfig = {
             host: emailTransportSmtpHost,
             port: emailTransportSmtpPort,
@@ -114,7 +128,7 @@ async function run(): Promise<void> {
         } else {
           setFailed(
             new Error(
-              `Invalid SMTP config. Please check the wiki for more info: ${emailWikiLink}`,
+              `Invalid email config. Please check the wiki for more info: ${emailWikiLink}`,
             ),
           )
         }

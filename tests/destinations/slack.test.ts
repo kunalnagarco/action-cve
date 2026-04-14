@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import { Alert } from '../../src/entities'
-
 import { sendAlertsToSlack, validateSlackWebhookUrl } from '../../src/destinations/slack'
 
 // Split to avoid triggering secret-scanning heuristics on the hooks.slack.com pattern

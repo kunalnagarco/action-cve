@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest'
 
 import { Alert } from '../../src/entities'
 import { request } from '../../src/utils'
-
 import { sendAlertsToZenduty } from '../../src/destinations/zenduty'
 
 vi.mock('../../src/utils', () => ({

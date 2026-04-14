@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/kunalnagarco/action-cve/compare/v1.14.27...v1.15.0) (2026-04-14)
+
+
+### Features
+
+* add AWS SES email transport ([#222](https://github.com/kunalnagarco/action-cve/issues/222)) ([7e2e41c](https://github.com/kunalnagarco/action-cve/commit/7e2e41cf17273149d6341ab60f1610836f43476f)), closes [#101](https://github.com/kunalnagarco/action-cve/issues/101)
+
 ## [1.14.27](https://github.com/kunalnagarco/action-cve/compare/v1.14.26...v1.14.27) (2026-04-14)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.27](https://github.com/kunalnagarco/action-cve/compare/v1.14.26...v1.14.27) (2026-04-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v8.0.5 [security] ([#220](https://github.com/kunalnagarco/action-cve/issues/220)) ([a371ada](https://github.com/kunalnagarco/action-cve/commit/a371adad63fa9a7e2265eb7645d1eaea76d46adb))
+
 ## [1.14.26](https://github.com/kunalnagarco/action-cve/compare/v1.14.25...v1.14.26) (2026-04-14)
 
 

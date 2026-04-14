@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/kunalnagarco/action-cve/compare/v1.15.0...v1.16.0) (2026-04-14)
+
+
+### Features
+
+* support Zenduty integration key alongside existing API token ([#223](https://github.com/kunalnagarco/action-cve/issues/223)) ([47943b9](https://github.com/kunalnagarco/action-cve/commit/47943b9d2da4e71bed05dbe6c0509caeab90d33d)), closes [#135](https://github.com/kunalnagarco/action-cve/issues/135)
+
 ## [1.15.0](https://github.com/kunalnagarco/action-cve/compare/v1.14.27...v1.15.0) (2026-04-14)
 
 

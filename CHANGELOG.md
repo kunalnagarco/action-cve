@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/kunalnagarco/action-cve/compare/v1.16.0...v1.17.0) (2026-04-14)
+
+
+### Features
+
+* add ignore input to suppress alerts for specific packages ([#224](https://github.com/kunalnagarco/action-cve/issues/224)) ([573b691](https://github.com/kunalnagarco/action-cve/commit/573b691e5c95d7c0bd52f66b518792de2b595c88)), closes [#195](https://github.com/kunalnagarco/action-cve/issues/195)
+
 ## [1.16.0](https://github.com/kunalnagarco/action-cve/compare/v1.15.0...v1.16.0) (2026-04-14)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.26](https://github.com/kunalnagarco/action-cve/compare/v1.14.25...v1.14.26) (2026-04-14)
+
+
+### Bug Fixes
+
+* resolve ESLint errors in test files ([#221](https://github.com/kunalnagarco/action-cve/issues/221)) ([2cdd66c](https://github.com/kunalnagarco/action-cve/commit/2cdd66cf702555b40a31bdfc3abdd8ee0211ed30))
+
 ## [1.14.25](https://github.com/kunalnagarco/action-cve/compare/v1.14.24...v1.14.25) (2026-04-07)
 
 

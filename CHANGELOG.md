@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.1](https://github.com/kunalnagarco/action-cve/compare/v1.17.0...v1.17.1) (2026-06-01)
+
+
+### Chores
+
+* **deps:** update dependency @semantic-release/release-notes-generator to v14.1.1 ([227a154](https://github.com/kunalnagarco/action-cve/commit/227a1543782696dd5ed183ec1b5ac3809b1c88a6))
+
 ## [1.17.0](https://github.com/kunalnagarco/action-cve/compare/v1.16.0...v1.17.0) (2026-04-14)
 
 

@@ -733,7 +733,7 @@ __metadata:
     eslint-plugin-jest: "npm:^29.15.2"
     husky: "npm:9.1.7"
     lint-staged: "npm:15.5.2"
-    nodemailer: "npm:8.0.5"
+    nodemailer: "npm:9.0.1"
     prettier: "npm:3.7.3"
     semantic-release: "npm:23.1.1"
     sort-package-json: "npm:2.10.0"
@@ -6023,10 +6023,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:8.0.5":
-  version: 8.0.5
-  resolution: "nodemailer@npm:8.0.5"
-  checksum: 10c0/5e8450499bd059c56d74ba96fa5f9928de2ecdae0d53c083dba5661d797114c1f9524d30f992d0263cc5a7dcf5a54b9c1d92dc1f766da150c9d0bde7d3798431
+"nodemailer@npm:9.0.1":
+  version: 9.0.1
+  resolution: "nodemailer@npm:9.0.1"
+  checksum: 10c0/4213f01aa211127c1ce33243c5e45e7f831601a933d03fa864cd827b1bd5ea2782cb4b43722bee7028cbc193733d9802dad1120fe67181448eb0b7de52218a37
   languageName: node
   linkType: hard
 

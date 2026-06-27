@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.2](https://github.com/kunalnagarco/action-cve/compare/v1.17.1...v1.17.2) (2026-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @slack/webhook to v7.0.9 ([#225](https://github.com/kunalnagarco/action-cve/issues/225)) ([927dddb](https://github.com/kunalnagarco/action-cve/commit/927dddb70c63caf256d7659e1a94b6cd22dec1c1))
+* **deps:** update dependency nodemailer to v9 [security] ([#227](https://github.com/kunalnagarco/action-cve/issues/227)) ([9d63561](https://github.com/kunalnagarco/action-cve/commit/9d63561d233e192d1979c02a840d3d6fae10b43d))
+
 ## [1.17.1](https://github.com/kunalnagarco/action-cve/compare/v1.17.0...v1.17.1) (2026-06-01)
 
 

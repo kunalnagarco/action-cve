@@ -86411,10 +86411,36 @@ class MailMessage {
                 this.data[key] = options[key];
             }
         });
+
+        // The access flags are a sandbox rather than a message field, so `defaults` counts as
+        // transporter configuration for them. For a transporter plugin it is the only channel
+        // there is, createTransport leaves `options` undefined for one, and the defaults copy
+        // above yields to anything the message already set, which let message data switch the
+        // sandbox back off. Closing is one way here, same as in resolveContent below: either
+        // side may switch a flag on, neither can switch off what the other closed.
+        ['disableFileAccess', 'disableUrlAccess'].forEach(key => {
+            if (!(key in options) && hasOwn(defaults, key)) {
+                this.data[key] = this.data[key] || defaults[key];
+            }
+        });
     }
 
-    resolveContent(...args) {
-        return shared.resolveContent(...args);
+    resolveContent(data, key, options, callback) {
+        // Most plugins call this with the legacy (data, key, callback) signature, which carries
+        // no access policy. The policy belongs to the message, so apply it here. Explicit
+        // options may only tighten it, never reopen what the transporter closed.
+        if (!callback && typeof options === 'function') {
+            callback = options;
+            options = false;
+        }
+        options = options || {};
+
+        const policy = {
+            disableFileAccess: this.data.disableFileAccess || options.disableFileAccess,
+            disableUrlAccess: this.data.disableUrlAccess || options.disableUrlAccess
+        };
+
+        return shared.resolveContent(data, key, policy, callback);
     }
 
     resolveAll(callback) {
@@ -89750,6 +89776,14 @@ class MimeNode {
      * @return {Object} Appended node object
      */
     appendChild(childNode) {
+        // Take the node out of the tree it is in first. Leaving it there keeps it in that
+        // parent's childNodes, so it still streams as part of the old tree while parentNode
+        // already points at the new one, and anything read off the parent chain answers for
+        // the wrong tree.
+        if (childNode.parentNode && childNode.parentNode !== this) {
+            childNode.remove();
+        }
+
         if (childNode.rootNode !== this.rootNode) {
             childNode.rootNode = this.rootNode;
             childNode._nodeId = ++this.rootNode.nodeCounter;
@@ -90533,6 +90567,26 @@ class MimeNode {
     /////// PRIVATE METHODS
 
     /**
+     * Checks an access policy flag for this node and every node above it. The flags are set
+     * from the options the node was built with, and createChild only ever sees the options
+     * the caller passed, so a child of a closed tree starts out open. Reading the answer off
+     * the parent chain keeps it right whatever order the tree was assembled in.
+     *
+     * @param {String} flag Either 'disableFileAccess' or 'disableUrlAccess'
+     * @return {Boolean} true if this node or an ancestor closed that access
+     */
+    _accessDisabled(flag) {
+        let node = this;
+        while (node) {
+            if (node[flag]) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+        return false;
+    }
+
+    /**
      * Detects and returns handle to a stream related with the content.
      *
      * @param {Mixed} content Node content
@@ -90562,7 +90616,7 @@ class MimeNode {
         }
 
         if (content && typeof content.path === 'string' && !content.href) {
-            if (this.disableFileAccess) {
+            if (this._accessDisabled('disableFileAccess')) {
                 contentStream = new PassThrough();
                 setImmediate(() => {
                     const err = new Error('File access rejected for ' + content.path);
@@ -90576,7 +90630,7 @@ class MimeNode {
         }
 
         if (content && typeof content.href === 'string') {
-            if (this.disableUrlAccess) {
+            if (this._accessDisabled('disableUrlAccess')) {
                 contentStream = new PassThrough();
                 setImmediate(() => {
                     const err = new Error('Url access rejected for ' + content.href);
@@ -131627,7 +131681,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"126":{"description":"126 Mail (NetEa
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"nodemailer","version":"9.1.0","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","test:coverage":"c8 node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","format":"prettier --write \\"**/*.{js,json,md}\\"","format:check":"prettier --check \\"**/*.{js,json,md}\\"","lint":"eslint .","lint:fix":"eslint . --fix","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install","test:syntax":"docker run --rm -v \\"$PWD:/app:ro\\" -w /app node:6-alpine node test/syntax-compat.js"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-sesv2":"3.1121.0","bunyan":"1.8.15","c8":"12.0.0","eslint":"10.9.1","eslint-config-prettier":"10.1.8","globals":"17.11.0","libbase64":"1.3.0","libmime":"5.4.2","libqp":"2.1.1","prettier":"3.9.6","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.19.4"},"engines":{"node":">=6.0.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"nodemailer","version":"9.1.1","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","test:coverage":"c8 node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","format":"prettier --write \\"**/*.{js,json,md}\\"","format:check":"prettier --check \\"**/*.{js,json,md}\\"","lint":"eslint .","lint:fix":"eslint . --fix","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install","test:syntax":"docker run --rm -v \\"$PWD:/app:ro\\" -w /app node:6-alpine node test/syntax-compat.js"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-sesv2":"3.1121.0","bunyan":"1.8.15","c8":"12.0.0","eslint":"10.9.1","eslint-config-prettier":"10.1.8","globals":"17.11.0","libbase64":"1.3.0","libmime":"5.4.2","libqp":"2.1.1","prettier":"3.9.6","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.19.4"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

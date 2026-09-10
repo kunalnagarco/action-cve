@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.5](https://github.com/kunalnagarco/action-cve/compare/v1.17.4...v1.17.5) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v9.1.1 [security] ([#229](https://github.com/kunalnagarco/action-cve/issues/229)) ([f0feca3](https://github.com/kunalnagarco/action-cve/commit/f0feca3384031ae10d9c9e00341a95e746b57919))
+
 ## [1.17.4](https://github.com/kunalnagarco/action-cve/compare/v1.17.3...v1.17.4) (2026-09-10)
 
 

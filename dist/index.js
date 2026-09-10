@@ -82959,6 +82959,135 @@ exports.AbortError = AbortError;
 
 
 /**
+ * Restores the quoting of a local part that was read out of a quoted string.
+ *
+ * RFC 5321 allows '@' inside a quoted local part, so handing '"user@evil.com"@good.com'
+ * on as the bare 'user@evil.com@good.com' leaves it to the consumer which '@' splits the
+ * domain off. Getting that wrong is a misrouting vector, so the quotes go back on. The
+ * same holds for the other specials: a ',' or a ';' that loses its quotes reads as a
+ * recipient separator once the consumer puts the address back into a header.
+ *
+ * This module has no dependencies so that it can ship on its own, which is why the two
+ * grammar tests below are spelled out here instead of shared with lib/mime-node. Keeping
+ * only what is ambiguous quoted is deliberate, mime-node applies the stricter RFC 5321
+ * dot-atom rule on top of this when it emits an address.
+ *
+ * @param {String} address Address with an unquoted local part
+ * @return {String} Address with the local part as a quoted-string
+ */
+function _quoteLocalPart(address) {
+    const lastAt = address.lastIndexOf('@');
+    if (lastAt < 0) {
+        // no domain to split off, nothing can be misrouted
+        return address;
+    }
+
+    const user = address.substr(0, lastAt);
+    if (/^[^\s"(),:;<>@[\\\]]+$/.test(user) || /^"(?:[^"\\]|\\[\s\S])*"$/.test(user)) {
+        // a local part that carries no special reads the same with or without the quotes,
+        // and one that is already a complete quoted-string needs nothing either
+        return address;
+    }
+
+    return '"' + user.replace(/["\\]/g, '\\$&') + '"@' + address.substr(lastAt + 1);
+}
+
+/**
+ * Reached for every parsed address, so it is built once rather than per call.
+ */
+const HAS_WHITESPACE = /\s/;
+
+/**
+ * An addr-spec that carries its whitespace legally, inside a quoted local part. The
+ * optional tail is the malformed shape: a real mailbox with wreckage trailing it.
+ */
+const QUOTED_LOCAL_ADDR = /^("(?:[^"\\]|\\[\s\S])*"@\S+)(?:\s+([\s\S]+))?$/;
+
+/**
+ * One run holding a single '@' and no whitespace, the shape an addr-spec has to have.
+ */
+const ADDR_SPEC = /^[^@\s]+@[^@\s]+$/;
+
+/**
+ * The looser reading applied once the strict one finds nothing, which tolerates the
+ * further '@' that a domain should not have but malformed headers carry anyway.
+ */
+const LOOSE_ADDR_SPEC = /^[^@\s]+@\S+$/;
+
+/**
+ * Recovers the addr-spec from an angle-addr that came back holding unquoted whitespace.
+ *
+ * A malformed header can put more than a mailbox between the angle brackets, most often
+ * because the generator wrote the recipient twice: '<user@example.com user@example.com>'
+ * or '<example.com user@example.com>'. Whitespace is not addr-spec, so the whole run can
+ * never be a mailbox anyone could deliver to, and passing it on as the address loses the
+ * recipient that is sitting right there in the header.
+ *
+ * The run that still reads as an addr-spec is kept and whatever is left over becomes
+ * display text rather than being dropped. Candidates are read strictly first and then
+ * under the looser grammar, the same two tiers the unquoted-text branch below applies to
+ * the same problem, so that '<a@b@c.com junk>' and a bare 'a@b@c.com junk' agree on the
+ * recipient. When several runs qualify the first wins, which is what that branch's looser
+ * tier does within a token.
+ *
+ * A quoted local part is left alone: RFC 5321 allows whitespace inside it, so
+ * '<"user name"@example.com>' is well formed and means exactly what it says.
+ *
+ * @param {Object} data Collected address parts, mutated in place
+ */
+function _recoverAddrSpec(data) {
+    if (!HAS_WHITESPACE.test(data.address)) {
+        return;
+    }
+
+    let address;
+    let rest;
+
+    const quoted = data.address.match(QUOTED_LOCAL_ADDR);
+    if (quoted) {
+        if (!quoted[2]) {
+            // the whitespace sits inside the quoted local part, this is a well formed mailbox
+            return;
+        }
+
+        // a real mailbox with wreckage trailing it, so peel the addr-spec off whole rather
+        // than splitting into the quotes
+        address = quoted[1];
+        rest = [quoted[2]];
+    } else {
+        if (data.address.indexOf('"') >= 0) {
+            // Splitting on whitespace loses track of where the quoted string starts and ends,
+            // and this module does not take addresses out of quoted strings: the run picked out
+            // of '<junk "user@evil.com b"@good.com>' would be an address from the domain the
+            // quotes were hiding. Every well formed shape was already handled above, so what is
+            // left is wreckage either way and the original is the honest answer
+            return;
+        }
+
+        const parts = data.address.split(/\s+/);
+
+        let addrIndex = parts.findIndex(part => ADDR_SPEC.test(part));
+        if (addrIndex < 0) {
+            addrIndex = parts.findIndex(part => LOOSE_ADDR_SPEC.test(part));
+        }
+
+        if (addrIndex < 0) {
+            // nothing in there reads as an address, there is no better answer than the original
+            return;
+        }
+
+        address = parts.splice(addrIndex, 1)[0];
+        rest = parts;
+    }
+
+    data.address = address;
+    data.text = [data.text]
+        .concat(rest)
+        .filter(part => part)
+        .join(' ');
+}
+
+/**
  * Converts tokens for a single address into an address object
  *
  * @param {Array} tokens Tokens object
@@ -83013,7 +83142,18 @@ function _handleAddress(tokens, depth) {
                 token.value = token.value.replace(/^[^<]*<\s*/, '');
             }
 
-            if (prevToken && prevToken.noBreak && data[state].length) {
+            // A comment is folding whitespace. It may sit inside an addr-spec, on either side
+            // of the '@', but it cannot join two atoms into one: gluing across it would read
+            // 'user@example.com(x)evil.com' as the single domain 'example.comevil.com' and
+            // deliver to a domain the sender never named.
+            const parts = data[state];
+            const joins =
+                prevToken &&
+                prevToken.noBreak &&
+                parts.length &&
+                (prevToken.value !== ')' || parts[parts.length - 1].slice(-1) === '@' || token.value.charAt(0) === '@');
+
+            if (joins) {
                 data[state][data[state].length - 1] += token.value;
                 if (state === 'text' && insideQuotes) {
                     data.textWasQuoted[data.textWasQuoted.length - 1] = true;
@@ -83061,7 +83201,7 @@ function _handleAddress(tokens, depth) {
                 // Security: Do not extract email addresses from quoted strings.
                 // RFC 5321 allows @ inside quoted local-parts like "user@domain"@example.com.
                 // Extracting emails from quoted text leads to misrouting vulnerabilities.
-                if (!data.textWasQuoted[i] && /^[^@\s]+@[^@\s]+$/.test(data.text[i])) {
+                if (!data.textWasQuoted[i] && ADDR_SPEC.test(data.text[i])) {
                     data.address = data.text.splice(i, 1);
                     data.textWasQuoted.splice(i, 1);
                     break;
@@ -83103,9 +83243,15 @@ function _handleAddress(tokens, depth) {
             data.text = data.text.concat(data.address.splice(1));
         }
 
+        // An address is only taken from unquoted text, so anything left in the text at this
+        // point that still has to serve as the address carries its quoting in this flag
+        const addressFromQuotedText = !data.address.length && data.textWasQuoted.some(wasQuoted => wasQuoted);
+
         // Join values with spaces
         data.text = data.text.join(' ');
         data.address = data.address.join(' ');
+
+        _recoverAddrSpec(data);
 
         const address = {
             address: data.address || data.text || '',
@@ -83118,6 +83264,10 @@ function _handleAddress(tokens, depth) {
             } else {
                 address.address = '';
             }
+        }
+
+        if (addressFromQuotedText && address.address) {
+            address.address = _quoteLocalPart(address.address);
         }
 
         addresses.push(address);
@@ -83139,6 +83289,7 @@ class Tokenizer {
         this.operatorExpecting = '';
         this.node = null;
         this.escaped = false;
+        this.inDomainLiteral = false;
 
         this.list = [];
         /**
@@ -83190,6 +83341,21 @@ class Tokenizer {
      * @param {String} chr Character from the address field
      */
     checkChar(chr, nextChr) {
+        // Track RFC 5322 domain-literals ("[" *dtext "]"). Operator characters such
+        // as the ":" of an IPv6 address-literal (user@[IPv6:2001:db8::1]) are dtext
+        // and must not be treated as the group delimiter while inside the brackets.
+        // Quoted strings and comments are handled separately via operatorExpecting,
+        // so only enter this state when no operator is open. The list separators ","
+        // and ";" are the exception: they always end the literal (and split the
+        // address list) so that an unclosed "[" cannot swallow later recipients.
+        if (!this.escaped && !this.operatorExpecting) {
+            if (!this.inDomainLiteral && chr === '[') {
+                this.inDomainLiteral = true;
+            } else if (this.inDomainLiteral && (chr === ']' || chr === ',' || chr === ';')) {
+                this.inDomainLiteral = false;
+            }
+        }
+
         if (this.escaped) {
             // ignore next condition blocks
         } else if (chr === this.operatorExpecting) {
@@ -83208,7 +83374,7 @@ class Tokenizer {
             this.escaped = false;
 
             return;
-        } else if (!this.operatorExpecting && chr in this.operators) {
+        } else if (!this.operatorExpecting && !this.inDomainLiteral && chr in this.operators) {
             this.node = {
                 type: 'operator',
                 value: chr
@@ -83302,8 +83468,10 @@ function addressparser(str, options) {
 
     addresses.forEach(addr => {
         const handled = _handleAddress(addr, depth);
-        if (handled.length) {
-            parsedAddresses = parsedAddresses.concat(handled);
+        // Appended in place. Rebuilding the accumulator with concat() would copy every
+        // entry collected so far on each address, making a flat list cost O(n^2).
+        for (let i = 0; i < handled.length; i++) {
+            parsedAddresses.push(handled[i]);
         }
     });
 
@@ -83311,14 +83479,20 @@ function addressparser(str, options) {
     // "Joe Foo, PhD <joe@example.com>" is split on the comma into
     // [{name:"Joe Foo", address:""}, {name:"PhD", address:"joe@example.com"}].
     // Recombine: a name-only entry followed by an entry with both name and address.
-    for (let i = parsedAddresses.length - 2; i >= 0; i--) {
+    // Walked back to front so that a run of fragments folds into one entry in a single
+    // pass. Splicing each fragment out of the list instead would cost O(n^2).
+    const mergedAddresses = [];
+    for (let i = parsedAddresses.length - 1; i >= 0; i--) {
         const current = parsedAddresses[i];
-        const next = parsedAddresses[i + 1];
-        if (current.address === '' && current.name && !current.group && next.address && next.name) {
+        const next = mergedAddresses.length ? mergedAddresses[mergedAddresses.length - 1] : null;
+        if (next && current.address === '' && current.name && !current.group && next.address && next.name) {
             next.name = current.name + ', ' + next.name;
-            parsedAddresses.splice(i, 1);
+        } else {
+            mergedAddresses.push(current);
         }
     }
+    mergedAddresses.reverse();
+    parsedAddresses = mergedAddresses;
 
     if (options.flatten) {
         const flatAddresses = [];
@@ -83504,6 +83678,7 @@ const { PassThrough } = __nccwpck_require__(2203);
 const fs = __nccwpck_require__(79896);
 const path = __nccwpck_require__(16928);
 const crypto = __nccwpck_require__(76982);
+const { copyOwnKeys } = __nccwpck_require__(37732);
 
 const DKIM_ALGO = 'sha256';
 const MAX_MESSAGE_SIZE = 2 * 1024 * 1024; // buffer messages larger than this to disk
@@ -83719,7 +83894,11 @@ class DKIM {
 
         let options = this.options;
         if (extraOptions && Object.keys(extraOptions).length) {
-            options = Object.assign({}, extraOptions, this.options);
+            // extraOptions is mail.data._dkim, caller supplied message data. An own
+            // "__proto__" key there would let every option this signer reads and the
+            // transport did not set, such as skipFields, answer from the caller
+            options = copyOwnKeys({}, extraOptions);
+            copyOwnKeys(options, this.options);
         }
 
         const signer = new DKIMSigner(options, this.keys, inputStream, output);
@@ -83920,7 +84099,7 @@ class RelaxedBody extends Transform {
         options = options || {};
         this.chunkBuffer = [];
         this.chunkBufferLen = 0;
-        this.bodyHash = crypto.createHash(options.hashAlgo || 'sha1');
+        this.bodyHash = crypto.createHash(options.hashAlgo || 'sha256');
         this.remainder = '';
         this.byteLength = 0;
 
@@ -84121,15 +84300,20 @@ module.exports = (headers, hashAlgo, bodyHash, options) => {
 module.exports.relaxedHeaders = relaxedHeaders;
 
 function generateDKIMHeader(domainName, keySelector, fieldNames, hashAlgo, bodyHash) {
+    // the caller supplied tag values are interpolated straight into the tag list, and none of
+    // them has any way to carry a control char, DEL, or one of the delimiters that would close
+    // the value and open a tag of its own
+    const cleanTagValue = value => (value || '').toString().replace(/[\x00-\x1f\x7f;=]/g, '');
+
     const dkim = [
         'v=1',
         'a=rsa-' + hashAlgo,
         'c=relaxed/relaxed',
-        'd=' + punycode.toASCII(domainName),
+        'd=' + punycode.toASCII(cleanTagValue(domainName)),
         'q=dns/txt',
-        's=' + keySelector,
+        's=' + cleanTagValue(keySelector),
         'bh=' + bodyHash,
-        'h=' + fieldNames
+        'h=' + cleanTagValue(fieldNames)
     ].join('; ');
 
     return mimeFuncs.foldLines('DKIM-Signature: ' + dkim, 76) + ';\r\n b=';
@@ -84233,6 +84417,7 @@ const ERROR_CODES = {
 
     // Resource errors
     EMAXLIMIT: 'Pool resource limit reached (max messages per connection)',
+    EMAXRECIPIENTS: 'Recipient count exceeds maxRecipients',
 
     // Transport-specific errors
     ESENDMAIL: 'Sendmail command error',
@@ -84554,8 +84739,66 @@ const Cookies = __nccwpck_require__(44312);
 const packageData = __nccwpck_require__(66710);
 const net = __nccwpck_require__(69278);
 const errors = __nccwpck_require__(37633);
+const { isProtoKey } = __nccwpck_require__(37732);
 
 const MAX_REDIRECTS = 5;
+
+// Only genuine TLS settings are taken from options.tls. That object reaches us straight
+// from a user supplied attachment (content.tls), so keys like host, port, path, socketPath
+// or lookup would otherwise repoint the request at a destination that never went through
+// the URL checks below.
+//
+// The source of truth is the tls.connect() option list in the Node docs. A key missing
+// here is dropped silently, so extend this list rather than working around it.
+const TLS_OPTION_KEYS = [
+    'ALPNProtocols',
+    'ca',
+    'cert',
+    'checkServerIdentity',
+    'ciphers',
+    'crl',
+    'dhparam',
+    'ecdhCurve',
+    'honorCipherOrder',
+    'key',
+    'maxVersion',
+    'minVersion',
+    'passphrase',
+    'pfx',
+    'rejectUnauthorized',
+    'secureContext',
+    'secureOptions',
+    'secureProtocol',
+    'servername',
+    'sessionIdContext',
+    'sigalgs'
+];
+
+/**
+ * Resolves a URL only if it is one this module is willing to request.
+ *
+ * urllib.parse throws for a host that contains forbidden bytes, and it is called for
+ * every URL that reaches nmfetch, including ones that arrive from a message attachment
+ * or from a redirect Location header. An uncaught throw here takes the process down,
+ * so a URL that does not parse is reported the same way as one with a scheme we refuse.
+ *
+ * @param {String} url URL to parse
+ * @returns {Object|Boolean} Parsed URL, or false if it is not a usable http(s) URL
+ */
+function parseFetchUrl(url) {
+    let parsed;
+    try {
+        parsed = urllib.parse(url);
+    } catch (_err) {
+        return false;
+    }
+
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return false;
+    }
+
+    return parsed;
+}
 
 module.exports = function (url, options) {
     return nmfetch(url, options);
@@ -84571,6 +84814,30 @@ function nmfetch(url, options) {
     options.redirects = options.redirects || 0;
     options.maxRedirects = isNaN(options.maxRedirects) ? MAX_REDIRECTS : options.maxRedirects;
 
+    const fetchRes = options.fetchRes;
+    const parsed = parseFetchUrl(url);
+
+    if (!parsed) {
+        // Only http(s) URLs can be fetched. Any other scheme (file:, gopher:, a
+        // protocol-relative redirect target etc.) would otherwise be silently served over
+        // plain HTTP, possibly against an unintended host. Bail out before the cookie jar
+        // is touched so a refused URL can not seed it, and release a caller supplied body:
+        // this is the one exit that runs before the error handler below is attached to it,
+        // so an error on that stream would have nowhere to go and the fd or socket behind
+        // it would never be released.
+        if (options.body && typeof options.body.destroy === 'function') {
+            options.body.on('error', () => false);
+            options.body.destroy();
+        }
+        setImmediate(() => {
+            const err = new Error('Unsupported protocol for URL ' + url);
+            err.code = errors.EFETCH;
+            err.sourceUrl = url;
+            fetchRes.emit('error', err);
+        });
+        return fetchRes;
+    }
+
     if (options.cookie) {
         [].concat(options.cookie || []).forEach(cookie => {
             options.cookies.set(cookie, url);
@@ -84578,8 +84845,6 @@ function nmfetch(url, options) {
         options.cookie = false;
     }
 
-    const fetchRes = options.fetchRes;
-    const parsed = urllib.parse(url);
     let method = (options.method || '').toString().trim().toUpperCase() || 'GET';
     let finished = false;
     let cookies;
@@ -84593,6 +84858,10 @@ function nmfetch(url, options) {
     };
 
     Object.keys(options.headers || {}).forEach(key => {
+        // options.headers is the caller's httpHeaders, straight off an attachment
+        if (isProtoKey(key.toLowerCase().trim())) {
+            return;
+        }
         headers[key.toLowerCase().trim()] = options.headers[key];
     });
 
@@ -84676,7 +84945,12 @@ function nmfetch(url, options) {
     };
 
     if (options.tls) {
-        Object.assign(reqOptions, options.tls);
+        // see TLS_OPTION_KEYS
+        Object.keys(options.tls).forEach(key => {
+            if (TLS_OPTION_KEYS.includes(key)) {
+                reqOptions[key] = options.tls[key];
+            }
+        });
     }
 
     if (
@@ -84761,8 +85035,29 @@ function nmfetch(url, options) {
             options.method = 'GET';
             options.body = false;
 
-            const redirectUrl = urllib.resolve(url, res.headers.location);
-            const redirectParsed = urllib.parse(redirectUrl);
+            let redirectUrl;
+            try {
+                redirectUrl = urllib.resolve(url, res.headers.location);
+            } catch (_err) {
+                // the legacy resolver throws on a Location the WHATWG parser also refused,
+                // so fall through to the check below with what the server actually sent
+                redirectUrl = res.headers.location;
+            }
+            const redirectParsed = parseFetchUrl(redirectUrl);
+
+            if (!redirectParsed) {
+                // Refuse the redirect target here rather than leaving it to the recursive
+                // call: that call gets its own `finished` flag and no handle on this
+                // request, so this one would stay open and could emit a second error on
+                // the shared fetchRes once it times out. Callers listen with req.once().
+                finished = true;
+                const err = new Error('Unsupported protocol for URL ' + redirectUrl);
+                err.code = errors.EFETCH;
+                err.sourceUrl = redirectUrl;
+                fetchRes.emit('error', err);
+                req.abort();
+                return;
+            }
 
             // Do not forward credentials when the redirect leaves the original
             // security context: a different host, or a downgrade from https to
@@ -84887,7 +85182,7 @@ class JSONTransport {
         // Sendmail strips this header line by itself
         mail.message.keepBcc = true;
 
-        const envelope = mail.data.envelope || mail.message.getEnvelope();
+        const envelope = mail.message.getEnvelope();
         const messageId = mail.message.messageId();
 
         const recipients = [].concat(envelope.to || []);
@@ -84948,7 +85243,7 @@ module.exports = JSONTransport;
 
 const MimeNode = __nccwpck_require__(26628);
 const mimeFuncs = __nccwpck_require__(10539);
-const { parseDataURI } = __nccwpck_require__(71284);
+const { parseDataURI, copyOwnKeys } = __nccwpck_require__(71284);
 
 /**
  * Creates the object for composing a MimeNode instance out from the mail options
@@ -85149,7 +85444,9 @@ class MailComposer {
                 typeof this.mail.icalEvent === 'object' &&
                 (this.mail.icalEvent.content || this.mail.icalEvent.path || this.mail.icalEvent.href || this.mail.icalEvent.raw)
             ) {
-                icalEvent = Object.assign({}, this.mail.icalEvent);
+                // an own "__proto__" key would make the copy inherit path/href from caller
+                // data, and the mapping below then replaces the content the caller did set
+                icalEvent = copyOwnKeys({}, this.mail.icalEvent);
             } else {
                 icalEvent = {
                     content: this.mail.icalEvent
@@ -85544,7 +85841,7 @@ class MailComposer {
             }
 
             // Return empty content for excessively long data URLs
-            return Object.assign({}, element, {
+            return Object.assign(copyOwnKeys({}, element), {
                 path: false,
                 href: false,
                 content: Buffer.alloc(0),
@@ -85603,6 +85900,13 @@ const MailMessage = __nccwpck_require__(17576);
 const net = __nccwpck_require__(69278);
 const dns = __nccwpck_require__(72250);
 const crypto = __nccwpck_require__(76982);
+
+/**
+ * Recipients allowed on one message unless the caller sets its own maxRecipients. A backstop
+ * against a runaway or hostile recipient list rather than a delivery policy: RFC 5321 only
+ * asks a server to accept 100, so a real send is bounded far below this.
+ */
+const DEFAULT_MAX_RECIPIENTS = 100000;
 
 /**
  * Creates an object for exposing the Mail API
@@ -85779,6 +86083,26 @@ class Mail extends EventEmitter {
             mail.setMailerHeader();
             mail.setPriorityHeaders();
             mail.setListHeaders();
+
+            const maxRecipients = mail.data.maxRecipients === undefined ? DEFAULT_MAX_RECIPIENTS : mail.data.maxRecipients;
+            const recipientCount = mail.message.getEnvelope().to.length;
+
+            if (maxRecipients && recipientCount > maxRecipients) {
+                const err = new Error(
+                    `Message has ${recipientCount} recipients, which is over the ${maxRecipients} allowed by maxRecipients`
+                );
+                err.code = errors.EMAXRECIPIENTS;
+                this.logger.error(
+                    {
+                        err,
+                        tnx: 'transport',
+                        action: 'send'
+                    },
+                    'Send Error: %s',
+                    err.message
+                );
+                return callback(err);
+            }
 
             this._processPlugins('stream', mail, err => {
                 if (err) {
@@ -86055,6 +86379,11 @@ const shared = __nccwpck_require__(71284);
 const MimeNode = __nccwpck_require__(26628);
 const mimeFuncs = __nccwpck_require__(10539);
 
+// Only an own key counts as already set. `key in obj` also matches every member of
+// Object.prototype, which silently drops a transporter default legitimately named
+// toString or constructor.
+const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+
 class MailMessage {
     constructor(mailer, data) {
         this.mailer = mailer;
@@ -86065,26 +86394,19 @@ class MailMessage {
         const options = mailer.options || {};
         const defaults = mailer._defaults || {};
 
-        Object.assign(this.data, data);
+        shared.copyOwnKeys(this.data, data);
 
         this.data.headers = this.data.headers || {};
 
-        // apply defaults
-        Object.keys(defaults).forEach(key => {
-            if (!(key in this.data)) {
-                this.data[key] = defaults[key];
-            } else if (key === 'headers') {
-                // headers is a special case. Allow setting individual default headers
-                Object.keys(defaults.headers).forEach(key => {
-                    if (!(key in this.data.headers)) {
-                        this.data.headers[key] = defaults.headers[key];
-                    }
-                });
-            }
-        });
+        // Apply defaults. `_defaults` is caller supplied too, it is the second argument of
+        // createTransport, so it needs the same treatment as `data` above
+        shared.copyOwnKeys(this.data, defaults, key => hasOwn(this.data, key));
+
+        // headers is a special case. Allow setting individual default headers
+        shared.copyOwnKeys(this.data.headers, defaults.headers, key => hasOwn(this.data.headers, key));
 
         // force specific keys from transporter options
-        ['disableFileAccess', 'disableUrlAccess', 'normalizeHeaderKey'].forEach(key => {
+        ['disableFileAccess', 'disableUrlAccess', 'normalizeHeaderKey', 'maxRecipients'].forEach(key => {
             if (key in options) {
                 this.data[key] = options[key];
             }
@@ -86174,11 +86496,12 @@ class MailMessage {
                         content: value
                     };
                     if (args[0][args[1]] && typeof args[0][args[1]] === 'object' && !Buffer.isBuffer(args[0][args[1]])) {
-                        Object.keys(args[0][args[1]]).forEach(key => {
-                            if (!(key in node) && !['content', 'path', 'href', 'raw'].includes(key)) {
-                                node[key] = args[0][args[1]][key];
-                            }
-                        });
+                        // The keys are the caller's, so copying them takes the same "__proto__"
+                        // rule as the constructor. `key in node` stays as the already-set test
+                        // here, unlike for the defaults: it also skips the Object.prototype
+                        // member names, and letting message data land a `toString` string on a
+                        // node only buys a TypeError the first time something stringifies it.
+                        shared.copyOwnKeys(node, args[0][args[1]], key => key in node || ['content', 'path', 'href', 'raw'].includes(key));
                     }
 
                     args[0][args[1]] = node;
@@ -86191,7 +86514,7 @@ class MailMessage {
     }
 
     normalize(callback) {
-        const envelope = this.data.envelope || this.message.getEnvelope();
+        const envelope = this.message.getEnvelope();
         const messageId = this.message.messageId();
 
         this.resolveAll((err, data) => {
@@ -86237,6 +86560,9 @@ class MailMessage {
 
             data.normalizedHeaders = {};
             Object.keys(data.headers || {}).forEach(key => {
+                if (shared.isProtoKey(key)) {
+                    return;
+                }
                 let value = [].concat(data.headers[key] || []).shift();
                 value = (value && value.value) || value;
                 if (value) {
@@ -86322,15 +86648,16 @@ class MailMessage {
                         }
 
                         if (value && value.url) {
+                            // strip CR/LF so a comment can't inject extra header lines. DEL is neither
+                            // qtext nor ctext, so it can not be carried literally by either construct
+                            // and has to become an encoded word like any other non-plaintext value
+                            let comment = (value.comment || '').toString().replace(/\r?\n|\r/g, ' ');
+                            const needsEncoding = !mimeFuncs.isPlainText(comment) || /\x7f/.test(comment);
+
                             if (key.toLowerCase().trim() === 'id') {
-                                // List-ID: "comment" <domain>
-                                // strip CR/LF so a comment can't inject extra header lines
-                                let comment = (value.comment || '').toString().replace(/\r?\n|\r/g, ' ');
-                                if (mimeFuncs.isPlainText(comment)) {
-                                    comment = '"' + comment + '"';
-                                } else {
-                                    comment = mimeFuncs.encodeWord(comment);
-                                }
+                                // List-ID: "comment" <domain>, where an unescaped quote or a trailing
+                                // backslash in the comment would swallow the <domain> behind it
+                                comment = needsEncoding ? mimeFuncs.encodeWord(comment) : mimeFuncs.quoteString(comment);
 
                                 // List-ID expects a bare domain-like identifier, so strip the
                                 // scheme prefix that _formatListUrl adds or passes through
@@ -86340,11 +86667,11 @@ class MailMessage {
                             }
 
                             // List-*: <http://domain> (comment)
-                            // strip CR/LF so a comment can't inject extra header lines
-                            let comment = (value.comment || '').toString().replace(/\r?\n|\r/g, ' ');
-                            if (!mimeFuncs.isPlainText(comment)) {
-                                comment = mimeFuncs.encodeWord(comment);
-                            }
+                            // the ctext specials go out as quoted-pairs, otherwise a ")" closes the
+                            // comment early and leaves the rest as junk, an unpaired "(" opens a
+                            // nested comment that never closes, and a trailing backslash escapes
+                            // the closing ")" so the comment swallows whatever follows it
+                            comment = needsEncoding ? mimeFuncs.encodeWord(comment) : comment.replace(/[()\\]/g, '\\$&');
 
                             return this._formatListUrl(value.url) + (value.comment ? ' (' + comment + ')' : '');
                         }
@@ -86358,7 +86685,9 @@ class MailMessage {
     }
 
     _formatListUrl(url) {
-        url = url.replace(/[\s<]+|[\s>]+/g, '');
+        // a url has no way to carry a control char or DEL, and the angle brackets around it
+        // are not a quoting construct, so anything left here lands in the header raw
+        url = url.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '').replace(/[\s<]+|[\s>]+/g, '');
         if (/^(https?|mailto|ftp):/.test(url)) {
             return '<' + url + '>';
         }
@@ -86386,17 +86715,37 @@ module.exports = MailMessage;
 const base64 = __nccwpck_require__(74558);
 const qp = __nccwpck_require__(17076);
 const mimeTypes = __nccwpck_require__(67395);
+const { isProtoKey } = __nccwpck_require__(37732);
 
 module.exports = {
     /**
      * Checks if a value is plaintext string (uses only printable 7bit chars)
      *
+     * When isParam is set the value is destined for a header parameter, so HT, CR and LF
+     * are not plaintext either: a header parameter has no way to carry them. HT is a valid
+     * fold point, so folding and unfolding a header would rewrite it as a space, and CR/LF
+     * cannot appear in a header value at all. DEL is neither a token character nor qtext,
+     * so it can not be carried bare or quoted. Such values have to go through the rfc2231
+     * parameter continuation encoding instead, the same way a quote already does.
+     *
      * @param {String} value String to be tested
+     * @param {Boolean} [isParam] Set to true if the value is a header parameter value
      * @returns {Boolean} true if it is a plaintext string
      */
     isPlainText(value, isParam) {
-        const re = isParam ? /[\x00-\x08\x0b\x0c\x0e-\x1f"\u0080-\uFFFF]/ : /[\x00-\x08\x0b\x0c\x0e-\x1f\u0080-\uFFFF]/;
+        const re = isParam ? /[\x00-\x1f\x7f"\u0080-\uFFFF]/ : /[\x00-\x08\x0b\x0c\x0e-\x1f\u0080-\uFFFF]/;
         return typeof value === 'string' && !re.test(value);
+    },
+
+    /**
+     * Wraps a value into a quoted-string. Inside one a quote would end the string early
+     * and a backslash would escape whatever follows it, so both go out as quoted-pairs.
+     *
+     * @param {String} value String to be quoted
+     * @returns {String} The value as a quoted-string, quotes included
+     */
+    quoteString(value) {
+        return '"' + (value || '').toString().replace(/["\\]/g, '\\$&') + '"';
     },
 
     /**
@@ -86461,8 +86810,10 @@ module.exports = {
                 for (let i = 0, len = encodedStr.length; i < len; i++) {
                     let chr = encodedStr.charAt(i);
 
-                    if (/[\ud83c\ud83d\ud83e]/.test(chr) && i < len - 1) {
-                        // composite emoji byte, so add the next byte as well
+                    if (/[\ud800-\udbff]/.test(chr) && /[\udc00-\udfff]/.test(encodedStr.charAt(i + 1))) {
+                        // leading surrogate, so add the trailing surrogate as well
+                        // an unpaired one must not swallow the next unit, that would destroy
+                        // a valid pair following it
                         chr += encodedStr.charAt(++i);
                     }
 
@@ -86549,10 +86900,12 @@ module.exports = {
     buildHeaderValue(structured) {
         const paramsArray = [];
 
-        Object.keys(structured.params || {}).forEach(param => {
+        Object.keys(structured.params || {}).forEach(key => {
             // filename might include unicode characters so it is a special case
             // other values probably do not
-            const value = structured.params[param];
+            const value = structured.params[key];
+            // a parameter name is a token too and it is emitted without any quoting around it
+            const param = key.replace(/[\x00-\x1f\x7f]/g, '');
             if (!this.isPlainText(value, true) || value.length >= 75) {
                 this.buildHeaderParam(param, value, 50).forEach(encodedParam => {
                     if (!/[\s"\\;:/=(),<>@[\]?]|^[-']|'$/.test(encodedParam.value) || encodedParam.key.substr(-1) === '*') {
@@ -86568,7 +86921,11 @@ module.exports = {
             }
         });
 
-        return structured.value + (paramsArray.length ? '; ' + paramsArray.join('; ') : '');
+        // the value ahead of the parameters is a token, it has no way to carry a control
+        // char or DEL and there is no quoting construct around it to escape one into
+        const value = typeof structured.value === 'string' ? structured.value.replace(/[\x00-\x1f\x7f]/g, '') : structured.value;
+
+        return value + (paramsArray.length ? '; ' + paramsArray.join('; ') : '');
     },
 
     /**
@@ -86589,7 +86946,7 @@ module.exports = {
     buildHeaderParam(key, data, maxLength) {
         const list = [];
         let encodedStr = typeof data === 'string' ? data : (data || '').toString();
-        let chr, ord;
+        let chr;
         let line;
         let startPos = 0;
         let i, len;
@@ -86626,8 +86983,9 @@ module.exports = {
                 const encodedStrArr = [];
                 for (i = 0, len = encodedStr.length; i < len; i++) {
                     chr = encodedStr.charAt(i);
-                    ord = chr.charCodeAt(0);
-                    if (ord >= 0xd800 && ord <= 0xdbff && i < len - 1) {
+                    if (/[\ud800-\udbff]/.test(chr) && /[\udc00-\udfff]/.test(encodedStr.charAt(i + 1))) {
+                        // an unpaired leading surrogate must not consume the next unit, that
+                        // would tear apart a valid pair following it
                         chr += encodedStr.charAt(i + 1);
                         encodedStrArr.push(chr);
                         i++;
@@ -86665,8 +87023,11 @@ module.exports = {
                                 line,
                                 encoded
                             });
+                            // the line we start here holds an encoded char, so it has to be
+                            // flagged as one. otherwise it gets an unstarred continuation key
+                            // and a receiver reads the percent escapes as literal text
                             line = '';
-                            startPos = i - 1;
+                            encoded = true;
                         } else {
                             encoded = true;
                             i = startPos;
@@ -86731,6 +87092,16 @@ module.exports = {
             value: false,
             params: {}
         };
+
+        // Parameter names come from a caller supplied contentType/contentDisposition. A
+        // "__proto__" name would target the prototype chain of the params object instead of
+        // an own property of it, and read back as Object.prototype, so it is dropped.
+        const setParam = (name, value) => {
+            if (!isProtoKey(name)) {
+                response.params[name] = value;
+            }
+        };
+
         let key = false;
         let value = '';
         let type = 'value';
@@ -86762,7 +87133,7 @@ module.exports = {
                     if (key === false) {
                         response.value = value.trim();
                     } else {
-                        response.params[key] = value.trim();
+                        setParam(key, value.trim());
                     }
                     type = 'key';
                     value = '';
@@ -86777,10 +87148,10 @@ module.exports = {
             if (key === false) {
                 response.value = value.trim();
             } else {
-                response.params[key] = value.trim();
+                setParam(key, value.trim());
             }
         } else if (value.trim()) {
-            response.params[value.trim().toLowerCase()] = '';
+            setParam(value.trim().toLowerCase(), '');
         }
 
         // handle parameter value continuations
@@ -86792,6 +87163,14 @@ module.exports = {
             if ((match = key.match(/(\*(\d+)|\*(\d+)\*|\*)$/))) {
                 actualKey = key.substr(0, match.index);
                 nr = Number(match[2] || match[3]) || 0;
+
+                if (isProtoKey(actualKey)) {
+                    // see setParam. Reading it back would yield Object.prototype, which is
+                    // an object, so the initializer below would be skipped and the write
+                    // that follows would throw out of a header build the caller can not catch
+                    delete response.params[key];
+                    return;
+                }
 
                 if (!response.params[actualKey] || typeof response.params[actualKey] !== 'object') {
                     response.params[actualKey] = {
@@ -86919,7 +87298,7 @@ module.exports = {
      */
     splitMimeEncodedString: (str, maxlen) => {
         const lines = [];
-        let curLine, match, chr, done;
+        let curLine, fallbackLine, match, chr, done;
 
         // require at least 12 symbols to fit possible 4 octet UTF-8 sequences
         maxlen = Math.max(maxlen || 0, 12);
@@ -86932,8 +87311,14 @@ module.exports = {
                 curLine = curLine.substr(0, match.index);
             }
 
+            // Malformed input (a run of stray UTF-8 continuation bytes) has no split point
+            // that keeps a character sequence whole, so the loop below walks back to an
+            // empty line looking for one. Keep the widest chunk that at least does not cut
+            // a "=XX" escape in half, so the part stays a decodable encoded word.
+            fallbackLine = curLine.length ? curLine : str.substr(0, maxlen);
+
             done = false;
-            while (!done) {
+            while (!done && curLine.length) {
                 done = true;
                 // check if not middle of a unicode char sequence
                 if ((match = str.substr(curLine.length).match(/^[=]([0-9A-F]{2})/i))) {
@@ -86946,9 +87331,11 @@ module.exports = {
                 }
             }
 
-            if (curLine.length) {
-                lines.push(curLine);
+            if (!curLine.length) {
+                curLine = fallbackLine;
             }
+
+            lines.push(curLine);
             str = str.substr(curLine.length);
         }
 
@@ -86981,8 +87368,11 @@ module.exports = {
             // might throw if we try to encode invalid sequences, eg. partial emoji
             str = encodeURIComponent(str);
         } catch (_E) {
-            // should never run
-            return str.replace(/[^\x00-\x1F *'()<>@,;:\\"[\]?=\u007F-\uFFFF]+/g, '');
+            // an unpaired surrogate has no utf-8 representation, so run the value through a
+            // utf-8 roundtrip to get the same U+FFFD every other encoder here produces and
+            // retry. the value must never come back unencoded, it goes into a header parameter
+            // where a bare quote or semicolon would break it out into a parameter of its own
+            str = encodeURIComponent(Buffer.from(str, 'utf-8').toString('utf-8'));
         }
 
         // ensure chars that are not handled by encodeURICompent are converted as well
@@ -89123,6 +89513,7 @@ const fs = __nccwpck_require__(79896);
 const punycode = __nccwpck_require__(65014);
 const { PassThrough } = __nccwpck_require__(2203);
 const shared = __nccwpck_require__(71284);
+const urlModule = __nccwpck_require__(87016);
 
 const mimeFuncs = __nccwpck_require__(10539);
 const qp = __nccwpck_require__(17076);
@@ -89136,6 +89527,59 @@ const LeWindows = __nccwpck_require__(97793);
 const LeUnix = __nccwpck_require__(80348);
 
 const FORMATTED_HEADERS = ['From', 'Sender', 'To', 'Cc', 'Bcc', 'Reply-To', 'Date', 'References'];
+
+// RFC 5321 atext, plus the non-ascii bytes that SMTPUTF8 (RFC 6531) adds to it. A local part
+// built from these, with '.' as a separator, is a dot-atom and can be emitted bare
+const ATEXT = "[A-Za-z0-9!#$%&'*+\\-/=?^_`{|}~\\x80-\\uFFFF]";
+const DOT_ATOM = new RegExp('^' + ATEXT + '+(?:\\.' + ATEXT + '+)*$');
+
+// A complete quoted-string: everything between the outer quotes is either a plain char or
+// a quoted-pair. Anchored, so a value that only starts and ends with a quote does not pass
+const QUOTED_STRING = /^"(?:[^"\\]|\\[\s\S])*"$/;
+
+// An address that carries no special anywhere can be emitted bare in a header, everything
+// else goes into angle brackets so that the header can not be read as more addresses than
+// the envelope carries
+const PLAIN_ADDRESS = /^[^\s"(),:;<>@[\\\]]+@[^\s"(),:;<>@[\\\]]+$/;
+
+// domainToASCII and domainToUnicode are WHATWG host parsers rather than plain IDNA
+// mappers, so they do more than map: they cut the host at '/', '\\', '?' and '#', drop C0
+// controls, and percent-decode. Handing them 'evil.example/mail.corp.example' returns the
+// deliverable 'evil.example', which would turn a value the bundled codec leaves as
+// unroutable garbage into mail for a domain the sender never named. None of these
+// characters are legal in a domain, so keep them away from the mapper.
+const URL_PARSER_UNSAFE = /[/\\?#%\x00-\x20\x7F]/;
+
+/**
+ * Encodes a domain the way browsers, the WHATWG URL Standard and DNS facing resolvers do,
+ * which is with UTS-46 mapping applied before the Punycode step.
+ *
+ * The bundled codec is plain RFC 3492 and maps nothing, so it disagrees with every
+ * conformant parser on any domain holding a mapped or ignored code point. An invisible
+ * U+00AD in 'compa\u00ADny.com' encoded to 'xn--company-pka.com' where a validator reads
+ * 'company.com', which let an allow-listed domain be checked and a different one mailed.
+ *
+ * Anything the URL parser does not accept as a hostname, an address literal such as
+ * '[127.0.0.1]' included, comes back empty and falls through to the bundled codec, which
+ * leaves those as they were supplied.
+ *
+ * @param {String} domain Domain to encode, already lowercased by the caller
+ * @param {Boolean} toUnicode Return the U-label form instead of the A-label form
+ * @return {String} Encoded domain
+ */
+function normalizeDomain(domain, toUnicode) {
+    // domainToASCII and domainToUnicode landed in Node 7, the bundled codec covers Node 6
+    const mapper = toUnicode ? urlModule.domainToUnicode : urlModule.domainToASCII;
+
+    if (typeof mapper === 'function' && !URL_PARSER_UNSAFE.test(domain)) {
+        const mapped = mapper(domain);
+        if (mapped) {
+            return mapped;
+        }
+    }
+
+    return toUnicode ? punycode.toUnicode(domain) : punycode.toASCII(domain);
+}
 
 /**
  * Creates a new mime tree node. Assumes 'multipart/*' as the content type
@@ -89635,11 +90079,10 @@ class MimeNode {
             const formattedHeaders = FORMATTED_HEADERS;
 
             if (value && typeof value === 'object' && !formattedHeaders.includes(key)) {
-                Object.keys(value).forEach(key => {
-                    if (key !== 'value') {
-                        options[key] = value[key];
-                    }
-                });
+                // the keys come from a caller supplied header object and `options.prepared`
+                // below decides whether the value is emitted raw, so an own "__proto__" key
+                // here would turn an unfolded value into header injection
+                shared.copyOwnKeys(options, value, optionKey => optionKey === 'value');
                 value = (value.value || '').toString();
                 if (!value.trim()) {
                     return;
@@ -89668,6 +90111,11 @@ class MimeNode {
                 case 'Content-Type':
                     structured = mimeFuncs.parseHeaderValue(value);
 
+                    // the type token decides multipart and charset below, so clean it before
+                    // those run and not just on the way out, otherwise a control char makes
+                    // the checks miss and the header ends up claiming a type it is not set up for
+                    structured.value = (structured.value || '').toString().replace(/[\x00-\x1f\x7f]/g, '');
+
                     this._handleContentType(structured);
 
                     if (
@@ -89684,11 +90132,18 @@ class MimeNode {
                         // add support for non-compliant clients like QQ webmail
                         // we can't build the value with buildHeaderValue as the value is non standard and
                         // would be converted to parameter continuation encoding that we do not want
-                        param = this._encodeWords(this.filename);
+                        // control chars can not be quoted here: HT is a fold point that unfolding would
+                        // turn into a space, CR/LF can not appear in a header at all and DEL is not
+                        // qtext, so force the mime encoded word that a non-ascii filename would get anyway
+                        param = /[\x00-\x1f\x7f]/.test(this.filename)
+                            ? mimeFuncs.encodeWord(this.filename, this._getTextEncoding(this.filename), 52)
+                            : this._encodeWords(this.filename);
 
                         if (param !== this.filename || /[\s'"\\;:/=(),<>@[\]?]|^-/.test(param)) {
-                            // include value in quotes if needed
-                            param = '"' + param + '"';
+                            // include value in quotes if needed, escaping backslashes and quotes as
+                            // quoted-pairs exactly like buildHeaderValue does for filename=, otherwise
+                            // a trailing backslash would escape the closing quote
+                            param = JSON.stringify(param);
                         }
                         value += '; name=' + param;
                     }
@@ -89711,8 +90166,12 @@ class MimeNode {
 
             if (typeof this.normalizeHeaderKey === 'function') {
                 const normalized = this.normalizeHeaderKey(key, value);
-                if (normalized && typeof normalized === 'string' && normalized.length) {
-                    key = normalized;
+                // the result replaces the key on the way into the header, so it gets the same
+                // treatment the key it replaces already had. a line break here would end the
+                // header and start one of the caller's own
+                const cleaned = typeof normalized === 'string' ? normalized.replace(/[\x00-\x1f\x7f]/g, '') : '';
+                if (cleaned) {
+                    key = cleaned;
                 }
             }
 
@@ -89953,26 +90412,23 @@ class MimeNode {
 
         if (envelope.from) {
             list = [];
-            this._convertAddresses(this._parseAddresses(envelope.from), list);
+            this._convertAddresses(this._parseEnvelopeAddresses(envelope.from), list);
             list = list.filter(address => address && address.address);
             if (list.length && list[0]) {
                 this._envelope.from = list[0].address;
             }
         }
+        const seenRecipients = new Set();
         ['to', 'cc', 'bcc'].forEach(key => {
             if (envelope[key]) {
-                this._convertAddresses(this._parseAddresses(envelope[key]), this._envelope.to);
+                this._convertAddresses(this._parseEnvelopeAddresses(envelope[key]), this._envelope.to, seenRecipients);
             }
         });
 
         this._envelope.to = this._envelope.to.map(to => to.address).filter(address => address);
 
         const standardFields = ['to', 'cc', 'bcc', 'from'];
-        Object.keys(envelope).forEach(key => {
-            if (!standardFields.includes(key)) {
-                this._envelope[key] = envelope[key];
-            }
-        });
+        shared.copyOwnKeys(this._envelope, envelope, key => standardFields.includes(key));
 
         return this;
     }
@@ -89984,15 +90440,17 @@ class MimeNode {
      */
     getAddresses() {
         const addresses = {};
+        const seenByKey = new Map();
 
         this._headers.forEach(header => {
             const key = header.key.toLowerCase();
             if (['from', 'sender', 'reply-to', 'to', 'cc', 'bcc'].includes(key)) {
                 if (!Array.isArray(addresses[key])) {
                     addresses[key] = [];
+                    seenByKey.set(key, new Set());
                 }
 
-                this._convertAddresses(this._parseAddresses(header.value), addresses[key]);
+                this._convertAddresses(this._parseAddresses(header.value), addresses[key], seenByKey.get(key));
             }
         });
 
@@ -90013,6 +90471,12 @@ class MimeNode {
             from: false,
             to: []
         };
+
+        // Built once and carried across the headers. Letting _convertAddresses seed it per
+        // call would cost O(headers x recipients), and a message can carry many address
+        // headers: `headers: { to: [...] }` emits one To per entry.
+        const seenRecipients = new Set();
+
         this._headers.forEach(header => {
             const list = [];
             if (header.key === 'From' || (!envelope.from && ['Reply-To', 'Sender'].includes(header.key))) {
@@ -90021,7 +90485,7 @@ class MimeNode {
                     envelope.from = list[0].address;
                 }
             } else if (['To', 'Cc', 'Bcc'].includes(header.key)) {
-                this._convertAddresses(this._parseAddresses(header.value), envelope.to);
+                this._convertAddresses(this._parseAddresses(header.value), envelope.to, seenRecipients);
             }
         });
 
@@ -90121,7 +90585,9 @@ class MimeNode {
                 });
                 return contentStream;
             }
-            // fetch URL
+            // fetch URL. nmfetch refuses any scheme that is not http(s), and it decides
+            // that on the parsed URL. Testing the raw string here instead would reject
+            // forms the parser accepts, such as a leading space or a slash-less authority
             return nmfetch(content.href, { headers: content.httpHeaders, tls: content.tls });
         }
 
@@ -90146,17 +90612,81 @@ class MimeNode {
      * @return {Array} An array of address objects
      */
     _parseAddresses(addresses) {
-        return [].concat.apply(
-            [],
-            [].concat(addresses).map(address => {
-                if (address && address.address) {
-                    address.address = this._normalizeAddress(address.address);
-                    address.name = address.name || '';
-                    return [address];
+        // Collected into one list as we go. concat.apply spreads the entries into arguments
+        // and throws a RangeError once a recipient array is long enough to pass the
+        // argument limit, which a large Bcc list reaches on its own.
+        const flattened = [];
+
+        [].concat(addresses).forEach(address => {
+            if (address && address.address) {
+                const normalized = this._normalizeAddress(address.address);
+                if (normalized === address.address && typeof address.name === 'string') {
+                    // there is nothing to rewrite, so there is nothing to keep off the original
+                    flattened.push(address);
+                    return;
                 }
-                return addressparser(address);
-            })
-        );
+
+                // rewriting would land on the object the caller passed in and might
+                // still hold a reference to, so rewrite a copy of it instead. An own
+                // "__proto__" key would make the copy inherit from caller data, and
+                // _convertAddresses reads `group` off it straight into the envelope
+                const copy = shared.copyOwnKeys({}, address);
+                copy.address = normalized;
+                copy.name = address.name || '';
+                flattened.push(copy);
+                return;
+            }
+
+            const parsed = this._normalizeParsedAddresses(addressparser(address));
+            for (let i = 0; i < parsed.length; i++) {
+                flattened.push(parsed[i]);
+            }
+        });
+
+        return flattened;
+    }
+
+    /**
+     * Normalizes the addresses of a freshly parsed address list, groups included.
+     *
+     * Everything this method returns carries a normalized address, whether it arrived as an
+     * object or was parsed out of a header value. Without this the two shapes disagree, and
+     * a consumer reading the parsed form back is handed the ambiguous
+     * 'user@evil.com@good.com' that the header and the envelope no longer carry.
+     *
+     * @param {Array} parsed An array of address objects, as returned by addressparser
+     * @return {Array} The same array, with every address normalized
+     */
+    _normalizeParsedAddresses(parsed) {
+        // addressparser builds these objects, so no caller holds a reference to rewrite around
+        parsed.forEach(entry => {
+            if (entry.address) {
+                entry.address = this._normalizeAddress(entry.address);
+            } else if (entry.group) {
+                this._normalizeParsedAddresses(entry.group);
+            }
+        });
+
+        return parsed;
+    }
+
+    /**
+     * Parses the addresses of an explicitly set envelope.
+     *
+     * An envelope value is an addr-spec and never a display name, so a bare local username
+     * such as 'root' is the address here. Header parsing has to read the same value as a
+     * display name, as a value with no '@' in it can not be an addr-spec in a header.
+     *
+     * @param {Mixed} addresses Addresses to be parsed
+     * @return {Array} An array of address objects
+     */
+    _parseEnvelopeAddresses(addresses) {
+        return this._parseAddresses(addresses).map(entry => {
+            if (entry.address || entry.group || !entry.name || /[\s@]/.test(entry.name)) {
+                return entry;
+            }
+            return { address: this._normalizeAddress(entry.name), name: '' };
+        });
     }
 
     /**
@@ -90170,6 +90700,9 @@ class MimeNode {
             .toString()
             // no newlines in keys
             .replace(/\r?\n|\r/g, ' ')
+            // a field name is printable ascii without the colon, so a control char or DEL
+            // can only be dropped, there is no quoting construct around a field name
+            .replace(/[\x00-\x1f\x7f]/g, '')
             .trim()
             .toLowerCase()
             // use uppercase words, except MIME
@@ -90230,7 +90763,13 @@ class MimeNode {
             case 'Message-ID':
             case 'In-Reply-To':
             case 'Content-Id':
-                value = (value || '').toString().replace(/\r?\n|\r/g, ' ');
+                // a msg-id is structured, so an encoded word inside the angle brackets would
+                // be read as literal text. drop the characters that can not appear in a header
+                // at all, but leave HT alone, it separates the ids of a multi id value
+                value = (value || '')
+                    .toString()
+                    .replace(/\r?\n|\r/g, ' ')
+                    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
 
                 if (value.charAt(0) !== '<') {
                     value = '<' + value;
@@ -90250,6 +90789,7 @@ class MimeNode {
                             elm = (elm || '')
                                 .toString()
                                 .replace(/\r?\n|\r/g, ' ')
+                                .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')
                                 .trim();
                             return elm.replace(/<[^>]*>/g, str => str.replace(/\s/g, '')).split(/\s+/);
                         })
@@ -90272,7 +90812,7 @@ class MimeNode {
                 }
 
                 value = (value || '').toString().replace(/\r?\n|\r/g, ' ');
-                return this._encodeWords(value);
+                return this._encodeHeaderText(value);
 
             case 'Content-Type':
             case 'Content-Disposition':
@@ -90281,8 +90821,7 @@ class MimeNode {
 
             default:
                 value = (value || '').toString().replace(/\r?\n|\r/g, ' ');
-                // encodeWords only encodes if needed, otherwise the original string is returned
-                return this._encodeWords(value);
+                return this._encodeHeaderText(value);
         }
     }
 
@@ -90293,26 +90832,44 @@ class MimeNode {
      * @param {Array} [uniqueList] An array to be populated with addresses
      * @return {String} address string
      */
-    _convertAddresses(addresses, uniqueList) {
+    _convertAddresses(addresses, uniqueList, seenAddresses) {
         const values = [];
 
         uniqueList = uniqueList || [];
+
+        // Membership is checked once per address, so scanning uniqueList itself would make
+        // a recipient list cost O(n^2). Groups recurse with the same set so that a nested
+        // group still dedupes against the addresses collected around it, and a caller that
+        // passes a partly filled list (To, then Cc, then Bcc) keeps deduping across headers.
+        if (!seenAddresses) {
+            seenAddresses = new Set();
+            for (let i = 0; i < uniqueList.length; i++) {
+                seenAddresses.add(uniqueList[i].address);
+            }
+        }
 
         [].concat(addresses || []).forEach(address => {
             if (address.address) {
                 address.address = this._normalizeAddress(address.address);
 
                 if (!address.name) {
-                    values.push(address.address.indexOf(' ') >= 0 ? `<${address.address}>` : `${address.address}`);
+                    // an address that carries a special, be it a quoted local part or a domain
+                    // that could not be normalized, is only unambiguous inside angle brackets.
+                    // Without them a ',' or a ';' anywhere in it reads as a recipient separator
+                    // and the header would list more recipients than the envelope carries
+                    values.push(PLAIN_ADDRESS.test(address.address) ? address.address : `<${address.address}>`);
                 } else {
                     values.push(`${this._encodeAddressName(address.name)} <${address.address}>`);
                 }
 
-                if (!uniqueList.some(a => a.address === address.address)) {
+                if (!seenAddresses.has(address.address)) {
+                    seenAddresses.add(address.address);
                     uniqueList.push(address);
                 }
             } else if (address.group) {
-                const groupListAddresses = (address.group.length ? this._convertAddresses(address.group, uniqueList) : '').trim();
+                const groupListAddresses = (
+                    address.group.length ? this._convertAddresses(address.group, uniqueList, seenAddresses) : ''
+                ).trim();
                 values.push(`${this._encodeAddressName(address.name)}:${groupListAddresses};`);
             }
         });
@@ -90329,45 +90886,63 @@ class MimeNode {
     _normalizeAddress(address) {
         address = (address || '')
             .toString()
-            .replace(/[\x00-\x1F<>]+/g, ' ') // remove unallowed characters
+            .replace(/[\x00-\x1F\x7F<>]+/g, ' ') // remove unallowed characters
             .trim();
 
-        const lastAt = address.lastIndexOf('@');
-        if (lastAt < 0) {
-            // Bare username
+        if (!address) {
+            // callers use an empty value to detect a missing address
             return address;
         }
 
-        let user = address.substr(0, lastAt);
+        const lastAt = address.lastIndexOf('@');
+        if (lastAt < 0) {
+            // Bare username, there is no domain to split off
+            return this._normalizeLocalPart(address);
+        }
+
+        const user = address.substr(0, lastAt);
         const domain = address.substr(lastAt + 1);
 
-        // Usernames are not touched and are kept as is even if these include unicode.
+        // Unicode in the local part is kept as is, see _normalizeLocalPart for the rest of it.
+        // A domain has no quoting construct to fall back on, so whatever is not a valid domain
+        // is kept as supplied and it is _convertAddresses that keeps such an address unambiguous.
         // Domains are punycoded when the local part is ASCII ('safe@jõgeva.ee' -> 'safe@xn--jgeva-dua.ee').
         // When the local part contains non-ASCII bytes the address already requires SMTPUTF8,
         // so the domain is kept (or decoded back) as UTF-8 for symmetry on both sides of '@'.
 
         let encodedDomain = domain;
 
+        // A non-ASCII local part already requires SMTPUTF8, so the domain stays UTF-8 for
+        // symmetry on both sides of the '@' rather than being encoded to an A-label
+        const smtputf8 = /[\x80-\uFFFF]/.test(user);
+
         try {
-            if (/[\x80-\uFFFF]/.test(user)) {
-                encodedDomain = punycode.toUnicode(domain.toLowerCase());
-            } else {
-                encodedDomain = punycode.toASCII(domain.toLowerCase());
-            }
+            encodedDomain = normalizeDomain(domain.toLowerCase(), smtputf8);
         } catch (_err) {
             // keep domain as supplied
         }
 
-        if (user.indexOf(' ') >= 0) {
-            if (user.charAt(0) !== '"') {
-                user = '"' + user;
-            }
-            if (user.substr(-1) !== '"') {
-                user = user + '"';
-            }
+        return `${this._normalizeLocalPart(user)}@${encodedDomain}`;
+    }
+
+    /**
+     * Normalizes the local part of an address into a form that can be emitted as is.
+     *
+     * A local part is either a dot-atom or a quoted-string, anything else is not a valid
+     * addr-spec. The quotes of a quoted local part get lost along the way, and a bare
+     * 'user@evil.com@good.com' leaves it to the receiver which '@' splits the domain off,
+     * while the split here is always at the last one. So whatever is not already one of
+     * the two valid forms goes back out as a quoted-string.
+     *
+     * @param {String} user Local part of an address
+     * @return {String} Local part as a dot-atom or as a quoted-string
+     */
+    _normalizeLocalPart(user) {
+        if (DOT_ATOM.test(user) || QUOTED_STRING.test(user)) {
+            return user;
         }
 
-        return `${user}@${encodedDomain}`;
+        return mimeFuncs.quoteString(user);
     }
 
     /**
@@ -90379,12 +90954,27 @@ class MimeNode {
     _encodeAddressName(name) {
         if (!/^[\w ]*$/.test(name)) {
             if (/^[\x20-\x7e]*$/.test(name)) {
-                return '"' + name.replace(/([\\"])/g, '\\$1') + '"';
+                return mimeFuncs.quoteString(name);
             } else {
                 return mimeFuncs.encodeWord(name, this._getTextEncoding(name), 52);
             }
         }
         return name;
+    }
+
+    /**
+     * Encodes an unstructured header value. Such a value can only carry VCHAR and WSP, so a
+     * control char or DEL has to be forced into the mime encoded word that a non-ascii value
+     * would get anyway. HT stays as it is, it is valid folding whitespace here.
+     *
+     * @param {String} value Header value to encode
+     * @returns {String} Mime word encoded string if needed
+     */
+    _encodeHeaderText(value) {
+        return /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(value)
+            ? mimeFuncs.encodeWord(value, this._getTextEncoding(value), 52)
+            : // encodeWords only encodes if needed, otherwise the original string is returned
+              this._encodeWords(value);
     }
 
     /**
@@ -91036,7 +91626,7 @@ const decode = function (input) {
     // Main decoding loop: start just after the last delimiter if any basic code
     // points were copied; start at the beginning otherwise.
 
-    for (let index = basic > 0 ? basic + 1 : 0; index < inputLength /* no final expression */; ) {
+    for (let index = basic > 0 ? basic + 1 : 0; index < inputLength /* no final expression */;) {
         // `index` is the index of the next character to be consumed.
         // Decode a generalized variable-length integer into `delta`,
         // which gets added to `i`. The overflow checking is easier
@@ -91554,14 +92144,17 @@ class SendmailTransport {
         // Sendmail strips this header line by itself
         mail.message.keepBcc = true;
 
-        const envelope = mail.data.envelope || mail.message.getEnvelope();
+        const envelope = mail.message.getEnvelope();
         const messageId = mail.message.messageId();
         let returned;
 
         const hasInvalidAddresses = []
             .concat(envelope.from || [])
             .concat(envelope.to || [])
-            .some(addr => /^-/.test(addr));
+            // a local part is either a dot-atom or a quoted-string, so a leading dash sits at
+            // offset 0 or, behind the opening quote, at offset 1. Only the first shape is read
+            // as an option by sendmail, but both are the address this guard keeps out of argv
+            .some(addr => /^"?-/.test(addr));
         if (hasInvalidAddresses) {
             const err = new Error('Can not send mail. Invalid envelope addresses.');
             err.code = errors.ESENDMAIL;
@@ -91760,11 +92353,12 @@ class SESTransport extends EventEmitter {
 
     getRegion(cb) {
         if (this.ses.sesClient.config && typeof this.ses.sesClient.config.region === 'function') {
-            // promise
-            return this.ses.sesClient.config
-                .region()
-                .then(region => cb(null, region))
-                .catch(err => cb(err));
+            // Resolve the region provider. Use the two-argument form of then() so that a
+            // synchronous throw from cb is not recaught here and used to invoke cb a second time.
+            return this.ses.sesClient.config.region().then(
+                region => cb(null, region),
+                err => cb(err)
+            );
         }
         return cb(null, false);
     }
@@ -91782,7 +92376,7 @@ class SESTransport extends EventEmitter {
             fromHeader = mimeNode._convertAddresses(mimeNode._parseAddresses(fromHeader.value));
         }
 
-        const envelope = mail.data.envelope || mail.message.getEnvelope();
+        const envelope = mail.message.getEnvelope();
         const messageId = mail.message.messageId();
 
         const recipients = [].concat(envelope.to || []);
@@ -91846,7 +92440,8 @@ class SESTransport extends EventEmitter {
                     return callback(err);
                 }
 
-                const sesMessage = Object.assign(
+                // mail.data.ses is caller supplied message data, so copy its own keys only
+                const sesMessage = shared.copyOwnKeys(
                     {
                         Content: {
                             Raw: {
@@ -91859,7 +92454,7 @@ class SESTransport extends EventEmitter {
                             ToAddresses: envelope.to
                         }
                     },
-                    mail.data.ses || {}
+                    mail.data.ses
                 );
 
                 this.getRegion((err, region) => {
@@ -91867,8 +92462,27 @@ class SESTransport extends EventEmitter {
                         region = 'us-east-1';
                     }
 
-                    const command = new this.ses.SendEmailCommand(sesMessage);
-                    const sendPromise = this.ses.sesClient.send(command);
+                    let sendPromise;
+                    try {
+                        // command construction or dispatch can throw synchronously on a
+                        // misconfigured SDK; surface it as a single error callback instead
+                        // of letting it escape into getRegion's promise chain
+                        const command = new this.ses.SendEmailCommand(sesMessage);
+                        sendPromise = this.ses.sesClient.send(command);
+                    } catch (err) {
+                        tagSesError(err);
+                        this.logger.error(
+                            {
+                                err,
+                                tnx: 'send'
+                            },
+                            'Send error for %s: %s',
+                            messageId,
+                            err.message
+                        );
+                        setImmediate(() => callback(err));
+                        return;
+                    }
 
                     sendPromise
                         .then(data => {
@@ -91876,7 +92490,7 @@ class SESTransport extends EventEmitter {
                                 region = 'email';
                             }
 
-                            callback(null, {
+                            const info = {
                                 envelope: {
                                     from: envelope.from,
                                     to: envelope.to
@@ -91884,7 +92498,11 @@ class SESTransport extends EventEmitter {
                                 messageId: '<' + data.MessageId + (!/@/.test(data.MessageId) ? '@' + region + '.amazonses.com' : '') + '>',
                                 response: data.MessageId,
                                 raw
-                            });
+                            };
+
+                            // invoke the callback outside the promise chain so a throw from it
+                            // is not recaught by .catch() and used to call it a second time
+                            setImmediate(() => callback(null, info));
                         })
                         .catch(err => {
                             tagSesError(err);
@@ -91897,7 +92515,7 @@ class SESTransport extends EventEmitter {
                                 messageId,
                                 err.message
                             );
-                            callback(err);
+                            setImmediate(() => callback(err));
                         });
                 });
             })
@@ -91939,10 +92557,16 @@ class SESTransport extends EventEmitter {
         // the region value is not used for anything when verifying, but the lookup
         // exercises the client configuration the same way as send() does
         this.getRegion(() => {
-            const command = new this.ses.SendEmailCommand(sesMessage);
-            const sendPromise = this.ses.sesClient.send(command);
+            let sendPromise;
+            try {
+                const command = new this.ses.SendEmailCommand(sesMessage);
+                sendPromise = this.ses.sesClient.send(command);
+            } catch (err) {
+                setImmediate(() => cb(err));
+                return;
+            }
 
-            sendPromise.then(() => cb(null)).catch(err => cb(err));
+            sendPromise.then(() => setImmediate(() => cb(null))).catch(err => setImmediate(() => cb(err)));
         });
 
         return promise;
@@ -91967,9 +92591,14 @@ const util = __nccwpck_require__(39023);
 const fs = __nccwpck_require__(79896);
 const nmfetch = __nccwpck_require__(80943);
 const errors = __nccwpck_require__(37633);
+const objects = __nccwpck_require__(37732);
 const dns = __nccwpck_require__(72250);
 const net = __nccwpck_require__(69278);
 const os = __nccwpck_require__(70857);
+
+// re-exported for the callers that already depend on this module, see ./objects
+const isProtoKey = (module.exports.isProtoKey = objects.isProtoKey);
+module.exports.copyOwnKeys = objects.copyOwnKeys;
 
 const DNS_TTL = 5 * 60 * 1000;
 const CACHE_CLEANUP_INTERVAL = 30 * 1000; // Minimum 30 seconds between cleanups
@@ -92315,7 +92944,9 @@ module.exports.parseConnectionUrl = str => {
             return;
         }
 
-        if (!(lKey in obj)) {
+        // `in` already keeps "__proto__" out, but only as a side effect of it being an
+        // Object.prototype member. Say it, so the protection survives a change to the check
+        if (!isProtoKey(lKey) && !(lKey in obj)) {
             obj[lKey] = value;
         }
     });
@@ -92430,7 +93061,7 @@ module.exports.parseDataURI = uri => {
             // Ensure there's a key before the '='
             const key = entry.substring(0, sepPos).trim();
             const value = entry.substring(sepPos + 1).trim();
-            if (key) {
+            if (key && !isProtoKey(key)) {
                 params[key] = value;
             }
         }
@@ -92521,19 +93152,24 @@ function resolveContentValue(data, key, options, callback) {
                 }
                 callback(null, value);
             });
-        } else if (/^https?:\/\//i.test(content.path || content.href)) {
-            if (options.disableUrlAccess) {
-                return setImmediate(() => {
-                    const err = new Error('Url access rejected for ' + (content.path || content.href));
-                    err.code = errors.EURLACCESS;
-                    callback(err);
-                });
-            }
-            return resolveStream(nmfetch(content.path || content.href, { headers: content.httpHeaders, tls: content.tls }), callback);
         } else if (/^data:/i.test(content.path || content.href)) {
             const parsedDataUri = module.exports.parseDataURI(content.path || content.href);
 
             return callback(null, parsedDataUri && parsedDataUri.data ? parsedDataUri.data : Buffer.alloc(0));
+        } else if (content.href || /^https?:\/\//i.test(content.path)) {
+            // An href is always a URL, and so is a path that looks like one. Let nmfetch
+            // decide whether it is fetchable, it validates the parsed URL. Testing the raw
+            // string here instead would let a file: href fall through to the "return as is"
+            // default below and travel on inside the resolved message.
+            const url = content.href || content.path;
+            if (options.disableUrlAccess) {
+                return setImmediate(() => {
+                    const err = new Error('Url access rejected for ' + url);
+                    err.code = errors.EURLACCESS;
+                    callback(err);
+                });
+            }
+            return resolveStream(nmfetch(url, { headers: content.httpHeaders, tls: content.tls }), callback);
         } else if (content.path) {
             if (options.disableFileAccess) {
                 return setImmediate(() => {
@@ -92563,10 +93199,14 @@ module.exports.assign = function (/* target, ... sources */) {
 
     args.forEach(source => {
         Object.keys(source || {}).forEach(key => {
+            if (isProtoKey(key)) {
+                return;
+            }
             if (['tls', 'auth'].includes(key) && source[key] && typeof source[key] === 'object') {
                 // tls and auth are special keys that need to be enumerated separately
-                // other objects are passed as is
-                target[key] = Object.assign(target[key] || {}, source[key]);
+                // other objects are passed as is. Enumerating is a copy of user supplied
+                // keys just like the loop above, so it gets the same treatment
+                target[key] = module.exports.copyOwnKeys(target[key] || {}, source[key]);
             } else {
                 target[key] = source[key];
             }
@@ -92689,6 +93329,56 @@ function createDefaultLogger(levels) {
 
     return logger;
 }
+
+
+/***/ }),
+
+/***/ 37732:
+/***/ ((module) => {
+
+"use strict";
+
+
+// Safe copying of objects whose keys come from the caller.
+//
+// This lives in its own leaf module, like ./url.js, so that every layer can reach it.
+// lib/shared/index.js requires lib/fetch, so lib/fetch can not require lib/shared back,
+// and lib/mime-funcs is a leaf that would otherwise pull in dns/net/os/fs for a string
+// comparison. lib/shared/index.js re-exports both functions for the callers that already
+// depend on it.
+
+/**
+ * Detects a key that can not be copied onto a plain object with `target[key] = value`.
+ *
+ * "__proto__" is the only one: assigning it runs the inherited setter and replaces the
+ * prototype of the target instead of adding a property to it, so a caller can smuggle
+ * values past validation that only inspects own keys. JSON.parse produces such a key
+ * where an object literal can not. "constructor" and "prototype" have no such setter and
+ * become ordinary own properties, so dropping them would only discard legitimate values.
+ *
+ * @param {String} key Key to check
+ * @returns {Boolean} true if the key must not be copied
+ */
+module.exports.isProtoKey = key => key === '__proto__';
+
+/**
+ * Copies own enumerable keys from a source object to a target object. Every copy that
+ * walks the keys of user supplied data goes through here, see isProtoKey.
+ *
+ * @param {Object} target Object to copy the keys to
+ * @param {Object} source Object to copy the keys from
+ * @param {Function} [skip] Optional predicate, return true to leave a key out
+ * @returns {Object} The target object
+ */
+module.exports.copyOwnKeys = (target, source, skip) => {
+    Object.keys(source || {}).forEach(key => {
+        if (module.exports.isProtoKey(key) || (skip && skip(key))) {
+            return;
+        }
+        target[key] = source[key];
+    });
+    return target;
+};
 
 
 /***/ }),
@@ -92980,6 +93670,10 @@ const tls = __nccwpck_require__(64756);
 const urllib = __nccwpck_require__(83101);
 const errors = __nccwpck_require__(37633);
 
+// Cap the CONNECT response we buffer before the header terminator, so a proxy that
+// never sends \r\n\r\n cannot grow memory unboundedly before the socket times out.
+const MAX_RESPONSE_HEADER_BYTES = 64 * 1024;
+
 /**
  * Establishes proxied connection to destinationPort
  *
@@ -92999,6 +93693,16 @@ function httpProxyClient(proxyUrl, destinationPort, destinationHost, tlsOptions,
         tlsOptions = {};
     }
     tlsOptions = tlsOptions || {};
+
+    // Reject CRLF in the destination before it reaches the CONNECT request line
+    // and Host header. A tainted host/port could otherwise inject additional
+    // request headers into the proxy connection (HTTP request splitting).
+    destinationPort = Number(destinationPort) || 0;
+    if (!destinationPort || /[\r\n]/.test(destinationHost)) {
+        const err = new Error('Invalid proxy destination');
+        err.code = errors.EPROXY;
+        return setImmediate(() => callback(err));
+    }
 
     const proxy = urllib.parse(proxyUrl);
 
@@ -93110,6 +93814,13 @@ function httpProxyClient(proxyUrl, destinationPort, destinationHost, tlsOptions,
                 socket.setTimeout(0);
 
                 return callback(null, socket);
+            }
+
+            if (headers.length > MAX_RESPONSE_HEADER_BYTES) {
+                socket.removeListener('data', onSocketData);
+                const err = new Error('Proxy response headers too large');
+                err.code = errors.EPROXY;
+                return tempSocketErr(err);
             }
         };
         socket.on('data', onSocketData);
@@ -93430,6 +94141,20 @@ class SMTPConnection extends EventEmitter {
                 try {
                     this._socket.connect(this.port, this.host, () => {
                         this._socket.setKeepAlive(true);
+
+                        // a `secure` connection over a caller-provided socket must still
+                        // perform the TLS handshake, otherwise AUTH and the message body
+                        // would be sent in cleartext despite the caller requesting TLS
+                        if (this.secureConnection && !this.alreadySecured) {
+                            return this._upgradeConnection(err => {
+                                if (err) {
+                                    this._onError(new Error('Error initiating TLS - ' + (err.message || err)), 'ETLS', false, 'CONN');
+                                    return;
+                                }
+                                this._onConnect();
+                            });
+                        }
+
                         this._onConnect();
                     });
                     this._setupConnectionHandlers();
@@ -93497,6 +94222,14 @@ class SMTPConnection extends EventEmitter {
      * @param {Boolean} secure Whether to use TLS
      */
     _connectToHost(opts, secure) {
+        // If the client was closed while DNS resolution was in flight, do not open
+        // a socket here: close() ran with this._socket still unset and so had
+        // nothing to tear down, and _onConnect's remedial close() is a no-op once
+        // _closing is set — the freshly connected socket would leak.
+        if (this._destroyed || this._closing) {
+            return;
+        }
+
         this._connectionAttemptId++;
         const currentAttemptId = this._connectionAttemptId;
 
@@ -93563,6 +94296,9 @@ class SMTPConnection extends EventEmitter {
         if (this._socket) {
             try {
                 this._socket.removeListener('error', this._onConnectionSocketError);
+                // Absorb any late teardown error (e.g. a TLS fallback socket emitting
+                // after destroy), mirroring the guard used in close()
+                this._socket.on('error', TEARDOWN_NOOP);
                 this._socket.destroy();
             } catch (_E) {
                 // ignore
@@ -93889,6 +94625,11 @@ class SMTPConnection extends EventEmitter {
      * @param {Function} callback Callback to return once connection is reset
      */
     reset(callback) {
+        const isDestroyedMessage = this._isDestroyedMessage('reset');
+        if (isDestroyedMessage) {
+            return callback(this._formatError(isDestroyedMessage, 'ECONNECTION', false, 'API'));
+        }
+
         this._sendCommand('RSET');
         this._responseActions.push(str => {
             if (str.charAt(0) !== '2') {
@@ -93937,6 +94678,9 @@ class SMTPConnection extends EventEmitter {
         this._socket.removeListener('end', this._onSocketEnd);
         // Switch from connection-phase error handler to normal error handler
         this._socket.removeListener('error', this._onConnectionSocketError);
+        // _upgradeConnection (options.connection + secure) may already have attached
+        // the normal handler; remove it first so we never end up with a duplicate
+        this._socket.removeListener('error', this._onSocketError);
 
         this._socket.on('error', this._onSocketError);
         this._socket.on('data', this._onSocketData);
@@ -94126,6 +94870,8 @@ class SMTPConnection extends EventEmitter {
             return;
         }
         this._destroyed = true;
+        // keep the documented public flag in sync with the private state
+        this.destroyed = true;
         this.emit('end');
     }
 
@@ -94136,6 +94882,15 @@ class SMTPConnection extends EventEmitter {
      *        has been secured
      */
     _upgradeConnection(callback) {
+        // RFC 3207 section 6: the client MUST discard any knowledge obtained from
+        // the server that was not received over the TLS-protected session. Drop any
+        // buffered input received before the handshake so a man-in-the-middle cannot
+        // inject plaintext bytes after the "220" reply (e.g. a CRLF-free fragment that
+        // would otherwise be prepended to the first post-TLS response and parsed as
+        // part of the secured EHLO capabilities). STARTTLS response injection.
+        this._remainder = '';
+        this._responseQueue = [];
+
         // do not remove all listeners or it breaks node v0.10 as there's
         // apparently a 'finish' event set that would be cleared as well
 
@@ -94164,6 +94919,9 @@ class SMTPConnection extends EventEmitter {
             socketPlain.removeListener('close', this._onSocketClose);
             socketPlain.removeListener('end', this._onSocketEnd);
             socketPlain.removeListener('error', this._onSocketError);
+            // the connection-phase handler is attached when upgrading a pre-opened
+            // options.connection socket; strip it so nothing lingers on the plain socket
+            socketPlain.removeListener('error', this._onConnectionSocketError);
         };
 
         this.upgrading = true;
@@ -94196,18 +94954,27 @@ class SMTPConnection extends EventEmitter {
 
     /**
      * Processes queued responses from the server
-     *
-     * @param {Boolean} force If true, ignores _processing flag
      */
     _processResponse() {
         if (!this._responseQueue.length) {
             return false;
         }
 
-        let str = (this.lastServerResponse = decodeServerResponse((this._responseQueue.shift() || '').toString()));
+        const raw = (this._responseQueue.shift() || '').toString();
+
+        // Skip unexpected empty lines without consuming a response action or
+        // overwriting lastServerResponse; reprocess whatever else is queued.
+        if (!raw.trim()) {
+            setImmediate(() => this._processResponse());
+            return;
+        }
+
+        let str = (this.lastServerResponse = decodeServerResponse(raw));
 
         if (/^\d+-/.test(str.split('\n').pop())) {
-            // keep waiting for the final part of multiline response
+            // last line is still a continuation: put the partial response back on the
+            // queue and wait for the rest rather than dropping it
+            this._responseQueue.unshift(raw);
             return;
         }
 
@@ -94218,11 +94985,6 @@ class SMTPConnection extends EventEmitter {
                 },
                 str.replace(/\r?\n$/, '')
             );
-        }
-
-        if (!str.trim()) {
-            // skip unexpected empty lines
-            setImmediate(() => this._processResponse());
         }
 
         const action = this._responseActions.shift();
@@ -94321,6 +95083,23 @@ class SMTPConnection extends EventEmitter {
             }
         }
 
+        // RFC 8689: validate REQUIRETLS eligibility before queuing the MAIL FROM
+        // response action, so a rejection here cannot leave an orphaned action in
+        // _responseActions (which would consume the next reply and desync a reused
+        // connection).
+        if (this._envelope.requireTLSExtensionEnabled) {
+            if (!this.secure) {
+                return callback(
+                    this._formatError('REQUIRETLS can only be used over TLS connections (RFC 8689)', 'EREQUIRETLS', false, 'MAIL FROM')
+                );
+            }
+            if (!this._supportedExtensions.includes('REQUIRETLS')) {
+                return callback(
+                    this._formatError('Server does not support REQUIRETLS extension (RFC 8689)', 'EREQUIRETLS', false, 'MAIL FROM')
+                );
+            }
+        }
+
         this._responseActions.push(str => {
             this._actionMAIL(str, callback);
         });
@@ -94357,20 +95136,10 @@ class SMTPConnection extends EventEmitter {
             }
         }
 
-        // RFC 8689: If the envelope requests REQUIRETLS extension
-        // then append REQUIRETLS keyword to the MAIL FROM command
-        // Note: REQUIRETLS can only be used over TLS connections and requires server support
+        // RFC 8689: append the REQUIRETLS keyword to MAIL FROM. Eligibility
+        // (TLS connection + server support) was already validated above, before
+        // the response action was queued.
         if (this._envelope.requireTLSExtensionEnabled) {
-            if (!this.secure) {
-                return callback(
-                    this._formatError('REQUIRETLS can only be used over TLS connections (RFC 8689)', 'EREQUIRETLS', false, 'MAIL FROM')
-                );
-            }
-            if (!this._supportedExtensions.includes('REQUIRETLS')) {
-                return callback(
-                    this._formatError('Server does not support REQUIRETLS extension (RFC 8689)', 'EREQUIRETLS', false, 'MAIL FROM')
-                );
-            }
             args.push('REQUIRETLS');
         }
 
@@ -96491,7 +97260,7 @@ class StreamTransport {
         // We probably need this in the output
         mail.message.keepBcc = true;
 
-        const envelope = mail.data.envelope || mail.message.getEnvelope();
+        const envelope = mail.message.getEnvelope();
         const messageId = mail.message.messageId();
 
         const recipients = [].concat(envelope.to || []);
@@ -130850,7 +131619,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"application/1d-interleaved-parityfec
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"126":{"description":"126 Mail (NetEase)","host":"smtp.126.com","port":465,"secure":true},"163":{"description":"163 Mail (NetEase)","host":"smtp.163.com","port":465,"secure":true},"1und1":{"description":"1&1 Mail (German hosting provider)","host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"Aliyun":{"description":"Alibaba Cloud Mail","domains":["aliyun.com"],"host":"smtp.aliyun.com","port":465,"secure":true},"AliyunQiye":{"description":"Alibaba Cloud Enterprise Mail","host":"smtp.qiye.aliyun.com","port":465,"secure":true},"AOL":{"description":"AOL Mail","domains":["aol.com"],"host":"smtp.aol.com","port":587},"Aruba":{"description":"Aruba PEC (Italian email provider)","domains":["aruba.it","pec.aruba.it"],"aliases":["Aruba PEC"],"host":"smtps.aruba.it","port":465,"secure":true,"authMethod":"LOGIN"},"Bluewin":{"description":"Bluewin (Swiss email provider)","host":"smtpauths.bluewin.ch","domains":["bluewin.ch"],"port":465},"BOL":{"description":"BOL Mail (Brazilian provider)","domains":["bol.com.br"],"host":"smtp.bol.com.br","port":587,"requireTLS":true},"DebugMail":{"description":"DebugMail (email testing service)","host":"debugmail.io","port":25},"Disroot":{"description":"Disroot (privacy-focused provider)","domains":["disroot.org"],"host":"disroot.org","port":587,"secure":false,"authMethod":"LOGIN"},"DynectEmail":{"description":"Dyn Email Delivery","aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"ElasticEmail":{"description":"Elastic Email","aliases":["Elastic Email"],"host":"smtp.elasticemail.com","port":465,"secure":true},"Ethereal":{"description":"Ethereal Email (email testing service)","aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"description":"FastMail","domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"Feishu Mail":{"description":"Feishu Mail (Lark)","aliases":["Feishu","FeishuMail"],"domains":["www.feishu.cn"],"host":"smtp.feishu.cn","port":465,"secure":true},"Forward Email":{"description":"Forward Email (email forwarding service)","aliases":["FE","ForwardEmail"],"domains":["forwardemail.net"],"host":"smtp.forwardemail.net","port":465,"secure":true},"GandiMail":{"description":"Gandi Mail","aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"description":"Gmail","aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"GmailWorkspace":{"description":"Gmail Workspace","aliases":["Google Workspace Mail"],"host":"smtp-relay.gmail.com","port":465,"secure":true},"GMX":{"description":"GMX Mail","domains":["gmx.com","gmx.net","gmx.de"],"host":"mail.gmx.com","port":587},"Godaddy":{"description":"GoDaddy Email (US)","host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"description":"GoDaddy Email (Asia)","host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"description":"GoDaddy Email (Europe)","host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"description":"Hot.ee (Estonian email provider)","host":"mail.hot.ee"},"Hotmail":{"description":"Outlook.com / Hotmail","aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"description":"iCloud Mail","aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"description":"Infomaniak Mail (Swiss hosting provider)","host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"KolabNow":{"description":"KolabNow (secure email service)","domains":["kolabnow.com"],"aliases":["Kolab"],"host":"smtp.kolabnow.com","port":465,"secure":true,"authMethod":"LOGIN"},"Loopia":{"description":"Loopia (Swedish hosting provider)","host":"mailcluster.loopia.se","port":465},"Loops":{"description":"Loops","host":"smtp.loops.so","port":587},"mail.ee":{"description":"Mail.ee (Estonian email provider)","host":"smtp.mail.ee"},"Mail.ru":{"description":"Mail.ru","host":"smtp.mail.ru","port":465,"secure":true},"Mailcatch.app":{"description":"Mailcatch (email testing service)","host":"sandbox-smtp.mailcatch.app","port":2525},"Maildev":{"description":"MailDev (local email testing)","port":1025,"ignoreTLS":true},"MailerSend":{"description":"MailerSend","host":"smtp.mailersend.net","port":587},"Mailgun":{"description":"Mailgun","host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"description":"Mailjet","host":"in.mailjet.com","port":587},"Mailosaur":{"description":"Mailosaur (email testing service)","host":"mailosaur.io","port":25},"Mailtrap":{"description":"Mailtrap","host":"live.smtp.mailtrap.io","port":587},"Mandrill":{"description":"Mandrill (by Mailchimp)","host":"smtp.mandrillapp.com","port":587},"Naver":{"description":"Naver Mail (Korean email provider)","host":"smtp.naver.com","port":587},"OhMySMTP":{"description":"OhMySMTP (email delivery service)","host":"smtp.ohmysmtp.com","port":587,"secure":false},"One":{"description":"One.com Email","host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"description":"OpenMailBox","aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"description":"Microsoft 365 / Office 365","host":"smtp.office365.com","port":587,"secure":false},"Postmark":{"description":"Postmark","aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"Proton":{"description":"Proton Mail","aliases":["ProtonMail","Proton.me","Protonmail.com","Protonmail.ch"],"domains":["proton.me","protonmail.com","pm.me","protonmail.ch"],"host":"smtp.protonmail.ch","port":587,"requireTLS":true},"qiye.aliyun":{"description":"Alibaba Mail Enterprise Edition","host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"description":"QQ Mail","domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"description":"QQ Enterprise Mail","aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"Resend":{"description":"Resend","host":"smtp.resend.com","port":465,"secure":true},"Runbox":{"description":"Runbox (Norwegian email provider)","domains":["runbox.com"],"host":"smtp.runbox.com","port":465,"secure":true},"SendCloud":{"description":"SendCloud (Chinese email delivery)","host":"smtp.sendcloud.net","port":2525},"SendGrid":{"description":"SendGrid","host":"smtp.sendgrid.net","port":587},"SendinBlue":{"description":"Brevo (formerly Sendinblue)","aliases":["Brevo"],"host":"smtp-relay.brevo.com","port":587},"SendPulse":{"description":"SendPulse","host":"smtp-pulse.com","port":465,"secure":true},"SES":{"description":"AWS SES US East (N. Virginia)","host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-1":{"description":"AWS SES Asia Pacific (Tokyo)","host":"email-smtp.ap-northeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-2":{"description":"AWS SES Asia Pacific (Seoul)","host":"email-smtp.ap-northeast-2.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-3":{"description":"AWS SES Asia Pacific (Osaka)","host":"email-smtp.ap-northeast-3.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTH-1":{"description":"AWS SES Asia Pacific (Mumbai)","host":"email-smtp.ap-south-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-1":{"description":"AWS SES Asia Pacific (Singapore)","host":"email-smtp.ap-southeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-2":{"description":"AWS SES Asia Pacific (Sydney)","host":"email-smtp.ap-southeast-2.amazonaws.com","port":465,"secure":true},"SES-CA-CENTRAL-1":{"description":"AWS SES Canada (Central)","host":"email-smtp.ca-central-1.amazonaws.com","port":465,"secure":true},"SES-EU-CENTRAL-1":{"description":"AWS SES Europe (Frankfurt)","host":"email-smtp.eu-central-1.amazonaws.com","port":465,"secure":true},"SES-EU-NORTH-1":{"description":"AWS SES Europe (Stockholm)","host":"email-smtp.eu-north-1.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"description":"AWS SES Europe (Ireland)","host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-2":{"description":"AWS SES Europe (London)","host":"email-smtp.eu-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-3":{"description":"AWS SES Europe (Paris)","host":"email-smtp.eu-west-3.amazonaws.com","port":465,"secure":true},"SES-SA-EAST-1":{"description":"AWS SES South America (São Paulo)","host":"email-smtp.sa-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"description":"AWS SES US East (N. Virginia)","host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-2":{"description":"AWS SES US East (Ohio)","host":"email-smtp.us-east-2.amazonaws.com","port":465,"secure":true},"SES-US-GOV-EAST-1":{"description":"AWS SES GovCloud (US-East)","host":"email-smtp.us-gov-east-1.amazonaws.com","port":465,"secure":true},"SES-US-GOV-WEST-1":{"description":"AWS SES GovCloud (US-West)","host":"email-smtp.us-gov-west-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-1":{"description":"AWS SES US West (N. California)","host":"email-smtp.us-west-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"description":"AWS SES US West (Oregon)","host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"Seznam":{"description":"Seznam Email (Czech email provider)","aliases":["Seznam Email"],"domains":["seznam.cz","email.cz","post.cz","spoluzaci.cz"],"host":"smtp.seznam.cz","port":465,"secure":true},"SMTP2GO":{"description":"SMTP2GO","host":"mail.smtp2go.com","port":2525},"Sparkpost":{"description":"SparkPost","aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"description":"Tipimail (email delivery service)","host":"smtp.tipimail.com","port":587},"Tutanota":{"description":"Tutanota (Tuta Mail)","domains":["tutanota.com","tuta.com","tutanota.de","tuta.io"],"host":"smtp.tutanota.com","port":465,"secure":true},"Yahoo":{"description":"Yahoo Mail","domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"description":"Yandex Mail","domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zimbra":{"description":"Zimbra Mail Server","aliases":["Zimbra Collaboration"],"host":"smtp.zimbra.com","port":587,"requireTLS":true},"Zoho":{"description":"Zoho Mail","host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"126":{"description":"126 Mail (NetEase)","host":"smtp.126.com","port":465,"secure":true},"163":{"description":"163 Mail (NetEase)","host":"smtp.163.com","port":465,"secure":true},"1und1":{"description":"1&1 Mail (German hosting provider)","host":"smtp.1und1.de","port":465,"secure":true,"authMethod":"LOGIN"},"Aliyun":{"description":"Alibaba Cloud Mail","domains":["aliyun.com"],"host":"smtp.aliyun.com","port":465,"secure":true},"AliyunQiye":{"description":"Alibaba Cloud Enterprise Mail","host":"smtp.qiye.aliyun.com","port":465,"secure":true},"AOL":{"description":"AOL Mail","domains":["aol.com"],"host":"smtp.aol.com","port":587},"Aruba":{"description":"Aruba PEC (Italian email provider)","domains":["aruba.it","pec.aruba.it"],"aliases":["Aruba PEC"],"host":"smtps.aruba.it","port":465,"secure":true,"authMethod":"LOGIN"},"Bluewin":{"description":"Bluewin (Swiss email provider)","host":"smtpauths.bluewin.ch","domains":["bluewin.ch"],"port":465},"BOL":{"description":"BOL Mail (Brazilian provider)","domains":["bol.com.br"],"host":"smtp.bol.com.br","port":587,"requireTLS":true},"DebugMail":{"description":"DebugMail (email testing service)","host":"debugmail.io","port":25},"Disroot":{"description":"Disroot (privacy-focused provider)","domains":["disroot.org"],"host":"disroot.org","port":587,"secure":false,"authMethod":"LOGIN"},"DynectEmail":{"description":"Dyn Email Delivery","aliases":["Dynect"],"host":"smtp.dynect.net","port":25},"ElasticEmail":{"description":"Elastic Email","aliases":["Elastic Email"],"host":"smtp.elasticemail.com","port":465,"secure":true},"Ethereal":{"description":"Ethereal Email (email testing service)","aliases":["ethereal.email"],"host":"smtp.ethereal.email","port":587},"FastMail":{"description":"FastMail","domains":["fastmail.fm"],"host":"smtp.fastmail.com","port":465,"secure":true},"Feishu Mail":{"description":"Feishu Mail (Lark)","aliases":["Feishu","FeishuMail"],"domains":["www.feishu.cn"],"host":"smtp.feishu.cn","port":465,"secure":true},"Forward Email":{"description":"Forward Email (email forwarding service)","aliases":["FE","ForwardEmail"],"domains":["forwardemail.net"],"host":"smtp.forwardemail.net","port":465,"secure":true},"GandiMail":{"description":"Gandi Mail","aliases":["Gandi","Gandi Mail"],"host":"mail.gandi.net","port":587},"Gmail":{"description":"Gmail","aliases":["Google Mail"],"domains":["gmail.com","googlemail.com"],"host":"smtp.gmail.com","port":465,"secure":true},"GmailWorkspace":{"description":"Gmail Workspace","aliases":["Google Workspace Mail"],"host":"smtp-relay.gmail.com","port":465,"secure":true},"GMX":{"description":"GMX Mail","domains":["gmx.com","gmx.net","gmx.de"],"host":"mail.gmx.com","port":587},"Godaddy":{"description":"GoDaddy Email (US)","host":"smtpout.secureserver.net","port":25},"GodaddyAsia":{"description":"GoDaddy Email (Asia)","host":"smtp.asia.secureserver.net","port":25},"GodaddyEurope":{"description":"GoDaddy Email (Europe)","host":"smtp.europe.secureserver.net","port":25},"hot.ee":{"description":"Hot.ee (Estonian email provider)","host":"mail.hot.ee"},"Hotmail":{"description":"Outlook.com / Hotmail","aliases":["Outlook","Outlook.com","Hotmail.com"],"domains":["hotmail.com","outlook.com"],"host":"smtp-mail.outlook.com","port":587},"iCloud":{"description":"iCloud Mail","aliases":["Me","Mac"],"domains":["me.com","mac.com"],"host":"smtp.mail.me.com","port":587},"Infomaniak":{"description":"Infomaniak Mail (Swiss hosting provider)","host":"mail.infomaniak.com","domains":["ik.me","ikmail.com","etik.com"],"port":587},"KolabNow":{"description":"KolabNow (secure email service)","domains":["kolabnow.com"],"aliases":["Kolab"],"host":"smtp.kolabnow.com","port":465,"secure":true,"authMethod":"LOGIN"},"Loopia":{"description":"Loopia (Swedish hosting provider)","host":"mailcluster.loopia.se","port":465},"Loops":{"description":"Loops","host":"smtp.loops.so","port":587},"mail.ee":{"description":"Mail.ee (Estonian email provider)","host":"smtp.mail.ee"},"Mail.ru":{"description":"Mail.ru","host":"smtp.mail.ru","port":465,"secure":true},"Mailcatch.app":{"description":"Mailcatch (email testing service)","host":"sandbox-smtp.mailcatch.app","port":2525},"Maildev":{"description":"MailDev (local email testing)","port":1025,"ignoreTLS":true},"MailerSend":{"description":"MailerSend","host":"smtp.mailersend.net","port":587},"Mailgun":{"description":"Mailgun","host":"smtp.mailgun.org","port":465,"secure":true},"Mailjet":{"description":"Mailjet","host":"in.mailjet.com","port":587},"Mailosaur":{"description":"Mailosaur (email testing service)","host":"mailosaur.io","port":25},"Mailtrap":{"description":"Mailtrap","host":"live.smtp.mailtrap.io","port":587},"Mandrill":{"description":"Mandrill (by Mailchimp)","host":"smtp.mandrillapp.com","port":587},"Naver":{"description":"Naver Mail (Korean email provider)","host":"smtp.naver.com","port":587},"OhMySMTP":{"description":"OhMySMTP (email delivery service)","host":"smtp.ohmysmtp.com","port":587,"secure":false},"One":{"description":"One.com Email","host":"send.one.com","port":465,"secure":true},"OpenMailBox":{"description":"OpenMailBox","aliases":["OMB","openmailbox.org"],"host":"smtp.openmailbox.org","port":465,"secure":true},"Outlook365":{"description":"Microsoft 365 / Office 365","host":"smtp.office365.com","port":587,"secure":false},"Postmark":{"description":"Postmark","aliases":["PostmarkApp"],"host":"smtp.postmarkapp.com","port":2525},"Proton":{"description":"Proton Mail","aliases":["ProtonMail","Proton.me","Protonmail.com","Protonmail.ch"],"domains":["proton.me","protonmail.com","pm.me","protonmail.ch"],"host":"smtp.protonmail.ch","port":587,"requireTLS":true},"qiye.aliyun":{"description":"Alibaba Mail Enterprise Edition","host":"smtp.mxhichina.com","port":"465","secure":true},"QQ":{"description":"QQ Mail","domains":["qq.com"],"host":"smtp.qq.com","port":465,"secure":true},"QQex":{"description":"QQ Enterprise Mail","aliases":["QQ Enterprise"],"domains":["exmail.qq.com"],"host":"smtp.exmail.qq.com","port":465,"secure":true},"Resend":{"description":"Resend","host":"smtp.resend.com","port":465,"secure":true},"Runbox":{"description":"Runbox (Norwegian email provider)","domains":["runbox.com"],"host":"smtp.runbox.com","port":465,"secure":true},"SendCloud":{"description":"SendCloud (Chinese email delivery)","host":"smtp.sendcloud.net","port":2525},"SendGrid":{"description":"SendGrid","host":"smtp.sendgrid.net","port":587},"SendinBlue":{"description":"Brevo (formerly Sendinblue)","aliases":["Brevo"],"host":"smtp-relay.brevo.com","port":587},"SendPulse":{"description":"SendPulse","host":"smtp-pulse.com","port":465,"secure":true},"SES":{"description":"AWS SES US East (N. Virginia)","host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-1":{"description":"AWS SES Asia Pacific (Tokyo)","host":"email-smtp.ap-northeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-2":{"description":"AWS SES Asia Pacific (Seoul)","host":"email-smtp.ap-northeast-2.amazonaws.com","port":465,"secure":true},"SES-AP-NORTHEAST-3":{"description":"AWS SES Asia Pacific (Osaka)","host":"email-smtp.ap-northeast-3.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTH-1":{"description":"AWS SES Asia Pacific (Mumbai)","host":"email-smtp.ap-south-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-1":{"description":"AWS SES Asia Pacific (Singapore)","host":"email-smtp.ap-southeast-1.amazonaws.com","port":465,"secure":true},"SES-AP-SOUTHEAST-2":{"description":"AWS SES Asia Pacific (Sydney)","host":"email-smtp.ap-southeast-2.amazonaws.com","port":465,"secure":true},"SES-CA-CENTRAL-1":{"description":"AWS SES Canada (Central)","host":"email-smtp.ca-central-1.amazonaws.com","port":465,"secure":true},"SES-EU-CENTRAL-1":{"description":"AWS SES Europe (Frankfurt)","host":"email-smtp.eu-central-1.amazonaws.com","port":465,"secure":true},"SES-EU-NORTH-1":{"description":"AWS SES Europe (Stockholm)","host":"email-smtp.eu-north-1.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-1":{"description":"AWS SES Europe (Ireland)","host":"email-smtp.eu-west-1.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-2":{"description":"AWS SES Europe (London)","host":"email-smtp.eu-west-2.amazonaws.com","port":465,"secure":true},"SES-EU-WEST-3":{"description":"AWS SES Europe (Paris)","host":"email-smtp.eu-west-3.amazonaws.com","port":465,"secure":true},"SES-SA-EAST-1":{"description":"AWS SES South America (São Paulo)","host":"email-smtp.sa-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-1":{"description":"AWS SES US East (N. Virginia)","host":"email-smtp.us-east-1.amazonaws.com","port":465,"secure":true},"SES-US-EAST-2":{"description":"AWS SES US East (Ohio)","host":"email-smtp.us-east-2.amazonaws.com","port":465,"secure":true},"SES-US-GOV-EAST-1":{"description":"AWS SES GovCloud (US-East)","host":"email-smtp.us-gov-east-1.amazonaws.com","port":465,"secure":true},"SES-US-GOV-WEST-1":{"description":"AWS SES GovCloud (US-West)","host":"email-smtp.us-gov-west-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-1":{"description":"AWS SES US West (N. California)","host":"email-smtp.us-west-1.amazonaws.com","port":465,"secure":true},"SES-US-WEST-2":{"description":"AWS SES US West (Oregon)","host":"email-smtp.us-west-2.amazonaws.com","port":465,"secure":true},"Seznam":{"description":"Seznam Email (Czech email provider)","aliases":["Seznam Email"],"domains":["seznam.cz","email.cz","post.cz","spoluzaci.cz"],"host":"smtp.seznam.cz","port":465,"secure":true},"SMTP2GO":{"description":"SMTP2GO","host":"mail.smtp2go.com","port":2525},"Sparkpost":{"description":"SparkPost","aliases":["SparkPost","SparkPost Mail"],"domains":["sparkpost.com"],"host":"smtp.sparkpostmail.com","port":587,"secure":false},"Tipimail":{"description":"Tipimail (email delivery service)","host":"smtp.tipimail.com","port":587},"TurboSMTP":{"description":"TurboSMTP","host":"pro.turbo-smtp.com","port":465,"secure":true},"TurboSMTP-EU":{"description":"TurboSMTP (EU region)","host":"pro.eu.turbo-smtp.com","port":465,"secure":true},"Tutanota":{"description":"Tutanota (Tuta Mail)","domains":["tutanota.com","tuta.com","tutanota.de","tuta.io"],"host":"smtp.tutanota.com","port":465,"secure":true},"Yahoo":{"description":"Yahoo Mail","domains":["yahoo.com"],"host":"smtp.mail.yahoo.com","port":465,"secure":true},"Yandex":{"description":"Yandex Mail","domains":["yandex.ru"],"host":"smtp.yandex.ru","port":465,"secure":true},"Zimbra":{"description":"Zimbra Mail Server","aliases":["Zimbra Collaboration"],"host":"smtp.zimbra.com","port":587,"requireTLS":true},"Zoho":{"description":"Zoho Mail","host":"smtp.zoho.com","port":465,"secure":true,"authMethod":"LOGIN"}}');
 
 /***/ }),
 
@@ -130858,7 +131627,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"126":{"description":"126 Mail (NetEa
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"nodemailer","version":"9.0.1","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","test:coverage":"c8 node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","format":"prettier --write \\"**/*.{js,json,md}\\"","format:check":"prettier --check \\"**/*.{js,json,md}\\"","lint":"eslint .","lint:fix":"eslint . --fix","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install","test:syntax":"docker run --rm -v \\"$PWD:/app:ro\\" -w /app node:6-alpine node test/syntax-compat.js"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-sesv2":"3.1068.0","bunyan":"1.8.15","c8":"11.0.0","eslint":"10.5.0","eslint-config-prettier":"10.1.8","globals":"17.6.0","libbase64":"1.3.0","libmime":"5.3.8","libqp":"2.1.1","prettier":"3.8.4","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.19.0"},"engines":{"node":">=6.0.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"nodemailer","version":"9.1.0","description":"Easy as cake e-mail sending from your Node.js applications","main":"lib/nodemailer.js","scripts":{"test":"node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","test:coverage":"c8 node --test --test-concurrency=1 $(find test \\\\( -name \'*-test.js\' -o -name \'*.test.js\' \\\\))","format":"prettier --write \\"**/*.{js,json,md}\\"","format:check":"prettier --check \\"**/*.{js,json,md}\\"","lint":"eslint .","lint:fix":"eslint . --fix","update":"rm -rf node_modules/ package-lock.json && ncu -u && npm install","test:syntax":"docker run --rm -v \\"$PWD:/app:ro\\" -w /app node:6-alpine node test/syntax-compat.js"},"repository":{"type":"git","url":"https://github.com/nodemailer/nodemailer.git"},"keywords":["Nodemailer"],"author":"Andris Reinman","license":"MIT-0","bugs":{"url":"https://github.com/nodemailer/nodemailer/issues"},"homepage":"https://nodemailer.com/","devDependencies":{"@aws-sdk/client-sesv2":"3.1121.0","bunyan":"1.8.15","c8":"12.0.0","eslint":"10.9.1","eslint-config-prettier":"10.1.8","globals":"17.11.0","libbase64":"1.3.0","libmime":"5.4.2","libqp":"2.1.1","prettier":"3.9.6","proxy":"1.0.2","proxy-test-server":"1.0.0","smtp-server":"3.19.4"},"engines":{"node":">=6.0.0"}}');
 
 /***/ }),
 

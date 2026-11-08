@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.6](https://github.com/kunalnagarco/action-cve/compare/v1.17.5...v1.17.6) (2026-11-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency nodemailer to v10 [security] ([#230](https://github.com/kunalnagarco/action-cve/issues/230)) ([bbc86e8](https://github.com/kunalnagarco/action-cve/commit/bbc86e86c411262f9ec1f93e2d62d1d28400592a))
+
 ## [1.17.5](https://github.com/kunalnagarco/action-cve/compare/v1.17.4...v1.17.5) (2026-09-10)
 
 

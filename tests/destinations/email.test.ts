@@ -8,16 +8,21 @@ import { sendAlertsToEmailSes, sendAlertsToEmailSmtp } from '../../src/destinati
 const mockSendMail = vi.fn().mockResolvedValue(undefined)
 const mockCreateTransport = vi.fn().mockReturnValue({ sendMail: mockSendMail })
 const mockSESClient = vi.fn()
+const { mockSESClientInstance, MockSendEmailCommand } = vi.hoisted(() => ({
+  mockSESClientInstance: { send: vi.fn() },
+  MockSendEmailCommand: vi.fn(),
+}))
 
 vi.mock('nodemailer', () => ({
   createTransport: (...args: unknown[]) => mockCreateTransport(...args),
 }))
 
-vi.mock('@aws-sdk/client-ses', () => ({
-  SESClient: function (...args: unknown[]) {
-    return mockSESClient(...args)
+vi.mock('@aws-sdk/client-sesv2', () => ({
+  SESv2Client: function (...args: unknown[]) {
+    mockSESClient(...args)
+    return mockSESClientInstance
   },
-  SendRawEmailCommand: vi.fn(),
+  SendEmailCommand: MockSendEmailCommand,
 }))
 
 const mockAlert: Alert = {
@@ -52,7 +57,7 @@ describe('sendAlertsToEmailSes', () => {
     mockSESClient.mockClear()
   })
 
-  it('creates an SESClient with the provided credentials', async () => {
+  it('creates an SESv2Client with the provided credentials', async () => {
     await sendAlertsToEmailSes('us-east-1', 'KEY_ID', 'SECRET', [mockAlert], 'to@example.com', 'from@example.com')
     expect(mockSESClient).toHaveBeenCalledWith({
       region: 'us-east-1',
@@ -60,11 +65,11 @@ describe('sendAlertsToEmailSes', () => {
     })
   })
 
-  it('creates a transport with the SES client', async () => {
+  it('creates a transport with the SESv2 client and SendEmailCommand', async () => {
     await sendAlertsToEmailSes('us-east-1', 'KEY_ID', 'SECRET', [mockAlert], 'to@example.com', 'from@example.com')
-    expect(mockCreateTransport).toHaveBeenCalledWith(
-      expect.objectContaining({ SES: expect.objectContaining({ aws: expect.anything() }) }),
-    )
+    expect(mockCreateTransport).toHaveBeenCalledWith({
+      SES: { sesClient: mockSESClientInstance, SendEmailCommand: MockSendEmailCommand },
+    })
   })
 
   it('sends mail with the correct from and bcc fields', async () => {

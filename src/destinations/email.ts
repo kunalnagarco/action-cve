@@ -1,4 +1,4 @@
-import { SESClient, SendRawEmailCommand } from '@aws-sdk/client-ses'
+import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2'
 import { createTransport } from 'nodemailer'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
@@ -55,12 +55,12 @@ export const sendAlertsToEmailSes = async (
   emailFrom: string,
   subject?: string,
 ): Promise<void> => {
-  const ses = new SESClient({
+  const sesClient = new SESv2Client({
     region,
     credentials: { accessKeyId, secretAccessKey },
   })
   const transporter = createTransport({
-    SES: { ses, aws: { SendRawEmailCommand } },
+    SES: { sesClient, SendEmailCommand },
   })
   await transporter.sendMail({
     from: emailFrom,
